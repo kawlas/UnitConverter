@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet";
 import SearchBar from "@/components/SearchBar";
 import ConversionCategories from "@/components/ConversionCategories";
 import AdCard from "@/components/AdCard";
+import Footer from "@/components/Footer";
 
 interface HomeProps {
   initialSearchTerm?: string;
@@ -17,6 +18,36 @@ const Home: React.FC<HomeProps> = ({ initialSearchTerm = "" }) => {
   };
 
   const defaultCategories = [
+    {
+      id: "power",
+      title: "Power",
+      units: [
+        { value: "watts", label: "Watts" },
+        { value: "kilowatts", label: "Kilowatts" },
+        { value: "horsepower", label: "Horsepower" },
+        { value: "btu_per_hour", label: "BTU/hour" },
+      ],
+    },
+    {
+      id: "energy",
+      title: "Energy",
+      units: [
+        { value: "joules", label: "Joules" },
+        { value: "kilowatt_hours", label: "Kilowatt Hours" },
+        { value: "calories", label: "Calories" },
+        { value: "btu", label: "BTU" },
+      ],
+    },
+    {
+      id: "speed",
+      title: "Speed",
+      units: [
+        { value: "mph", label: "Miles per Hour" },
+        { value: "kph", label: "Kilometers per Hour" },
+        { value: "mps", label: "Meters per Second" },
+        { value: "knots", label: "Knots" },
+      ],
+    },
     {
       id: "length",
       title: "Length",
@@ -100,26 +131,87 @@ const Home: React.FC<HomeProps> = ({ initialSearchTerm = "" }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#ffffff" />
       </Helmet>
-      <div className="min-h-screen bg-gray-100 py-8 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-8">
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+        <div className="max-w-7xl mx-auto space-y-8">
           <div className="space-y-8">
-            <div className="text-center space-y-4">
-              <h1 className="text-3xl font-bold text-gray-900">
-                Measurement Converter
-              </h1>
-              <p className="text-gray-600">
-                Convert between different units of measurement quickly and
-                easily
-              </p>
+            <div className="text-center space-y-6 max-w-3xl mx-auto">
+              <div className="space-y-4">
+                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                  Unit Converter
+                </h1>
+                <h2 className="text-2xl md:text-3xl font-semibold text-gray-700">
+                  Free Online Measurement Conversion Tool
+                </h2>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Quick and accurate conversions for power, energy, speed,
+                  length, weight, temperature, volume, and area measurements
+                </p>
+              </div>
+              <div className="flex justify-center gap-4 text-sm text-gray-500">
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                  Instant Results
+                </span>
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  High Precision
+                </span>
+                <span className="flex items-center gap-2">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  Real-time Updates
+                </span>
+              </div>
             </div>
             <SearchBar onSearch={handleSearch} />
             <ConversionCategories categories={filteredCategories} />
           </div>
-          <aside className="hidden lg:block">
+        </div>
+        <div className="max-w-7xl mx-auto mt-8">
+          <div className="flex justify-center gap-4">
             <AdCard />
-          </aside>
+          </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };

@@ -70,7 +70,7 @@ const ConversionCategories: React.FC<ConversionCategoriesProps> = ({
   ],
 }) => {
   return (
-    <div className="w-full max-w-3xl mx-auto p-4 space-y-4 bg-gray-50">
+    <div className="w-full max-w-3xl mx-auto p-4 space-y-4 bg-white rounded-xl shadow-sm border border-gray-100">
       <Accordion type="single" collapsible className="w-full">
         {categories.map((category) => (
           <AccordionItem key={category.id} value={category.id}>

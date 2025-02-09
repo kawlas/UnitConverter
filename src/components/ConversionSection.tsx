@@ -35,15 +35,29 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   const [toUnit, setToUnit] = useState<string>(units[1].value);
   const [result, setResult] = useState<string>("0");
 
-  const handleValueChange = (value: string) => {
-    setFromValue(value);
+  const updateConversion = (value: string, from: string, to: string) => {
     const numericValue = parseFloat(value) || 0;
-    const convertedValue = onValueChange(numericValue, fromUnit, toUnit);
+    const convertedValue = onValueChange(numericValue, from, to);
     setResult(convertedValue.toString());
   };
 
+  const handleValueChange = (value: string) => {
+    setFromValue(value);
+    updateConversion(value, fromUnit, toUnit);
+  };
+
+  const handleFromUnitChange = (unit: string) => {
+    setFromUnit(unit);
+    updateConversion(fromValue, unit, toUnit);
+  };
+
+  const handleToUnitChange = (unit: string) => {
+    setToUnit(unit);
+    updateConversion(fromValue, fromUnit, unit);
+  };
+
   return (
-    <Card className="p-6 bg-white shadow-sm">
+    <Card className="p-6 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 border-gray-100">
       <div className="space-y-6">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
 
@@ -59,7 +73,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                 onChange={(e) => handleValueChange(e.target.value)}
                 className="flex-1"
               />
-              <Select value={fromUnit} onValueChange={setFromUnit}>
+              <Select value={fromUnit} onValueChange={handleFromUnitChange}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Select unit" />
                 </SelectTrigger>
@@ -113,7 +127,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                 readOnly
                 className="flex-1"
               />
-              <Select value={toUnit} onValueChange={setToUnit}>
+              <Select value={toUnit} onValueChange={handleToUnitChange}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Select unit" />
                 </SelectTrigger>
