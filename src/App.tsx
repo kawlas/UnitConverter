@@ -1,7 +1,8 @@
 import { Suspense } from "react";
-import { useRoutes, Routes, Route } from "react-router-dom";
-import Home from "./components/home";
+import { useRoutes, Routes, Route, Navigate } from "react-router-dom";
 import routes from "tempo-routes";
+import ConverterPage from "./pages/ConverterPage";
+import Navbar from "./components/Navbar";
 
 function App() {
   const tempoRoutes =
@@ -11,7 +12,12 @@ function App() {
     <Suspense fallback={<p>Loading...</p>}>
       <div>
         <Routes>
-          <Route path="/" element={<Home />} />
+          {/* Default route redirects to power converter */}
+          <Route path="/" element={<Navigate to="/power" replace />} />
+          {/* Individual converter routes */}
+          <Route path="/:categoryId" element={<ConverterPage />} />
+          {/* Tempo routes */}
+          {import.meta.env.VITE_TEMPO && <Route path="/tempobook/*" />}
         </Routes>
         {tempoRoutes}
       </div>

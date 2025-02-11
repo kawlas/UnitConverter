@@ -6,7 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./ui/accordion";
-import ConversionSection from "./ConversionSection";
+const ConversionSection = React.lazy(() => import("./ConversionSection"));
 
 interface ConversionCategoriesProps {
   categories?: Array<{

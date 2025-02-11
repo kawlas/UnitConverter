@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Helmet } from "react-helmet";
+const Helmet = React.lazy(() => import("react-helmet"));
 
 import SearchBar from "@/components/SearchBar";
 import ConversionCategories from "@/components/ConversionCategories";
 import AdCard from "@/components/AdCard";
-import Footer from "@/components/Footer";
+const Footer = React.lazy(() => import("@/components/Footer"));
 
 interface HomeProps {
   initialSearchTerm?: string;
