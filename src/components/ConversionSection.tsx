@@ -73,19 +73,19 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
       <h2 className="font-medium text-lg">{title}</h2>
 
       <div className="space-y-4">
-        {/* From Section */}
-        <div>
-          <div className="text-sm mb-2">From</div>
-          <div className="flex flex-col sm:flex-row gap-2">
+        <div className="grid grid-cols-[120px_1fr] gap-4 items-center">
+          {/* From Section */}
+          <div className="text-sm font-medium">From</div>
+          <div className="flex items-center gap-2">
             <Input
               type="number"
               value={fromValue}
               onChange={(e) => setFromValue(e.target.value)}
-              className="flex-1"
+              className="w-[120px]"
               placeholder="0"
             />
             <Select value={fromUnit} onValueChange={setFromUnit}>
-              <SelectTrigger className="w-full sm:w-[140px]">
+              <SelectTrigger className="w-[140px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -97,21 +97,19 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
               </SelectContent>
             </Select>
           </div>
-        </div>
 
-        {/* To Section */}
-        <div>
-          <div className="text-sm mb-2">To</div>
-          <div className="flex flex-col sm:flex-row gap-2">
+          {/* To Section */}
+          <div className="text-sm font-medium">To</div>
+          <div className="flex items-center gap-2">
             <Input
               type="number"
               value={result}
               readOnly
-              className="flex-1"
+              className="w-[120px]"
               placeholder="0"
             />
             <Select value={toUnit} onValueChange={setToUnit}>
-              <SelectTrigger className="w-full sm:w-[140px]">
+              <SelectTrigger className="w-[140px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
