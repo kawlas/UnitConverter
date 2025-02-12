@@ -17,111 +17,25 @@ const Home: React.FC<HomeProps> = ({ initialSearchTerm = "" }) => {
     setSearchTerm(term.toLowerCase());
   };
 
-  const defaultCategories = [
-    {
-      id: "power",
-      title: "Power",
-      units: [
-        { value: "watts", label: "Watts" },
-        { value: "kilowatts", label: "Kilowatts" },
-        { value: "horsepower", label: "Horsepower" },
-        { value: "btu_per_hour", label: "BTU/hour" },
-      ],
-    },
-    {
-      id: "energy",
-      title: "Energy",
-      units: [
-        { value: "joules", label: "Joules" },
-        { value: "kilowatt_hours", label: "Kilowatt Hours" },
-        { value: "calories", label: "Calories" },
-        { value: "btu", label: "BTU" },
-      ],
-    },
-    {
-      id: "speed",
-      title: "Speed",
-      units: [
-        { value: "mph", label: "Miles per Hour" },
-        { value: "kph", label: "Kilometers per Hour" },
-        { value: "mps", label: "Meters per Second" },
-        { value: "knots", label: "Knots" },
-      ],
-    },
-    {
-      id: "length",
-      title: "Length",
-      units: [
-        { value: "meters", label: "Meters" },
-        { value: "feet", label: "Feet" },
-        { value: "inches", label: "Inches" },
-        { value: "kilometers", label: "Kilometers" },
-      ],
-    },
-    {
-      id: "weight",
-      title: "Weight",
-      units: [
-        { value: "kilograms", label: "Kilograms" },
-        { value: "pounds", label: "Pounds" },
-        { value: "ounces", label: "Ounces" },
-        { value: "grams", label: "Grams" },
-      ],
-    },
-    {
-      id: "temperature",
-      title: "Temperature",
-      units: [
-        { value: "celsius", label: "Celsius" },
-        { value: "fahrenheit", label: "Fahrenheit" },
-        { value: "kelvin", label: "Kelvin" },
-      ],
-    },
-    {
-      id: "volume",
-      title: "Volume",
-      units: [
-        { value: "liters", label: "Liters" },
-        { value: "gallons", label: "Gallons" },
-        { value: "milliliters", label: "Milliliters" },
-        { value: "cubic_meters", label: "Cubic Meters" },
-      ],
-    },
-    {
-      id: "area",
-      title: "Area",
-      units: [
-        { value: "square_meters", label: "Square Meters" },
-        { value: "square_feet", label: "Square Feet" },
-        { value: "square_kilometers", label: "Square Kilometers" },
-        { value: "acres", label: "Acres" },
-      ],
-    },
-  ];
-
-  const filteredCategories = defaultCategories.filter((category) =>
-    category.title.toLowerCase().includes(searchTerm),
-  );
-
   return (
     <>
       <Helmet>
-        <title>Unit Converter - Free Online Measurement Conversion Tool</title>
+        <title>Q Converter - Free Online Measurement Conversion Tool</title>
         <meta
           name="description"
-          content="Free online unit converter for length, weight, temperature, volume, and area. Quick and accurate conversions with an easy-to-use interface."
+          content="Free online Q converter for length, weight, temperature, volume, and area. Quick and accurate conversions with an easy-to-use interface."
         />
         <meta
           name="keywords"
-          content="unit converter, measurement converter, length converter, weight converter, temperature converter, volume converter, area converter, meters to feet, kilograms to pounds, celsius to fahrenheit"
+          content="Q converter, measurement converter, length converter, weight converter, temperature converter, volume converter, area converter, meters to feet, kilograms to pounds, celsius to fahrenheit"
         />
         <meta
           property="og:title"
-          content="Unit Converter - Free Online Measurement Conversion Tool"
+          content="Q Converter - Free Online Measurement Conversion Tool"
         />
         <meta
           property="og:description"
-          content="Free online unit converter for length, weight, temperature, volume, and area measurements. Quick and accurate conversions."
+          content="Free online Q converter for length, weight, temperature, volume, and area measurements. Quick and accurate conversions."
         />
         <meta name="robots" content="index, follow" />
         <link
@@ -137,7 +51,7 @@ const Home: React.FC<HomeProps> = ({ initialSearchTerm = "" }) => {
             <div className="text-center space-y-6 max-w-3xl mx-auto">
               <div className="space-y-4">
                 <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                  Unit Converter
+                  Q Converter
                 </h1>
                 <h2 className="text-2xl md:text-3xl font-semibold text-gray-700">
                   Free Online Measurement Conversion Tool
@@ -202,7 +116,7 @@ const Home: React.FC<HomeProps> = ({ initialSearchTerm = "" }) => {
               </div>
             </div>
             <SearchBar onSearch={handleSearch} />
-            <ConversionCategories categories={filteredCategories} />
+            <ConversionCategories />
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8">

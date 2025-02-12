@@ -20,21 +20,21 @@ export default function HomePage() {
   return (
     <>
       <Helmet>
-        <title>Unit Converter - Free Online Measurement Conversion Tool</title>
+        <title>Q Converter - Free Online Measurement Conversion Tool</title>
         <meta
           name="description"
-          content="Free online unit converter for length, weight, temperature, volume, and area. Quick and accurate conversions with an easy-to-use interface."
+          content="Free online Q converter for length, weight, temperature, volume, and area. Quick and accurate conversions with an easy-to-use interface."
         />
         <meta
           name="keywords"
-          content="unit converter, measurement converter, length converter, weight converter, temperature converter, volume converter, area converter"
+          content="Q converter, measurement converter, length converter, weight converter, temperature converter, volume converter, area converter"
         />
       </Helmet>
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="text-center space-y-6 max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-              Unit Converter
+              Q Converter
             </h1>
             <p className="text-lg text-gray-600">
               Quick and accurate conversions for all your measurement needs

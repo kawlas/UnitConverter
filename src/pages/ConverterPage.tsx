@@ -41,10 +41,10 @@ export default function ConverterPage() {
   return (
     <>
       <Helmet>
-        <title>{title} Converter - Free Online Unit Conversion</title>
+        <title>{title} Converter - Free Online Q Conversion</title>
         <meta
           name="description"
-          content={`Convert ${title.toLowerCase()} units online. Free ${title.toLowerCase()} converter with common conversions like ${commonConversion}. Quick and accurate results.`}
+          content={`Convert ${title.toLowerCase()} measurements online. Free ${title.toLowerCase()} converter with common conversions like ${commonConversion}. Quick and accurate results.`}
         />
         <meta
           name="keywords"
