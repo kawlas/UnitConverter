@@ -45,7 +45,7 @@ const Home: React.FC<HomeProps> = ({ initialSearchTerm = "" }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#ffffff" />
       </Helmet>
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4">
+      <div className="min-h-screen bg-background py-12 px-4">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="space-y-8">
             <div className="text-center space-y-6 max-w-3xl mx-auto">
