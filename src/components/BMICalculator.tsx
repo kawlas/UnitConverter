@@ -52,9 +52,12 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
   const [weight, setWeight] = useState<string>("70");
   const [heightUnit, setHeightUnit] = useState<string>("cm");
   const [weightUnit, setWeightUnit] = useState<string>("kg");
-  const [gender, setGender] = useState<string>("male");
   const [bmi, setBMI] = useState<number>(0);
   const [category, setCategory] = useState<string>("");
+  const [idealWeightRange, setIdealWeightRange] = useState<{
+    min: number;
+    max: number;
+  }>({ min: 0, max: 0 });
 
   const calculateBMI = () => {
     let heightInMeters = parseFloat(height);
@@ -84,6 +87,14 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
     const bmiValue = weightInKg / (heightInMeters * heightInMeters);
     setBMI(Math.round(bmiValue * 10) / 10);
 
+    // Calculate ideal weight range
+    const minWeight = 18.5 * (heightInMeters * heightInMeters);
+    const maxWeight = 24.9 * (heightInMeters * heightInMeters);
+    setIdealWeightRange({
+      min: Math.round(minWeight * 10) / 10,
+      max: Math.round(maxWeight * 10) / 10,
+    });
+
     // Determine BMI category
     if (bmiValue < 18.5) {
       setCategory("Underweight");
@@ -111,15 +122,16 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
           {/* Height Section */}
           <div>
             <div className="text-sm mb-2">Height</div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 type="number"
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
                 className="flex-1"
+                placeholder="170"
               />
               <Select value={heightUnit} onValueChange={setHeightUnit}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-full sm:w-[140px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -134,15 +146,16 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
           {/* Weight Section */}
           <div>
             <div className="text-sm mb-2">Weight</div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 type="number"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 className="flex-1"
+                placeholder="70"
               />
               <Select value={weightUnit} onValueChange={setWeightUnit}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-full sm:w-[140px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -151,20 +164,6 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          {/* Gender Section */}
-          <div>
-            <div className="text-sm mb-2">Gender</div>
-            <Select value={gender} onValueChange={setGender}>
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
 
@@ -186,6 +185,25 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
               {getCurrentRange()?.description && (
                 <div className="mt-2 text-sm text-gray-600">
                   {getCurrentRange()?.description}
+                </div>
+              )}
+              {idealWeightRange.min > 0 && (
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg text-sm text-blue-800">
+                  <p className="font-medium">Healthy Weight Range</p>
+                  <p className="mt-1">
+                    For your height, a healthy weight range would be:
+                    <br />
+                    {weightUnit === "kg" ? (
+                      <span className="font-medium">
+                        {idealWeightRange.min} - {idealWeightRange.max} kg
+                      </span>
+                    ) : (
+                      <span className="font-medium">
+                        {Math.round(idealWeightRange.min * 2.20462)} -{" "}
+                        {Math.round(idealWeightRange.max * 2.20462)} lbs
+                      </span>
+                    )}
+                  </p>
                 </div>
               )}
             </div>

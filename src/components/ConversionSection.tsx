@@ -18,14 +18,14 @@ interface ConversionSectionProps {
 }
 
 const defaultUnits: { [key: string]: { from: string; to: string } } = {
+  energy: { from: "joules", to: "kilowatt_hours" },
+  speed: { from: "kph", to: "mph" },
   length: { from: "meters", to: "feet" },
   weight: { from: "kilograms", to: "pounds" },
   temperature: { from: "celsius", to: "fahrenheit" },
   volume: { from: "liters", to: "gallons" },
   area: { from: "square_meters", to: "square_feet" },
   power: { from: "watts", to: "kilowatts" },
-  energy: { from: "joules", to: "kilowatt_hours" },
-  speed: { from: "mph", to: "kph" },
 };
 
 const ConversionSection: React.FC<ConversionSectionProps> = ({
@@ -76,7 +76,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         {/* From Section */}
         <div>
           <div className="text-sm mb-2">From</div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Input
               type="number"
               value={fromValue}
@@ -85,7 +85,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
               placeholder="0"
             />
             <Select value={fromUnit} onValueChange={setFromUnit}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -102,7 +102,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         {/* To Section */}
         <div>
           <div className="text-sm mb-2">To</div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Input
               type="number"
               value={result}
@@ -111,7 +111,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
               placeholder="0"
             />
             <Select value={toUnit} onValueChange={setToUnit}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-full sm:w-[140px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
