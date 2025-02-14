@@ -82,9 +82,6 @@ const ConversionCategories: React.FC<ConversionCategoriesProps> = ({
                 title={category.title}
                 units={category.units}
                 categoryId={category.id}
-                onValueChange={(value, fromUnit, toUnit) => {
-                  return convert(value, fromUnit, toUnit, category.id);
-                }}
               />
             </AccordionContent>
           </AccordionItem>
