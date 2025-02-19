@@ -20,30 +20,37 @@ const Home: React.FC<HomeProps> = ({ initialSearchTerm = "" }) => {
   return (
     <>
       <Helmet>
-        <title>Q Converter - Free Online Measurement Conversion Tool</title>
+        <title>
+          Q Converter - Free Online Unit Conversion Calculator | Length, Weight,
+          Temperature & More
+        </title>
         <meta
           name="description"
-          content="Free online Q converter for length, weight, temperature, volume, and area. Quick and accurate conversions with an easy-to-use interface."
+          content="Free online unit converter for quick and accurate conversions. Convert length, weight, temperature, volume, area, power, energy, and speed measurements instantly. Easy-to-use interface with real-time results."
         />
         <meta
           name="keywords"
-          content="Q converter, measurement converter, length converter, weight converter, temperature converter, volume converter, area converter, meters to feet, kilograms to pounds, celsius to fahrenheit"
+          content="unit converter, measurement converter, metric to imperial, imperial to metric, length converter, meters to feet, weight converter, kg to lbs, temperature converter, celsius to fahrenheit, volume converter, liters to gallons, area converter, power converter, watts to horsepower, energy converter, speed converter, mph to kmh"
         />
+        <meta property="og:type" content="website" />
         <meta
           property="og:title"
-          content="Q Converter - Free Online Measurement Conversion Tool"
+          content="Q Converter - Free Online Unit Conversion Calculator"
         />
         <meta
           property="og:description"
-          content="Free online Q converter for length, weight, temperature, volume, and area measurements. Quick and accurate conversions."
+          content="Convert between different units of measurement instantly. Free online converter for length, weight, temperature, volume, area, power, energy, and speed. Quick, accurate, and easy to use."
         />
         <meta name="robots" content="index, follow" />
-        <link
-          rel="canonical"
-          href="https://wizardly-haibt6-7k9er.dev.tempolabs.ai"
-        />
+        <meta name="googlebot" content="index, follow" />
+        <meta name="google" content="notranslate" />
+        <meta name="author" content="Q Converter" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#ffffff" />
+        <link
+          rel="canonical"
+          href="https://upbeat-liskov4-4sexx.dev.tempolabs.ai"
+        />
       </Helmet>
       <div className="min-h-screen bg-background py-12 px-4">
         <div className="max-w-7xl mx-auto space-y-8">
