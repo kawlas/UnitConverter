@@ -58,8 +58,23 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeftIcon className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRightIcon className="h-4 w-4" />,
+        Chevron: ({ ...props }) => {
+          // The component provided by react-day-picker has been changed from IconLeft and IconRight to a single Chevron component
+          // The Chevron component receives an orientation prop that can be "left" or "right"
+          // We are using a switch statement to render the correct icon based on the orientation
+          // We are also passing the rest of the props to the icon component
+          // The original code was:
+          // IconLeft: ({ ...props }) => <ChevronLeftIcon className="h-4 w-4" />,
+          // IconRight: ({ ...props }) => <ChevronRightIcon className="h-4 w-4" />,
+          switch ((props as any).orientation) {
+            case "left":
+              return <ChevronLeftIcon className="h-4 w-4" />
+            case "right":
+              return <ChevronRightIcon className="h-4 w-4" />
+            default:
+              return null
+          }
+        },
       }}
       {...props}
     />
