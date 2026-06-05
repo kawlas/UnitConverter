@@ -1,12 +1,23 @@
-import { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 import { useRoutes, Routes, Route, Navigate } from "react-router-dom";
-import routes from "tempo-routes";
+// `tempo-routes` is optional at runtime; dynamically load when enabled.
 
 const ConverterPage = lazy(() => import("./pages/ConverterPage"));
 
 function App() {
-  const tempoRoutes =
-    import.meta.env.VITE_TEMPO === "true" ? useRoutes(routes) : null;
+  const tempoEnabled = import.meta.env.VITE_TEMPO === "true";
+  const [externalRoutes, setExternalRoutes] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!tempoEnabled) return;
+    // @ts-ignore - optional runtime dependency
+    const _r = "tempo-routes"
+    import(_r)
+      .then((mod) => setExternalRoutes(mod?.default || mod?.routes || []))
+      .catch(() => setExternalRoutes([]))
+  }, [tempoEnabled]);
+
+  const tempoRoutes = useRoutes(tempoEnabled ? externalRoutes : []);
 
   return (
     <Suspense
@@ -20,9 +31,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/power" replace />} />
           <Route path="/:categoryId" element={<ConverterPage />} />
-          {import.meta.env.VITE_TEMPO && <Route path="/tempobook/*" />}
+          {tempoEnabled && <Route path="/tempobook/*" />}
         </Routes>
-        {tempoRoutes}
+        {tempoEnabled && tempoRoutes}
       </div>
     </Suspense>
   );

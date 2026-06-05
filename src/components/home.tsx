@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 const Helmet = React.lazy(() => import("react-helmet"));
 
 import SearchBar from "@/components/SearchBar";
@@ -11,10 +11,15 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ initialSearchTerm = "" }) => {
-  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+  React.useEffect(() => {
+    if (initialSearchTerm) {
+      console.debug("initialSearchTerm:", initialSearchTerm)
+    }
+  }, [initialSearchTerm])
 
   const handleSearch = (term: string) => {
-    setSearchTerm(term.toLowerCase());
+    // Keep handler for SearchBar callback; log term for now
+    console.debug("search term:", term)
   };
 
   return (
