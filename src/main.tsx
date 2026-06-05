@@ -4,8 +4,21 @@ import App from "./App.tsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 
-import { TempoDevtools } from "tempo-devtools";
-TempoDevtools.init();
+if (import.meta.env.VITE_TEMPO === "true") {
+  // @ts-ignore - optional devtool package
+    const _m = "tempo-devtools"
+    import(_m)
+    .then((mod) => {
+      try {
+        mod?.TempoDevtools?.init?.()
+      } catch (e) {
+        // ignore devtools init errors
+      }
+    })
+    .catch(() => {
+      // tempo-devtools not installed; skip
+    })
+}
 
 const basename = import.meta.env.BASE_URL;
 
