@@ -1,19 +1,19 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { useRoutes, Routes, Route, Navigate } from "react-router-dom";
+import type { RouteObject } from "react-router-dom";
 // `tempo-routes` is optional at runtime; dynamically load when enabled.
 
 const ConverterPage = lazy(() => import("./pages/ConverterPage"));
 
 function App() {
   const tempoEnabled = import.meta.env.VITE_TEMPO === "true";
-  const [externalRoutes, setExternalRoutes] = useState<any[]>([]);
+  const [externalRoutes, setExternalRoutes] = useState<RouteObject[]>([]);
 
   useEffect(() => {
     if (!tempoEnabled) return;
-    // @ts-ignore - optional runtime dependency
     const _r = "tempo-routes"
     import(_r)
-      .then((mod) => setExternalRoutes(mod?.default || mod?.routes || []))
+      .then((mod) => setExternalRoutes((mod?.default || mod?.routes || []) as RouteObject[]))
       .catch(() => setExternalRoutes([]))
   }, [tempoEnabled]);
 

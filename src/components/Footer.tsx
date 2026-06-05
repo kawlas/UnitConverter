@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+// no-op: `cn` removed because not used in this file
 
 const categories = [
   {

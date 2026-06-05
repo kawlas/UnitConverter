@@ -5,13 +5,12 @@ import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 
 if (import.meta.env.VITE_TEMPO === "true") {
-  // @ts-ignore - optional devtool package
-    const _m = "tempo-devtools"
-    import(_m)
+  const _m = "tempo-devtools"
+  import(_m)
     .then((mod) => {
       try {
         mod?.TempoDevtools?.init?.()
-      } catch (e) {
+      } catch {
         // ignore devtools init errors
       }
     })
