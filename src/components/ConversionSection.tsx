@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ArrowUpDown, RotateCcw } from "lucide-react";
 import { Button } from "./ui/button";
 import { convert } from "@/lib/conversions";
@@ -44,23 +44,14 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   const [fromValue, setFromValue] = useState<string>("0");
   const [fromUnit, setFromUnit] = useState<string>(defaults.from);
   const [toUnit, setToUnit] = useState<string>(defaults.to);
-  const [result, setResult] = useState<string>("0");
-
-  // Function to perform conversion
-  const updateConversion = (value: string, from: string, to: string) => {
-    const numericValue = parseFloat(value);
+  const result = React.useMemo(() => {
+    const numericValue = parseFloat(fromValue);
     if (isNaN(numericValue)) {
-      setResult("0");
-      return;
+      return "0";
     }
-    const convertedValue = convert(numericValue, from, to, categoryId);
-    setResult(convertedValue.toString());
-  };
-
-  // Update conversion whenever inputs change
-  useEffect(() => {
-    updateConversion(fromValue, fromUnit, toUnit);
-  }, [fromValue, fromUnit, toUnit]);
+    const convertedValue = convert(numericValue, fromUnit, toUnit, categoryId);
+    return convertedValue.toString();
+  }, [fromValue, fromUnit, toUnit, categoryId]);
 
   const resetToDefaults = () => {
     setFromValue("0");

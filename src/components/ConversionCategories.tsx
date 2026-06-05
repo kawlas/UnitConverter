@@ -1,5 +1,5 @@
 import React from "react";
-import { convert } from "@/lib/conversions";
+// convert is not used in this file; conversions happen inside ConversionSection
 import {
   Accordion,
   AccordionContent,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Card } from "./ui/card";
 import {
@@ -52,21 +52,12 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
   const [weight, setWeight] = useState<string>("70");
   const [heightUnit, setHeightUnit] = useState<string>("cm");
   const [weightUnit, setWeightUnit] = useState<string>("kg");
-  const [bmi, setBMI] = useState<number>(0);
-  const [category, setCategory] = useState<string>("");
-  const [idealWeightRange, setIdealWeightRange] = useState<{
-    min: number;
-    max: number;
-  }>({ min: 0, max: 0 });
-
-  const calculateBMI = () => {
+  const { bmi: computedBMI, category: computedCategory, idealRange } = React.useMemo(() => {
     let heightInMeters = parseFloat(height);
     let weightInKg = parseFloat(weight);
 
-    if (isNaN(heightInMeters) || isNaN(weightInKg)) {
-      setBMI(0);
-      setCategory("");
-      return;
+    if (isNaN(heightInMeters) || isNaN(weightInKg) || heightInMeters <= 0) {
+      return { bmi: 0, category: "", idealRange: { min: 0, max: 0 } };
     }
 
     // Convert height to meters
@@ -85,33 +76,35 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
 
     // Calculate BMI
     const bmiValue = weightInKg / (heightInMeters * heightInMeters);
-    setBMI(Math.round(bmiValue * 10) / 10);
+    const rounded = Math.round(bmiValue * 10) / 10;
 
     // Calculate ideal weight range
     const minWeight = 18.5 * (heightInMeters * heightInMeters);
     const maxWeight = 24.9 * (heightInMeters * heightInMeters);
-    setIdealWeightRange({
-      min: Math.round(minWeight * 10) / 10,
-      max: Math.round(maxWeight * 10) / 10,
-    });
 
     // Determine BMI category
+    let categoryLabel = "";
     if (bmiValue < 18.5) {
-      setCategory("Underweight");
+      categoryLabel = "Underweight";
     } else if (bmiValue >= 18.5 && bmiValue < 25) {
-      setCategory("Normal weight");
+      categoryLabel = "Normal weight";
     } else if (bmiValue >= 25 && bmiValue < 30) {
-      setCategory("Overweight");
+      categoryLabel = "Overweight";
     } else {
-      setCategory("Obese");
+      categoryLabel = "Obese";
     }
-  };
 
-  useEffect(() => {
-    calculateBMI();
+    return {
+      bmi: rounded,
+      category: categoryLabel,
+      idealRange: {
+        min: Math.round(minWeight * 10) / 10,
+        max: Math.round(maxWeight * 10) / 10,
+      },
+    };
   }, [height, weight, heightUnit, weightUnit]);
 
-  const getCurrentRange = () => bmiRanges.find((r) => r.category === category);
+  const getCurrentRange = () => bmiRanges.find((r) => r.category === computedCategory);
 
   return (
     <div className="space-y-6">
@@ -172,14 +165,14 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
           <Card className="p-6 bg-gray-50">
             <div className="text-center">
               <div className="text-4xl font-bold text-gray-900">
-                {bmi || "-"}
+                {computedBMI || "-"}
               </div>
               <div className="text-sm text-gray-500 mt-1">Your BMI</div>
-              {category && (
+              {computedCategory && (
                 <div
                   className={`mt-2 text-lg font-medium ${getCurrentRange()?.color}`}
                 >
-                  {category}
+                  {computedCategory}
                 </div>
               )}
               {getCurrentRange()?.description && (
@@ -187,7 +180,7 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
                   {getCurrentRange()?.description}
                 </div>
               )}
-              {idealWeightRange.min > 0 && (
+              {idealRange.min > 0 && (
                 <div className="mt-4 p-4 bg-blue-50 rounded-lg text-sm text-blue-800">
                   <p className="font-medium">Healthy Weight Range</p>
                   <p className="mt-1">
@@ -195,12 +188,12 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
                     <br />
                     {weightUnit === "kg" ? (
                       <span className="font-medium">
-                        {idealWeightRange.min} - {idealWeightRange.max} kg
+                        {idealRange.min} - {idealRange.max} kg
                       </span>
                     ) : (
                       <span className="font-medium">
-                        {Math.round(idealWeightRange.min * 2.20462)} -{" "}
-                        {Math.round(idealWeightRange.max * 2.20462)} lbs
+                        {Math.round(idealRange.min * 2.20462)} - {" "}
+                        {Math.round(idealRange.max * 2.20462)} lbs
                       </span>
                     )}
                   </p>
@@ -216,7 +209,7 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
               {bmiRanges.map((range) => (
                 <div
                   key={range.category}
-                  className={`p-2 rounded ${category === range.category ? "bg-gray-100" : ""}`}
+                  className={`p-2 rounded ${computedCategory === range.category ? "bg-gray-100" : ""}`}
                 >
                   <div className="flex justify-between items-center">
                     <span className={`font-medium ${range.color}`}>
