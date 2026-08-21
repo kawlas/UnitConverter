@@ -29,3 +29,42 @@ test("saved conversion controls are available", async ({ page }) => {
   await expect(page.getByText("Favorites (1)")).toBeVisible();
   await expect(page.getByRole("button", { name: "Clear saved data" })).toBeVisible();
 });
+
+test("mobile navigation is keyboard accessible and keeps closed links out of tab order", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/length", { waitUntil: "domcontentloaded" });
+
+  const menu = page.locator("#mobile-navigation");
+  const toggle = page.getByRole("button", { name: "Open menu" });
+  const links = menu.locator("a");
+
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toHaveAttribute("aria-controls", "mobile-navigation");
+  await expect(menu).toHaveAttribute("aria-hidden", "true");
+  await expect(links.first()).toHaveAttribute("tabindex", "-1");
+  await expect.poll(async () => (await toggle.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(44);
+
+  await toggle.click();
+  await expect(page.getByRole("button", { name: "Close menu" })).toHaveAttribute("aria-expanded", "true");
+  await expect(menu).toHaveAttribute("aria-hidden", "false");
+  await expect(links.last()).toBeVisible();
+  await page.keyboard.press("Tab");
+  await expect(links.first()).toBeFocused();
+  await expect(links.first()).toHaveAttribute("tabindex", "0");
+});
+
+test("converter inputs have accessible names and a live result", async ({ page }) => {
+  await page.goto("/length", { waitUntil: "domcontentloaded" });
+
+  await expect(page.getByLabel("From")).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Source unit" })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Target unit" })).toBeVisible();
+  await expect(page.locator("#length-result")).toHaveAttribute("aria-live", "polite");
+
+  await page.goto("/bmi", { waitUntil: "domcontentloaded" });
+  await expect(page.getByRole("textbox", { name: "Height", exact: true })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Height unit" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Weight", exact: true })).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Weight unit" })).toBeVisible();
+  await expect(page.locator("[aria-live=polite]").first()).toBeVisible();
+});

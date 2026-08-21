@@ -289,30 +289,30 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
       <div className="grid grid-cols-[minmax(70px,120px)_1fr] gap-4 items-center">
         <label htmlFor={`${categoryId}-from-value`} className="text-sm font-medium">From</label>
         <div className="flex items-center gap-2">
-          <Input id={`${categoryId}-from-value`} type="text" inputMode="decimal" value={fromValue} onChange={(e) => setValue(e.target.value)} className="w-[120px]" placeholder="0" aria-invalid={Boolean(resultState.error)} aria-describedby={`${categoryId}-conversion-error`} />
+          <Input id={`${categoryId}-from-value`} type="text" inputMode="decimal" value={fromValue} onChange={(e) => setValue(e.target.value)} className="w-[120px] min-h-11" placeholder="0" aria-invalid={Boolean(resultState.error)} aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
           <Select value={fromUnit} onValueChange={setFrom}>
-            <SelectTrigger aria-label="Source unit" className="w-[170px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger aria-label="Source unit" className="min-h-11 w-[170px]"><SelectValue /></SelectTrigger>
             <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <label htmlFor={`${categoryId}-result`} className="text-sm font-medium">To</label>
         <div className="flex items-center gap-2">
-          <Input id={`${categoryId}-result`} type="text" value={resultState.result} readOnly className="w-[120px]" aria-live="polite" aria-describedby={`${categoryId}-conversion-error`} />
+          <Input id={`${categoryId}-result`} type="text" value={resultState.result} readOnly className="w-[120px] min-h-11" aria-live="polite" aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
           <Select value={toUnit} onValueChange={setTo}>
-            <SelectTrigger aria-label="Target unit" className="w-[170px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger aria-label="Target unit" className="min-h-11 w-[170px]"><SelectValue /></SelectTrigger>
             <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
           </Select>
         </div>
       </div>
       {resultState.error && <p id={`${categoryId}-conversion-error`} className="text-sm text-red-700" role="alert">{resultState.error}</p>}
       <div className="flex flex-wrap justify-end gap-2">
-        <label className="text-sm flex items-center gap-1">Precision<select aria-label="Decimal precision" value={precision} onChange={(e) => { const next = Number(e.target.value); setPrecision(next); updateUrl({ precision: String(next) }); }} className="border rounded px-1 py-1">{Array.from({ length: 13 }, (_, index) => <option key={index} value={index}>{index}</option>)}</select></label>
-        <label className="text-sm flex items-center gap-1">Locale<select aria-label="Number locale" value={locale} onChange={(e) => { setLocale(e.target.value); updateUrl({ locale: e.target.value }); }} className="border rounded px-1 py-1">{LOCALES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-        <Button variant="ghost" size="icon" onClick={swap} aria-label="Swap units"><ArrowUpDown className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" onClick={resetToDefaults} aria-label="Reset category"><RotateCcw className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" onClick={() => { copyText(window.location.href).then((ok) => setStatus(ok ? "Share URL copied." : "Unable to copy URL.")); }} aria-label="Copy share URL"><Copy className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
+        <label className="text-sm flex items-center gap-1">Precision<select aria-label="Decimal precision" value={precision} onChange={(e) => { const next = Number(e.target.value); setPrecision(next); updateUrl({ precision: String(next) }); }} className="min-h-11 border rounded px-2 py-1">{Array.from({ length: 13 }, (_, index) => <option key={index} value={index}>{index}</option>)}</select></label>
+        <label className="text-sm flex items-center gap-1">Locale<select aria-label="Number locale" value={locale} onChange={(e) => { setLocale(e.target.value); updateUrl({ locale: e.target.value }); }} className="min-h-11 border rounded px-2 py-1">{LOCALES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={swap} aria-label="Swap units"><ArrowUpDown className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={resetToDefaults} aria-label="Reset category"><RotateCcw className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={() => { copyText(window.location.href).then((ok) => setStatus(ok ? "Share URL copied." : "Unable to copy URL.")); }} aria-label="Copy share URL"><Copy className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
       </div>
       {(history.length > 0 || favoriteIds.length > 0) && <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
         {history.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Recent conversions</summary><ul className="mt-2 space-y-1 text-sm">{history.slice(0, 5).map((entry) => <li key={`${entry.timestamp}-${entry.input}`}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => playSavedConversion(entry.categoryId, { from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale })}>{entry.input} {entry.fromUnit} → {entry.result} {entry.toUnit}</button></li>)}</ul></details>}

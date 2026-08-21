@@ -9,7 +9,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
+    <nav aria-label="Primary" className="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="font-semibold text-xl text-gray-900">
@@ -24,7 +24,7 @@ export default function Navbar() {
                 to={`/${category.id}`}
                 aria-current={location.pathname === `/${category.id}` ? "page" : undefined}
                 className={cn(
-                  "px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap",
+                  "px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600",
                   location.pathname === `/${category.id}`
                     ? "bg-gray-100 text-gray-900"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
@@ -37,9 +37,12 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
+            type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-            aria-label="Toggle menu"
+            className="md:hidden min-h-11 min-w-11 p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             {isMenuOpen ? (
               <X className="h-6 w-6" />
@@ -51,9 +54,11 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         <div
+          id="mobile-navigation"
+          aria-hidden={!isMenuOpen}
           className={cn(
-            "md:hidden transition-all duration-200 ease-in-out overflow-hidden",
-            isMenuOpen ? "max-h-96" : "max-h-0",
+            "md:hidden transition-all duration-200 ease-in-out overflow-x-hidden",
+            isMenuOpen ? "max-h-[calc(100vh-4rem)] overflow-y-auto" : "max-h-0 overflow-y-hidden",
           )}
         >
           <div className="py-2 space-y-1">
@@ -63,8 +68,9 @@ export default function Navbar() {
                 to={`/${category.id}`}
                 onClick={() => setIsMenuOpen(false)}
                 aria-current={location.pathname === `/${category.id}` ? "page" : undefined}
+                tabIndex={isMenuOpen ? 0 : -1}
                 className={cn(
-                  "block px-3 py-2 rounded-md text-base font-medium transition-colors",
+                  "flex min-h-11 items-center px-3 py-2 rounded-md text-base font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600",
                   location.pathname === `/${category.id}`
                     ? "bg-gray-100 text-gray-900"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
