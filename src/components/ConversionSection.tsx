@@ -28,6 +28,13 @@ const HISTORY_KEY = "q-converter:history:v1";
 const FAVORITES_KEY = "q-converter:favorites:v1";
 const MAX_HISTORY = 50;
 const MAX_FAVORITES = 30;
+// Keep locally saved conversions for 30 days, limiting the lifetime of private input data.
+const SAVED_DATA_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+
+interface StoredFavorite {
+  id: string;
+  timestamp: number;
+}
 
 type StorageLike = Pick<Storage, "removeItem">;
 
@@ -77,6 +84,9 @@ const safeStorage = (key: string, fallback: string): string => {
 
 const isNonEmptyString = (value: unknown): value is string => typeof value === "string" && value.length > 0;
 
+const isRetained = (timestamp: number, now: number): boolean =>
+  timestamp <= now && now - timestamp <= SAVED_DATA_TTL_MS;
+
 const isHistoryEntry = (value: unknown): value is HistoryEntry => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const entry = value as Partial<HistoryEntry>;
@@ -96,23 +106,42 @@ const isFavoriteId = (value: unknown): value is string => {
   return parts.length === 3 && parts.every(isNonEmptyString);
 };
 
-const parseStoredHistory = (raw: string): HistoryEntry[] => {
+const isStoredFavorite = (value: unknown): value is StoredFavorite => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const favorite = value as Partial<StoredFavorite>;
+  return isFavoriteId(favorite.id) &&
+    typeof favorite.timestamp === "number" && Number.isFinite(favorite.timestamp) && favorite.timestamp >= 0;
+};
+
+const parseStoredHistory = (raw: string, now = Date.now()): HistoryEntry[] => {
   try {
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter(isHistoryEntry).slice(0, MAX_HISTORY) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((entry): entry is HistoryEntry => isHistoryEntry(entry) && isRetained(entry.timestamp, now)).slice(0, MAX_HISTORY)
+      : [];
   } catch {
     return [];
   }
 };
 
-const parseStoredFavorites = (raw: string): string[] => {
+const parseStoredFavoriteEntries = (raw: string, now = Date.now()): StoredFavorite[] => {
   try {
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter(isFavoriteId).slice(0, MAX_FAVORITES) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .flatMap((value): StoredFavorite[] => {
+        // Legacy favorites were plain IDs. Keep them once and timestamp them during migration.
+        if (isFavoriteId(value)) return [{ id: value, timestamp: now }];
+        return isStoredFavorite(value) && isRetained(value.timestamp, now) ? [value] : [];
+      })
+      .slice(0, MAX_FAVORITES);
   } catch {
     return [];
   }
 };
+
+const parseStoredFavorites = (raw: string, now = Date.now()): string[] =>
+  parseStoredFavoriteEntries(raw, now).map(({ id }) => id);
 
 const normalizeStoredValue = <T,>(key: string, raw: string, value: T[]): T[] => {
   if (raw === JSON.stringify(value)) return value;
@@ -128,10 +157,12 @@ const readStoredHistory = (): HistoryEntry[] => {
   return normalizeStoredValue(HISTORY_KEY, raw, parseStoredHistory(raw));
 };
 
-const readStoredFavorites = (): string[] => {
+const readStoredFavoriteEntries = (): StoredFavorite[] => {
   const raw = safeStorage(FAVORITES_KEY, "[]");
-  return normalizeStoredValue(FAVORITES_KEY, raw, parseStoredFavorites(raw));
+  return normalizeStoredValue(FAVORITES_KEY, raw, parseStoredFavoriteEntries(raw));
 };
+
+const readStoredFavorites = (): string[] => readStoredFavoriteEntries().map(({ id }) => id);
 
 const buildPlaybackUrl = (categoryId: string, params: Record<string, string>): string =>
   `/convert/${encodeURIComponent(categoryId)}?${new URLSearchParams(params).toString()}`;
@@ -252,11 +283,14 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   };
   const toggleFavorite = () => {
     try {
-      const current = readStoredFavorites();
-      const next = current.includes(favoriteId) ? current.filter((id) => id !== favoriteId) : [favoriteId, ...current].slice(0, MAX_FAVORITES);
+      const current = readStoredFavoriteEntries();
+      const next = current.some(({ id }) => id === favoriteId)
+        ? current.filter(({ id }) => id !== favoriteId)
+        : [{ id: favoriteId, timestamp: Date.now() }, ...current].slice(0, MAX_FAVORITES);
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
-      setFavoriteIds(next);
-      setStatus(next.includes(favoriteId) ? "Added to favorites." : "Removed from favorites.");
+      const nextIds = next.map(({ id }) => id);
+      setFavoriteIds(nextIds);
+      setStatus(nextIds.includes(favoriteId) ? "Added to favorites." : "Removed from favorites.");
     } catch { setStatus("Favorites are unavailable in this browser."); }
   };
   const clearSavedData = () => {
@@ -324,5 +358,5 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   );
 };
 
-export { buildPlaybackUrl, clearStoredData, parseStrict, parseStoredHistory, parseStoredFavorites };
+export { SAVED_DATA_TTL_MS, buildPlaybackUrl, clearStoredData, parseStrict, parseStoredHistory, parseStoredFavorites };
 export default ConversionSection;
