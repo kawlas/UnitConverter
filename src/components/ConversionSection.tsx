@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ArrowUpDown, Copy, RotateCcw, Share2, Star } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
@@ -66,11 +66,15 @@ const safeStorage = (key: string, fallback: string): string => {
   try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
 };
 
+const buildPlaybackUrl = (categoryId: string, params: Record<string, string>): string =>
+  `/convert/${encodeURIComponent(categoryId)}?${new URLSearchParams(params).toString()}`;
+
 const ConversionSection: React.FC<ConversionSectionProps> = ({
   title = "Length",
   categoryId = "length",
   units = getCategory(categoryId)?.units ?? [],
 }) => {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const definition = useMemo<CategoryDefinition | undefined>(() => ({
     id: categoryId,
@@ -126,6 +130,13 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     const next = new URLSearchParams(searchParams);
     Object.entries(updates).forEach(([key, value]) => next.set(key, value));
     setSearchParams(next, { replace });
+  };
+  const playSavedConversion = (savedCategoryId: string, params: Record<string, string>) => {
+    if (savedCategoryId === categoryId) {
+      updateUrl(params, false);
+      return;
+    }
+    navigate(buildPlaybackUrl(savedCategoryId, params), { replace: false });
   };
 
   const parsedValue = parseStrict(fromValue, locale);
@@ -227,13 +238,13 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         <Button variant="ghost" size="icon" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
       </div>
       {(history.length > 0 || favoriteIds.length > 0) && <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
-        {history.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Recent conversions</summary><ul className="mt-2 space-y-1 text-sm">{history.slice(0, 5).map((entry) => <li key={`${entry.timestamp}-${entry.input}`}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => updateUrl({ from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale }, false)}>{entry.input} {entry.fromUnit} → {entry.result} {entry.toUnit}</button></li>)}</ul></details>}
-        {favoriteIds.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Favorites ({favoriteIds.length})</summary><ul className="mt-2 space-y-1 text-sm">{favoriteIds.slice(0, 5).map((id) => <li key={id}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => { const [, favoriteFrom, favoriteTo] = id.split(":"); updateUrl({ from: favoriteFrom, to: favoriteTo }, false); }}>{id}</button></li>)}</ul></details>}
+        {history.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Recent conversions</summary><ul className="mt-2 space-y-1 text-sm">{history.slice(0, 5).map((entry) => <li key={`${entry.timestamp}-${entry.input}`}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => playSavedConversion(entry.categoryId, { from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale })}>{entry.input} {entry.fromUnit} → {entry.result} {entry.toUnit}</button></li>)}</ul></details>}
+        {favoriteIds.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Favorites ({favoriteIds.length})</summary><ul className="mt-2 space-y-1 text-sm">{favoriteIds.slice(0, 5).map((id) => <li key={id}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => { const [favoriteCategoryId, favoriteFrom, favoriteTo] = id.split(":"); playSavedConversion(favoriteCategoryId, { from: favoriteFrom, to: favoriteTo }); }}>{id}</button></li>)}</ul></details>}
       </div>}
       <p className="sr-only" role="status" aria-live="polite">{status}</p>
     </div>
   );
 };
 
-export { parseStrict };
+export { buildPlaybackUrl, parseStrict };
 export default ConversionSection;

@@ -1,5 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { parseStrict } from "./ConversionSection";
+import { buildPlaybackUrl, parseStrict } from "./ConversionSection";
+
+describe("saved conversion playback URL", () => {
+  it("includes the target category and complete history state", () => {
+    expect(buildPlaybackUrl("weight", {
+      from: "kilogram",
+      to: "pound",
+      value: "12.5",
+      precision: "4",
+      locale: "pl-PL",
+    })).toBe("/convert/weight?from=kilogram&to=pound&value=12.5&precision=4&locale=pl-PL");
+  });
+
+  it("includes the target category and favorite units", () => {
+    expect(buildPlaybackUrl("temperature", {
+      from: "celsius",
+      to: "fahrenheit",
+    })).toBe("/convert/temperature?from=celsius&to=fahrenheit");
+  });
+});
 
 describe("parseStrict locale grammar", () => {
   it("rejects malformed separators in en-US", () => {
