@@ -1,5 +1,5 @@
 import React from "react";
-const Helmet = React.lazy(() => import("react-helmet"));
+import { Helmet } from "react-helmet-async";
 
 import SearchBar from "@/components/SearchBar";
 import ConversionCategories from "@/components/ConversionCategories";
@@ -13,13 +13,13 @@ interface HomeProps {
 const Home: React.FC<HomeProps> = ({ initialSearchTerm = "" }) => {
   React.useEffect(() => {
     if (initialSearchTerm) {
-      console.debug("initialSearchTerm:", initialSearchTerm)
+      console.debug("initialSearchTerm:", initialSearchTerm);
     }
-  }, [initialSearchTerm])
+  }, [initialSearchTerm]);
 
   const handleSearch = (term: string) => {
     // Keep handler for SearchBar callback; log term for now
-    console.debug("search term:", term)
+    console.debug("search term:", term);
   };
 
   return (
