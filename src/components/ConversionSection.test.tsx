@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPlaybackUrl, parseStrict } from "./ConversionSection";
+import { buildPlaybackUrl, parseStoredFavorites, parseStoredHistory, parseStrict } from "./ConversionSection";
 
 describe("saved conversion playback URL", () => {
   it("includes the target category and complete history state", () => {
@@ -17,6 +17,53 @@ describe("saved conversion playback URL", () => {
       from: "celsius",
       to: "fahrenheit",
     })).toBe("/convert/temperature?from=celsius&to=fahrenheit");
+  });
+});
+
+describe("localStorage payload validation", () => {
+  const validHistoryEntry = (timestamp: number) => ({
+    categoryId: "length",
+    fromUnit: "meters",
+    toUnit: "feet",
+    input: "1",
+    result: "3.28",
+    precision: 2,
+    locale: "en-US",
+    timestamp,
+  });
+
+  it("keeps only valid history entries and caps retained history", () => {
+    const entries = Array.from({ length: 52 }, (_, index) => validHistoryEntry(index + 1));
+    entries[1] = { ...validHistoryEntry(2), locale: "invalid" };
+    entries.push({ ...validHistoryEntry(53), precision: 13 });
+
+    const parsed = parseStoredHistory(JSON.stringify(entries));
+
+    expect(parsed).toHaveLength(50);
+    expect(parsed.every((entry) => entry.locale === "en-US" && entry.precision === 2)).toBe(true);
+    expect(parsed[0].timestamp).toBe(1);
+  });
+
+  it("returns an empty history for malformed JSON or a non-array payload", () => {
+    expect(parseStoredHistory("not-json")).toEqual([]);
+    expect(parseStoredHistory(JSON.stringify({ categoryId: "length" }))).toEqual([]);
+  });
+
+  it("keeps only well-formed favorite IDs and caps retained favorites", () => {
+    const favorites = Array.from({ length: 32 }, (_, index) => `category-${index}:from-${index}:to-${index}`);
+    favorites[2] = "missing-unit-separator";
+    favorites.push("length:meters:feet:extra");
+
+    const parsed = parseStoredFavorites(JSON.stringify(favorites));
+
+    expect(parsed).toHaveLength(30);
+    expect(parsed).not.toContain("missing-unit-separator");
+    expect(parsed.every((id) => id.split(":").length === 3)).toBe(true);
+  });
+
+  it("returns an empty favorites list for malformed JSON or a non-array payload", () => {
+    expect(parseStoredFavorites("not-json")).toEqual([]);
+    expect(parseStoredFavorites(JSON.stringify({ id: "length:meters:feet" }))).toEqual([]);
   });
 });
 
