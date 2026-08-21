@@ -1,5 +1,5 @@
 import React from "react";
-const Helmet = React.lazy(() => import("react-helmet"));
+import { Helmet } from "react-helmet-async";
 
 import SearchBar from "@/components/SearchBar";
 import ConversionCategories from "@/components/ConversionCategories";

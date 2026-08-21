@@ -1,5 +1,5 @@
 import { useParams, Navigate } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { categories } from "@/lib/conversion-data";
 import ConversionSection from "@/components/ConversionSection";
 import BMICalculator from "@/components/BMICalculator";
