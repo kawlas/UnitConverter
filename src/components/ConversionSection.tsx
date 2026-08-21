@@ -28,10 +28,16 @@ const HISTORY_KEY = "q-converter:history:v1";
 const FAVORITES_KEY = "q-converter:favorites:v1";
 const LOCALES = ["en-US", "pl-PL", "de-DE", "fr-FR"];
 
+const EN_US_NUMBER = /^-?(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)$/;
+const COMMA_DECIMAL_NUMBER = /^-?(?:(?:\d{1,3}(?:\.\d{3})+|\d+)(?:,\d+)?|,\d+)$/;
+
 const parseStrict = (raw: string, locale: string): number | undefined => {
   const value = raw.trim();
-  if (!value || !/^-?(?:(?:\d+(?:[.,]\d*)?)|(?:[.,]\d+))$/.test(value)) return undefined;
-  const normalized = locale !== "en-US" ? value.replace(",", ".") : value.replace(",", "");
+  const pattern = locale === "en-US" ? EN_US_NUMBER : COMMA_DECIMAL_NUMBER;
+  if (!value || !pattern.test(value)) return undefined;
+  const normalized = locale === "en-US"
+    ? value.replace(/,/g, "")
+    : value.replace(/\./g, "").replace(",", ".");
   const result = Number(normalized);
   return Number.isFinite(result) ? result : undefined;
 };
