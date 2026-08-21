@@ -3,75 +3,174 @@
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
+    /* Measurement-studio palette */
+    --canvas: #F6F8FC;
+    --surface: #fff;
+    --ink: #0F172A;
+    --muted-ink: #475569;
+    --line: #64748B;
+    --indigo: #4F46E5;
+    --success: #0F766E;
+
+    /* Keep the existing shadcn/Tailwind variable contract intact. */
+    --background: 220 50% 97.6471%;
+    --foreground: 222.2222 47.3684% 11.1765%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222.2222 47.3684% 11.1765%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222.2222 47.3684% 11.1765%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 243.3962 75.3555% 58.6275%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 220 50% 97.6471%;
+    --secondary-foreground: 222.2222 47.3684% 11.1765%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 50% 97.6471%;
+    --muted-foreground: 212.9032 15.8974% 38.2353%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 220 50% 97.6471%;
+    --accent-foreground: 222.2222 47.3684% 11.1765%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 214.7368 33.3333% 88.8235%;
+    --input: 214.7368 33.3333% 88.8235%;
+    --ring: 243.3962 75.3555% 58.6275%;
 
-    --radius: 0.5rem;
+    --radius: 0.625rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --canvas: #0F172A;
+    --surface: #1E293B;
+    --ink: #F6F8FC;
+    --muted-ink: #CBD5E1;
+    --line: #94A3B8;
+    --indigo: #818CF8;
+    --success: #2DD4BF;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --background: 222.2222 47.3684% 11.1765%;
+    --foreground: 220 50% 97.6471%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --card: 217.2414 32.5843% 17.451%;
+    --card-foreground: 220 50% 97.6471%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --popover: 217.2414 32.5843% 17.451%;
+    --popover-foreground: 220 50% 97.6471%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --primary: 234.4545 89.4737% 73.9216%;
+    --primary-foreground: 222.2222 47.3684% 11.1765%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --secondary: 217.2414 32.5843% 17.451%;
+    --secondary-foreground: 220 50% 97.6471%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --muted: 217.2414 32.5843% 17.451%;
+    --muted-foreground: 215 20.202% 65.098%;
+
+    --accent: 217.2414 32.5843% 17.451%;
+    --accent-foreground: 220 50% 97.6471%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 220 50% 97.6471%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 215.3846 25.3731% 26.2745%;
+    --input: 215.3846 25.3731% 26.2745%;
+    --ring: 234.4545 89.4737% 73.9216%;
   }
 }
 
 @layer base {
-  * {
+  *,
+  *::before,
+  *::after {
     /* Tailwind v4 changed how some utilities are resolved; apply the CSS variable directly */
+    box-sizing: border-box;
     border-color: hsl(var(--border));
   }
+
+  html {
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
+    min-width: 320px;
+    max-width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    min-width: 0;
+    max-width: 100%;
+    color: inherit;
+    font: inherit;
+    line-height: inherit;
+    accent-color: var(--indigo);
+  }
+
+  button {
+    border: 0;
+    background: transparent;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--indigo);
+    outline-offset: 2px;
+  }
+}
+
+/* Keep the existing ad placeholder within the same AA contrast baseline. */
+@layer utilities {
+  .border-dashed.border-gray-200 {
+    border-color: #64748B;
+  }
+
+  .border-dashed.border-gray-200 .text-gray-400,
+  .border-dashed.border-gray-200 .text-gray-300 {
+    color: #475569;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 0.9375rem;
   }
 }

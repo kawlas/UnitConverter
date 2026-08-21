@@ -320,20 +320,20 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   return (
     <div className="space-y-6">
       <h2 className="font-medium text-lg">{title}</h2>
-      <div className="grid grid-cols-[minmax(70px,120px)_1fr] gap-4 items-center">
+      <div className="grid items-center gap-4 sm:grid-cols-[minmax(70px,120px)_minmax(0,1fr)]">
         <label htmlFor={`${categoryId}-from-value`} className="text-sm font-medium">From</label>
-        <div className="flex items-center gap-2">
-          <Input id={`${categoryId}-from-value`} type="text" inputMode="decimal" value={fromValue} onChange={(e) => setValue(e.target.value)} className="w-[120px] min-h-11" placeholder="0" aria-invalid={Boolean(resultState.error)} aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+          <Input id={`${categoryId}-from-value`} type="text" inputMode="decimal" value={fromValue} onChange={(e) => setValue(e.target.value)} className="min-h-11 w-full sm:w-[120px]" placeholder="0" aria-invalid={Boolean(resultState.error)} aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
           <Select value={fromUnit} onValueChange={setFrom}>
-            <SelectTrigger aria-label="Source unit" className="min-h-11 w-[170px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger aria-label="Source unit" className="min-h-11 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
             <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <label htmlFor={`${categoryId}-result`} className="text-sm font-medium">To</label>
-        <div className="flex items-center gap-2">
-          <Input id={`${categoryId}-result`} type="text" value={resultState.result} readOnly className="w-[120px] min-h-11" aria-live="polite" aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+          <Input id={`${categoryId}-result`} type="text" value={resultState.result} readOnly className="min-h-11 w-full sm:w-[120px]" aria-live="polite" aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
           <Select value={toUnit} onValueChange={setTo}>
-            <SelectTrigger aria-label="Target unit" className="min-h-11 w-[170px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger aria-label="Target unit" className="min-h-11 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
             <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
           </Select>
         </div>
