@@ -47,17 +47,26 @@ const bmiRanges: BMIRange[] = [
   },
 ];
 
+const parseNumeric = (raw: string): number | undefined => {
+  if (!/^-?(?:(?:\d+(?:[.,]\d*)?)|(?:[.,]\d+))$/.test(raw.trim())) return undefined;
+  const value = Number(raw.trim().replace(",", "."));
+  return Number.isFinite(value) ? value : undefined;
+};
+
 const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
   const [height, setHeight] = useState<string>("170");
   const [weight, setWeight] = useState<string>("70");
   const [heightUnit, setHeightUnit] = useState<string>("cm");
   const [weightUnit, setWeightUnit] = useState<string>("kg");
-  const { bmi: computedBMI, category: computedCategory, idealRange } = React.useMemo(() => {
-    let heightInMeters = parseFloat(height);
-    let weightInKg = parseFloat(weight);
+  const { bmi: computedBMI, category: computedCategory, idealRange, error } = React.useMemo(() => {
+    let heightInMeters = parseNumeric(height);
+    let weightInKg = parseNumeric(weight);
 
-    if (isNaN(heightInMeters) || isNaN(weightInKg) || heightInMeters <= 0) {
-      return { bmi: 0, category: "", idealRange: { min: 0, max: 0 } };
+    if (heightInMeters === undefined || weightInKg === undefined) {
+      return { bmi: 0, category: "", idealRange: { min: 0, max: 0 }, error: "Enter valid finite numbers for height and weight." };
+    }
+    if (heightInMeters <= 0 || weightInKg <= 0) {
+      return { bmi: 0, category: "", idealRange: { min: 0, max: 0 }, error: "Height and weight must be greater than zero." };
     }
 
     // Convert height to meters
@@ -101,6 +110,7 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
         min: Math.round(minWeight * 10) / 10,
         max: Math.round(maxWeight * 10) / 10,
       },
+      error: "",
     };
   }, [height, weight, heightUnit, weightUnit]);
 
@@ -109,6 +119,7 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
   return (
     <div className="space-y-6">
       <h2 className="font-medium text-lg">{title}</h2>
+      {error && <p className="text-sm text-red-700" role="alert">{error}</p>}
 
       <div className="grid md:grid-cols-[.75fr_1fr] gap-6">
         <div className="space-y-4">
@@ -117,11 +128,15 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
             <div className="text-sm mb-2">Height</div>
             <div className="flex flex-col sm:flex-row gap-2">
               <Input
-                type="number"
+                id="bmi-height"
+                type="text"
+                inputMode="decimal"
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
                 className="flex-1"
                 placeholder="170"
+                aria-label="Height"
+                aria-invalid={Boolean(error)}
               />
               <Select value={heightUnit} onValueChange={setHeightUnit}>
                 <SelectTrigger className="w-full sm:w-[140px]">
@@ -141,11 +156,15 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
             <div className="text-sm mb-2">Weight</div>
             <div className="flex flex-col sm:flex-row gap-2">
               <Input
-                type="number"
+                id="bmi-weight"
+                type="text"
+                inputMode="decimal"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
                 className="flex-1"
                 placeholder="70"
+                aria-label="Weight"
+                aria-invalid={Boolean(error)}
               />
               <Select value={weightUnit} onValueChange={setWeightUnit}>
                 <SelectTrigger className="w-full sm:w-[140px]">

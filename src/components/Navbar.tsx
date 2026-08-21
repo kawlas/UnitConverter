@@ -22,6 +22,7 @@ export default function Navbar() {
               <Link
                 key={category.id}
                 to={`/${category.id}`}
+                aria-current={location.pathname === `/${category.id}` ? "page" : undefined}
                 className={cn(
                   "px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap",
                   location.pathname === `/${category.id}`
@@ -61,6 +62,7 @@ export default function Navbar() {
                 key={category.id}
                 to={`/${category.id}`}
                 onClick={() => setIsMenuOpen(false)}
+                aria-current={location.pathname === `/${category.id}` ? "page" : undefined}
                 className={cn(
                   "block px-3 py-2 rounded-md text-base font-medium transition-colors",
                   location.pathname === `/${category.id}`
