@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPlaybackUrl, parseStoredFavorites, parseStoredHistory, parseStrict } from "./ConversionSection";
+import { buildPlaybackUrl, clearStoredData, parseStoredFavorites, parseStoredHistory, parseStrict } from "./ConversionSection";
 
 describe("saved conversion playback URL", () => {
   it("includes the target category and complete history state", () => {
@@ -17,6 +17,16 @@ describe("saved conversion playback URL", () => {
       from: "celsius",
       to: "fahrenheit",
     })).toBe("/convert/temperature?from=celsius&to=fahrenheit");
+  });
+});
+
+describe("saved data controls", () => {
+  it("removes both saved-data keys", () => {
+    const removed: string[] = [];
+
+    clearStoredData({ removeItem: (key) => removed.push(key) });
+
+    expect(removed).toEqual(["q-converter:history:v1", "q-converter:favorites:v1"]);
   });
 });
 
