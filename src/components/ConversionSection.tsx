@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpDown, Copy, RotateCcw, Share2, Star } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -28,6 +28,13 @@ const HISTORY_KEY = "q-converter:history:v1";
 const FAVORITES_KEY = "q-converter:favorites:v1";
 const MAX_HISTORY = 50;
 const MAX_FAVORITES = 30;
+
+type StorageLike = Pick<Storage, "removeItem">;
+
+const clearStoredData = (storage: StorageLike = localStorage): void => {
+  storage.removeItem(HISTORY_KEY);
+  storage.removeItem(FAVORITES_KEY);
+};
 const LOCALES = ["en-US", "pl-PL", "de-DE", "fr-FR"];
 
 const EN_US_NUMBER = /^-?(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)$/;
@@ -159,6 +166,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   const [locale, setLocale] = useState(queryLocale);
   const [status, setStatus] = useState("");
   const [isSharing, setIsSharing] = useState(false);
+  const historyPersistenceVersion = useRef(0);
   const [history, setHistory] = useState<HistoryEntry[]>(readStoredHistory);
   const [favoriteIds, setFavoriteIds] = useState<string[]>(readStoredFavorites);
 
@@ -211,7 +219,9 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
 
   useEffect(() => {
     if (!resultState.result || parsedValue === undefined) return;
+    const persistenceVersion = historyPersistenceVersion.current;
     const timer = window.setTimeout(() => {
+      if (persistenceVersion !== historyPersistenceVersion.current) return;
       const entry: HistoryEntry = { categoryId, fromUnit, toUnit, input: fromValue, result: resultState.result, precision, locale, timestamp: Date.now() };
       try {
         const current = readStoredHistory();
@@ -248,6 +258,17 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
       setFavoriteIds(next);
       setStatus(next.includes(favoriteId) ? "Added to favorites." : "Removed from favorites.");
     } catch { setStatus("Favorites are unavailable in this browser."); }
+  };
+  const clearSavedData = () => {
+    historyPersistenceVersion.current += 1;
+    try {
+      clearStoredData();
+      setStatus("Saved data cleared.");
+    } catch {
+      setStatus("Saved data could not be cleared from this browser.");
+    }
+    setHistory([]);
+    setFavoriteIds([]);
   };
   const share = async () => {
     setIsSharing(true);
@@ -296,11 +317,12 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
       {(history.length > 0 || favoriteIds.length > 0) && <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
         {history.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Recent conversions</summary><ul className="mt-2 space-y-1 text-sm">{history.slice(0, 5).map((entry) => <li key={`${entry.timestamp}-${entry.input}`}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => playSavedConversion(entry.categoryId, { from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale })}>{entry.input} {entry.fromUnit} → {entry.result} {entry.toUnit}</button></li>)}</ul></details>}
         {favoriteIds.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Favorites ({favoriteIds.length})</summary><ul className="mt-2 space-y-1 text-sm">{favoriteIds.slice(0, 5).map((id) => <li key={id}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => { const [favoriteCategoryId, favoriteFrom, favoriteTo] = id.split(":"); playSavedConversion(favoriteCategoryId, { from: favoriteFrom, to: favoriteTo }); }}>{id}</button></li>)}</ul></details>}
+        <Button type="button" variant="outline" size="sm" onClick={clearSavedData}>Clear saved data</Button>
       </div>}
       <p className="sr-only" role="status" aria-live="polite">{status}</p>
     </div>
   );
 };
 
-export { buildPlaybackUrl, parseStrict, parseStoredHistory, parseStoredFavorites };
+export { buildPlaybackUrl, clearStoredData, parseStrict, parseStoredHistory, parseStoredFavorites };
 export default ConversionSection;
