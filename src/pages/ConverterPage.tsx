@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { categories, getCategory } from "@/lib/conversion-data";
 import { convertExact } from "@/lib/conversions";
 import ConversionSection from "@/components/ConversionSection";
@@ -10,12 +10,15 @@ import Navbar from "@/components/Navbar";
 
 export default function ConverterPage() {
   const { categoryId } = useParams();
-  const location = useLocation();
   const category = getCategory(categoryId);
 
   if (!category) {
     return <div className="min-h-screen bg-background"><Navbar /><main className="mx-auto max-w-3xl px-4 py-16"><h1 className="text-3xl font-bold">Category not found</h1><p className="mt-3 text-gray-600">Choose a supported conversion category from the navigation.</p></main><Footer /></div>;
   }
+
+  // Canonical path always uses the short form /:categoryId regardless of which alias route was used
+  const canonicalPath = `/${categoryId}`;
+  const canonicalUrl = `${window.location.origin}${canonicalPath}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -23,7 +26,7 @@ export default function ConverterPage() {
     name: `${category.title} Converter`,
     applicationCategory: "UtilitiesApplication",
     description: category.description,
-    url: `${window.location.origin}${location.pathname}`,
+    url: canonicalUrl,
   };
   const breadcrumb = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: window.location.origin }, { "@type": "ListItem", position: 2, name: `${category.title} Converter` }] };
   const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: category.faq.map((item) => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer } })) };
@@ -33,8 +36,8 @@ export default function ConverterPage() {
       <Helmet>
         <title>{category.title} Converter — Free Online Q Converter</title>
         <meta name="description" content={`${category.description} Use this free ${category.title.toLowerCase()} converter with precision and shareable URLs.`} />
-        <link rel="canonical" href={`${window.location.origin}${location.pathname}`} />
-        <meta property="og:title" content={`${category.title} Converter`} /><meta property="og:description" content={category.description} /><meta property="og:url" content={`${window.location.origin}${location.pathname}`} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:title" content={`${category.title} Converter`} /><meta property="og:description" content={category.description} /><meta property="og:url" content={canonicalUrl} />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script><script type="application/ld+json">{JSON.stringify(breadcrumb)}</script><script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
       </Helmet>
       <div className="min-h-screen bg-background"><Navbar /><main className="py-8 px-4"><div className="max-w-3xl mx-auto space-y-6">

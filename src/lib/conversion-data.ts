@@ -183,7 +183,13 @@ export const getUnit = (category: CategoryDefinition, id: string): UnitDefinitio
   );
 };
 
-export const defaultUnits = (category: CategoryDefinition): { from: string; to: string } => ({
-  from: category.units[0]?.value ?? "",
-  to: category.units[1]?.value ?? category.units[0]?.value ?? "",
-});
+const baselineDefaultUnits: Readonly<Record<string, { from: string; to: string }>> = {
+  speed: { from: "kph", to: "mph" },
+  area: { from: "square_meters", to: "square_feet" },
+};
+
+export const defaultUnits = (category: CategoryDefinition): { from: string; to: string } =>
+  baselineDefaultUnits[category.id] ?? {
+    from: category.units[0]?.value ?? "",
+    to: category.units[1]?.value ?? category.units[0]?.value ?? "",
+  };
