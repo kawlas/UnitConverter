@@ -26,6 +26,8 @@ interface HistoryEntry {
 
 const HISTORY_KEY = "q-converter:history:v1";
 const FAVORITES_KEY = "q-converter:favorites:v1";
+const MAX_HISTORY = 50;
+const MAX_FAVORITES = 30;
 const LOCALES = ["en-US", "pl-PL", "de-DE", "fr-FR"];
 
 const EN_US_NUMBER = /^-?(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)$/;
@@ -66,6 +68,64 @@ const safeStorage = (key: string, fallback: string): string => {
   try { return localStorage.getItem(key) ?? fallback; } catch { return fallback; }
 };
 
+const isNonEmptyString = (value: unknown): value is string => typeof value === "string" && value.length > 0;
+
+const isHistoryEntry = (value: unknown): value is HistoryEntry => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const entry = value as Partial<HistoryEntry>;
+  return isNonEmptyString(entry.categoryId) &&
+    isNonEmptyString(entry.fromUnit) &&
+    isNonEmptyString(entry.toUnit) &&
+    isNonEmptyString(entry.input) &&
+    isNonEmptyString(entry.result) &&
+    Number.isInteger(entry.precision) && entry.precision >= 0 && entry.precision <= 12 &&
+    LOCALES.includes(entry.locale ?? "") &&
+    typeof entry.timestamp === "number" && Number.isFinite(entry.timestamp) && entry.timestamp >= 0;
+};
+
+const isFavoriteId = (value: unknown): value is string => {
+  if (!isNonEmptyString(value)) return false;
+  const parts = value.split(":");
+  return parts.length === 3 && parts.every(isNonEmptyString);
+};
+
+const parseStoredHistory = (raw: string): HistoryEntry[] => {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter(isHistoryEntry).slice(0, MAX_HISTORY) : [];
+  } catch {
+    return [];
+  }
+};
+
+const parseStoredFavorites = (raw: string): string[] => {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter(isFavoriteId).slice(0, MAX_FAVORITES) : [];
+  } catch {
+    return [];
+  }
+};
+
+const normalizeStoredValue = <T,>(key: string, raw: string, value: T[]): T[] => {
+  if (raw === JSON.stringify(value)) return value;
+  try {
+    if (value.length === 0) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify(value));
+  } catch { /* Storage is optional. */ }
+  return value;
+};
+
+const readStoredHistory = (): HistoryEntry[] => {
+  const raw = safeStorage(HISTORY_KEY, "[]");
+  return normalizeStoredValue(HISTORY_KEY, raw, parseStoredHistory(raw));
+};
+
+const readStoredFavorites = (): string[] => {
+  const raw = safeStorage(FAVORITES_KEY, "[]");
+  return normalizeStoredValue(FAVORITES_KEY, raw, parseStoredFavorites(raw));
+};
+
 const buildPlaybackUrl = (categoryId: string, params: Record<string, string>): string =>
   `/convert/${encodeURIComponent(categoryId)}?${new URLSearchParams(params).toString()}`;
 
@@ -99,12 +159,8 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   const [locale, setLocale] = useState(queryLocale);
   const [status, setStatus] = useState("");
   const [isSharing, setIsSharing] = useState(false);
-  const [history, setHistory] = useState<HistoryEntry[]>(() => {
-    try { return JSON.parse(safeStorage(HISTORY_KEY, "[]")) as HistoryEntry[]; } catch { return []; }
-  });
-  const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
-    try { return JSON.parse(safeStorage(FAVORITES_KEY, "[]")) as string[]; } catch { return []; }
-  });
+  const [history, setHistory] = useState<HistoryEntry[]>(readStoredHistory);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(readStoredFavorites);
 
   const validUnit = (value: string) => units.some((unit) => unit.value === value);
   const queryHasInvalidUnit = (searchParams.has("from") && !validUnit(searchParams.get("from") ?? "")) ||
@@ -158,9 +214,9 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     const timer = window.setTimeout(() => {
       const entry: HistoryEntry = { categoryId, fromUnit, toUnit, input: fromValue, result: resultState.result, precision, locale, timestamp: Date.now() };
       try {
-        const current = JSON.parse(safeStorage(HISTORY_KEY, "[]")) as HistoryEntry[];
+        const current = readStoredHistory();
         const deduped = current.filter((item) => !(item.categoryId === categoryId && item.fromUnit === fromUnit && item.toUnit === toUnit && item.input === fromValue));
-        const nextHistory = [entry, ...deduped].slice(0, 50);
+        const nextHistory = [entry, ...deduped].slice(0, MAX_HISTORY);
         localStorage.setItem(HISTORY_KEY, JSON.stringify(nextHistory));
         setHistory(nextHistory);
       } catch { /* Storage is optional. */ }
@@ -186,8 +242,8 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   };
   const toggleFavorite = () => {
     try {
-      const current = JSON.parse(safeStorage(FAVORITES_KEY, "[]")) as string[];
-      const next = current.includes(favoriteId) ? current.filter((id) => id !== favoriteId) : [favoriteId, ...current].slice(0, 30);
+      const current = readStoredFavorites();
+      const next = current.includes(favoriteId) ? current.filter((id) => id !== favoriteId) : [favoriteId, ...current].slice(0, MAX_FAVORITES);
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
       setFavoriteIds(next);
       setStatus(next.includes(favoriteId) ? "Added to favorites." : "Removed from favorites.");
@@ -246,5 +302,5 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   );
 };
 
-export { buildPlaybackUrl, parseStrict };
+export { buildPlaybackUrl, parseStrict, parseStoredHistory, parseStoredFavorites };
 export default ConversionSection;
