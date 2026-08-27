@@ -1,116 +1,45 @@
-// no-op: `cn` removed because not used in this file
+import { Link } from "react-router-dom";
+import { categories } from "@/lib/conversion-data";
 
-const categories = [
-  {
-    title: "Power",
-    items: [
-      "Watts to Horsepower",
-      "Kilowatts to Horsepower",
-      "Watts to Kilowatts",
-      "BTU per Hour to Watts",
-    ],
-  },
-  {
-    title: "Energy",
-    items: [
-      "Joules to Kilowatt Hours",
-      "Calories to Joules",
-      "BTU to Joules",
-      "Kilowatt Hours to BTU",
-    ],
-  },
-  {
-    title: "Speed",
-    items: [
-      "Miles per Hour to Kilometers per Hour",
-      "Meters per Second to Miles per Hour",
-      "Knots to Miles per Hour",
-      "Kilometers per Hour to Meters per Second",
-    ],
-  },
-  {
-    title: "Length",
-    items: [
-      "Meters to Feet",
-      "Inches to Centimeters",
-      "Kilometers to Miles",
-      "Yards to Meters",
-    ],
-  },
-  {
-    title: "Weight",
-    items: [
-      "Kilograms to Pounds",
-      "Ounces to Grams",
-      "Pounds to Kilograms",
-      "Grams to Ounces",
-    ],
-  },
-  {
-    title: "Temperature",
-    items: [
-      "Celsius to Fahrenheit",
-      "Fahrenheit to Celsius",
-      "Kelvin to Celsius",
-      "Celsius to Kelvin",
-    ],
-  },
-  {
-    title: "Volume",
-    items: [
-      "Liters to Gallons",
-      "Milliliters to Ounces",
-      "Cubic Meters to Cubic Feet",
-      "Gallons to Liters",
-    ],
-  },
-  {
-    title: "Area",
-    items: [
-      "Square Meters to Square Feet",
-      "Acres to Hectares",
-      "Square Kilometers to Square Miles",
-      "Square Feet to Square Meters",
-    ],
-  },
-];
-
-const Footer = () => {
-  return (
-    <footer className="bg-gradient-to-b from-white to-gray-50 border-t border-gray-100">
-      <div className="max-w-7xl mx-auto py-12 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          {categories.map((category) => (
-            <div key={category.title}>
-              <h3 className="font-semibold mb-4">
-                {category.title} Conversions
-              </h3>
-              <ul className="space-y-2">
-                {category.items.map((item) => (
-                  <li
-                    key={item}
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+const Footer = () => (
+  <footer className="border-t border-slate-200 bg-white" aria-label="Footer">
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
+      <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600">Q Converter</p>
+          <h2 className="mt-1 text-lg font-semibold tracking-tight text-slate-950">Explore conversions</h2>
         </div>
-        <div className="mt-8 pt-8 border-t">
-          <p className="text-xs text-gray-300 text-center">
-            Keywords: unit converter, measurement converter, metric to imperial,
-            imperial to metric,
-            {categories
-              .map((cat) => cat.items)
-              .flat()
-              .join(", ")}
-          </p>
-        </div>
+        <p className="max-w-sm text-sm text-slate-500 sm:text-right">
+          Free, precise conversions for everyday measurements.
+        </p>
       </div>
-    </footer>
-  );
-};
+
+      <nav aria-label="Conversion categories" className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 lg:gap-x-6">
+        {categories.map((category) => (
+          <div key={category.id}>
+            <Link
+              to={`/${category.id}`}
+              className="inline-flex min-h-11 items-center rounded-md text-sm font-semibold text-slate-950 transition-colors hover:text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              {category.title} <span className="sr-only"> conversions</span>
+            </Link>
+            <ul className="mt-1 space-y-1" aria-label={`${category.title} units`}>
+              {category.units.slice(0, 4).map((unit) => (
+                <li key={unit.value} className="text-xs leading-5 text-slate-500">
+                  {unit.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
+
+      <div className="mt-9 flex flex-col gap-2 border-t border-slate-200 pt-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <p>Free unit converter with precise, shareable conversions.</p>
+        <p>© {new Date().getFullYear()} Q Converter</p>
+      </div>
+    </div>
+  </footer>
+);
 
 export default Footer;
