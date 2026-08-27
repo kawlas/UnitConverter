@@ -125,7 +125,7 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
         <div className="space-y-4">
           {/* Height Section */}
           <div>
-            <div className="text-sm mb-2">Height</div>
+            <label htmlFor="bmi-height" className="text-sm mb-2 block">Height</label>
             <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 id="bmi-height"
@@ -133,13 +133,13 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
                 inputMode="decimal"
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
-                className="flex-1"
+                className="flex-1 min-h-11"
                 placeholder="170"
-                aria-label="Height"
                 aria-invalid={Boolean(error)}
+                aria-describedby={error ? "bmi-error" : undefined}
               />
               <Select value={heightUnit} onValueChange={setHeightUnit}>
-                <SelectTrigger className="w-full sm:w-[140px]">
+                <SelectTrigger aria-label="Height unit" className="min-h-11 w-full sm:w-[140px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -153,7 +153,7 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
 
           {/* Weight Section */}
           <div>
-            <div className="text-sm mb-2">Weight</div>
+            <label htmlFor="bmi-weight" className="text-sm mb-2 block">Weight</label>
             <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 id="bmi-weight"
@@ -161,13 +161,13 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
                 inputMode="decimal"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
-                className="flex-1"
+                className="flex-1 min-h-11"
                 placeholder="70"
-                aria-label="Weight"
                 aria-invalid={Boolean(error)}
+                aria-describedby={error ? "bmi-error" : undefined}
               />
               <Select value={weightUnit} onValueChange={setWeightUnit}>
-                <SelectTrigger className="w-full sm:w-[140px]">
+                <SelectTrigger aria-label="Weight unit" className="min-h-11 w-full sm:w-[140px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -183,7 +183,7 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
         <div className="space-y-4">
           <Card className="p-6 bg-gray-50">
             <div className="text-center">
-              <div className="text-4xl font-bold text-gray-900">
+              <div className="text-4xl font-bold text-gray-900" aria-live="polite" aria-atomic="true">
                 {computedBMI || "-"}
               </div>
               <div className="text-sm text-gray-500 mt-1">Your BMI</div>

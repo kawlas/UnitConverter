@@ -70,6 +70,9 @@ const safeStorage = (key: string, fallback: string): string => {
 
 const isNonEmptyString = (value: unknown): value is string => typeof value === "string" && value.length > 0;
 
+const isRetained = (timestamp: number, now: number): boolean =>
+  timestamp <= now && now - timestamp <= SAVED_DATA_TTL_MS;
+
 const isHistoryEntry = (value: unknown): value is HistoryEntry => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const entry = value as Partial<HistoryEntry>;
@@ -93,19 +96,42 @@ const parseStoredHistory = (raw: string): HistoryEntry[] => {
   try {
     const parsed: unknown = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.filter(isHistoryEntry).slice(0, MAX_HISTORY) : [];
+const isStoredFavorite = (value: unknown): value is StoredFavorite => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const favorite = value as Partial<StoredFavorite>;
+  return isFavoriteId(favorite.id) &&
+    typeof favorite.timestamp === "number" && Number.isFinite(favorite.timestamp) && favorite.timestamp >= 0;
+};
+
+const parseStoredHistory = (raw: string, now = Date.now()): HistoryEntry[] => {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed)
+      ? parsed.filter((entry): entry is HistoryEntry => isHistoryEntry(entry) && isRetained(entry.timestamp, now)).slice(0, MAX_HISTORY)
+      : [];
   } catch {
     return [];
   }
 };
 
-const parseStoredFavorites = (raw: string): string[] => {
+const parseStoredFavoriteEntries = (raw: string, now = Date.now()): StoredFavorite[] => {
   try {
     const parsed: unknown = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.filter(isFavoriteId).slice(0, MAX_FAVORITES) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .flatMap((value): StoredFavorite[] => {
+        // Legacy favorites were plain IDs. Keep them once and timestamp them during migration.
+        if (isFavoriteId(value)) return [{ id: value, timestamp: now }];
+        return isStoredFavorite(value) && isRetained(value.timestamp, now) ? [value] : [];
+      })
+      .slice(0, MAX_FAVORITES);
   } catch {
     return [];
   }
 };
+
+const parseStoredFavorites = (raw: string, now = Date.now()): string[] =>
+  parseStoredFavoriteEntries(raw, now).map(({ id }) => id);
 
 const normalizeStoredValue = <T,>(key: string, raw: string, value: T[]): T[] => {
   if (raw === JSON.stringify(value)) return value;
@@ -121,10 +147,12 @@ const readStoredHistory = (): HistoryEntry[] => {
   return normalizeStoredValue(HISTORY_KEY, raw, parseStoredHistory(raw));
 };
 
-const readStoredFavorites = (): string[] => {
+const readStoredFavoriteEntries = (): StoredFavorite[] => {
   const raw = safeStorage(FAVORITES_KEY, "[]");
-  return normalizeStoredValue(FAVORITES_KEY, raw, parseStoredFavorites(raw));
+  return normalizeStoredValue(FAVORITES_KEY, raw, parseStoredFavoriteEntries(raw));
 };
+
+const readStoredFavorites = (): string[] => readStoredFavoriteEntries().map(({ id }) => id);
 
 const buildPlaybackUrl = (categoryId: string, params: Record<string, string>): string =>
   `/convert/${encodeURIComponent(categoryId)}?${new URLSearchParams(params).toString()}`;
@@ -159,6 +187,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   const [locale, setLocale] = useState(queryLocale);
   const [status, setStatus] = useState("");
   const [isSharing, setIsSharing] = useState(false);
+  const historyPersistenceVersion = useRef(0);
   const [history, setHistory] = useState<HistoryEntry[]>(readStoredHistory);
   const [favoriteIds, setFavoriteIds] = useState<string[]>(readStoredFavorites);
 
@@ -211,7 +240,9 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
 
   useEffect(() => {
     if (!resultState.result || parsedValue === undefined) return;
+    const persistenceVersion = historyPersistenceVersion.current;
     const timer = window.setTimeout(() => {
+      if (persistenceVersion !== historyPersistenceVersion.current) return;
       const entry: HistoryEntry = { categoryId, fromUnit, toUnit, input: fromValue, result: resultState.result, precision, locale, timestamp: Date.now() };
       try {
         const current = readStoredHistory();
@@ -242,12 +273,26 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   };
   const toggleFavorite = () => {
     try {
-      const current = readStoredFavorites();
-      const next = current.includes(favoriteId) ? current.filter((id) => id !== favoriteId) : [favoriteId, ...current].slice(0, MAX_FAVORITES);
+      const current = readStoredFavoriteEntries();
+      const next = current.some(({ id }) => id === favoriteId)
+        ? current.filter(({ id }) => id !== favoriteId)
+        : [{ id: favoriteId, timestamp: Date.now() }, ...current].slice(0, MAX_FAVORITES);
       localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
-      setFavoriteIds(next);
-      setStatus(next.includes(favoriteId) ? "Added to favorites." : "Removed from favorites.");
+      const nextIds = next.map(({ id }) => id);
+      setFavoriteIds(nextIds);
+      setStatus(nextIds.includes(favoriteId) ? "Added to favorites." : "Removed from favorites.");
     } catch { setStatus("Favorites are unavailable in this browser."); }
+  };
+  const clearSavedData = () => {
+    historyPersistenceVersion.current += 1;
+    try {
+      clearStoredData();
+      setStatus("Saved data cleared.");
+    } catch {
+      setStatus("Saved data could not be cleared from this browser.");
+    }
+    setHistory([]);
+    setFavoriteIds([]);
   };
   const share = async () => {
     setIsSharing(true);
@@ -265,42 +310,43 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   return (
     <div className="space-y-6">
       <h2 className="font-medium text-lg">{title}</h2>
-      <div className="grid grid-cols-[minmax(70px,120px)_1fr] gap-4 items-center">
+      <div className="grid items-center gap-4 sm:grid-cols-[minmax(70px,120px)_minmax(0,1fr)]">
         <label htmlFor={`${categoryId}-from-value`} className="text-sm font-medium">From</label>
-        <div className="flex items-center gap-2">
-          <Input id={`${categoryId}-from-value`} type="text" inputMode="decimal" value={fromValue} onChange={(e) => setValue(e.target.value)} className="w-[120px]" placeholder="0" aria-invalid={Boolean(resultState.error)} aria-describedby={`${categoryId}-conversion-error`} />
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+          <Input id={`${categoryId}-from-value`} type="text" inputMode="decimal" value={fromValue} onChange={(e) => setValue(e.target.value)} className="min-h-11 w-full sm:w-[120px]" placeholder="0" aria-invalid={Boolean(resultState.error)} aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
           <Select value={fromUnit} onValueChange={setFrom}>
-            <SelectTrigger aria-label="Source unit" className="w-[170px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger aria-label="Source unit" className="min-h-11 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
             <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <label htmlFor={`${categoryId}-result`} className="text-sm font-medium">To</label>
-        <div className="flex items-center gap-2">
-          <Input id={`${categoryId}-result`} type="text" value={resultState.result} readOnly className="w-[120px]" aria-live="polite" aria-describedby={`${categoryId}-conversion-error`} />
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+          <Input id={`${categoryId}-result`} type="text" value={resultState.result} readOnly className="min-h-11 w-full sm:w-[120px]" aria-live="polite" aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
           <Select value={toUnit} onValueChange={setTo}>
-            <SelectTrigger aria-label="Target unit" className="w-[170px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger aria-label="Target unit" className="min-h-11 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
             <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
           </Select>
         </div>
       </div>
       {resultState.error && <p id={`${categoryId}-conversion-error`} className="text-sm text-red-700" role="alert">{resultState.error}</p>}
       <div className="flex flex-wrap justify-end gap-2">
-        <label className="text-sm flex items-center gap-1">Precision<select aria-label="Decimal precision" value={precision} onChange={(e) => { const next = Number(e.target.value); setPrecision(next); updateUrl({ precision: String(next) }); }} className="border rounded px-1 py-1">{Array.from({ length: 13 }, (_, index) => <option key={index} value={index}>{index}</option>)}</select></label>
-        <label className="text-sm flex items-center gap-1">Locale<select aria-label="Number locale" value={locale} onChange={(e) => { setLocale(e.target.value); updateUrl({ locale: e.target.value }); }} className="border rounded px-1 py-1">{LOCALES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-        <Button variant="ghost" size="icon" onClick={swap} aria-label="Swap units"><ArrowUpDown className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" onClick={resetToDefaults} aria-label="Reset category"><RotateCcw className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" onClick={() => { copyText(window.location.href).then((ok) => setStatus(ok ? "Share URL copied." : "Unable to copy URL.")); }} aria-label="Copy share URL"><Copy className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
+        <label className="text-sm flex items-center gap-1">Precision<select aria-label="Decimal precision" value={precision} onChange={(e) => { const next = Number(e.target.value); setPrecision(next); updateUrl({ precision: String(next) }); }} className="min-h-11 border rounded px-2 py-1">{Array.from({ length: 13 }, (_, index) => <option key={index} value={index}>{index}</option>)}</select></label>
+        <label className="text-sm flex items-center gap-1">Locale<select aria-label="Number locale" value={locale} onChange={(e) => { setLocale(e.target.value); updateUrl({ locale: e.target.value }); }} className="min-h-11 border rounded px-2 py-1">{LOCALES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={swap} aria-label="Swap units"><ArrowUpDown className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={resetToDefaults} aria-label="Reset category"><RotateCcw className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={() => { copyText(window.location.href).then((ok) => setStatus(ok ? "Share URL copied." : "Unable to copy URL.")); }} aria-label="Copy share URL"><Copy className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
       </div>
       {(history.length > 0 || favoriteIds.length > 0) && <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
         {history.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Recent conversions</summary><ul className="mt-2 space-y-1 text-sm">{history.slice(0, 5).map((entry) => <li key={`${entry.timestamp}-${entry.input}`}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => playSavedConversion(entry.categoryId, { from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale })}>{entry.input} {entry.fromUnit} → {entry.result} {entry.toUnit}</button></li>)}</ul></details>}
         {favoriteIds.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Favorites ({favoriteIds.length})</summary><ul className="mt-2 space-y-1 text-sm">{favoriteIds.slice(0, 5).map((id) => <li key={id}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => { const [favoriteCategoryId, favoriteFrom, favoriteTo] = id.split(":"); playSavedConversion(favoriteCategoryId, { from: favoriteFrom, to: favoriteTo }); }}>{id}</button></li>)}</ul></details>}
+        <Button type="button" variant="outline" size="sm" onClick={clearSavedData}>Clear saved data</Button>
       </div>}
       <p className="sr-only" role="status" aria-live="polite">{status}</p>
     </div>
   );
 };
 
-export { buildPlaybackUrl, parseStrict, parseStoredHistory, parseStoredFavorites };
+export { SAVED_DATA_TTL_MS, buildPlaybackUrl, clearStoredData, parseStrict, parseStoredHistory, parseStoredFavorites };
 export default ConversionSection;
