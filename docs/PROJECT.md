@@ -1,0 +1,116 @@
+# Q Converter project handoff
+
+## Identity and current state
+
+- **Product:** Q Converter, a modern measurement-studio frontend.
+- **Stack:** React 19, TypeScript, Vite 7, Tailwind v4.
+- **Production:** <https://qconverter.netlify.app>
+- **Repository:** <https://github.com/kawlas/UnitConverter>
+- **Shipped redesign:** PR #31, merge `611658f`.
+- **Latest production deploy:** `6a88522abce553be2b8d4f85`.
+- CSS is restored using Tailwind v4 syntax (`@import "tailwindcss"` plus the project config).
+- Conversion history and favorites use `localStorage` with a 30-day TTL; users can clear saved data.
+- Playwright and axe coverage are part of the test surface.
+- The CodeQL workflow was removed because this private repository does not have purchased GitHub Advanced Security (GHAS). The `production-smoke` workflow remains.
+
+This document is the detailed project reference. Agents must read the root `AGENTS.md`,
+then this file, then Wiki `[[unit-converter]]` and `Wiki/log.md` when available. Work on a
+branch for every task; never work directly on `main`.
+
+## Architecture map
+
+- `src/App.tsx` — React Router route table and lazy page loading.
+- `src/pages/HomePage.tsx` — search-led home page, category cards, FAQ, metadata.
+- `src/pages/ConverterPage.tsx` — category page, formula/examples/FAQ, metadata and canonical URL.
+- `src/components/Navbar.tsx`, `Footer.tsx`, `SearchBar.tsx` — global navigation and discovery UI.
+- `src/components/ConversionSection.tsx` — inputs, URL state, conversion controls, history, favorites, sharing, locale and precision.
+- `src/components/BMICalculator.tsx` — BMI-specific calculator UI.
+- `src/lib/conversion-data.ts` / `src/lib/conversions.ts` — typed catalog, unit definitions and exact conversion engine.
+- `src/index.css` — Tailwind v4 entry point, theme variables, base styles and overflow/accessibility guards.
+- `vite.config.ts` — Vite/React plugin, aliases and production chunking.
+- `tests/e2e/smoke.pw.ts` — styling, responsive overflow, title, URL state, swap, canonical, saved controls, navigation and axe smoke tests.
+- `.github/workflows/production-smoke.yml` — scheduled/manual production E2E smoke run.
+- `netlify.toml` — `npm run build` and `dist` publish configuration.
+
+## Product behavior
+
+The app exposes a typed catalog of measurement categories and exact standard conversion
+formulas, including linear and affine units plus custom conversions and BMI. A conversion
+is encoded in shareable URL query state (`from`, `to`, `value`, `precision`, and `locale`),
+so a copied link restores the same inputs. Users can swap units, reset a category, copy or
+share a URL, save favorites, revisit recent history, and clear saved data. History and
+favorites are retained for at most 30 days and tolerate unavailable or malformed browser
+storage.
+
+Supported presentation behavior includes `en-US`, `pl-PL`, `de-DE`, and `fr-FR` number
+locales, precision from 0–12 decimals, category SEO metadata, canonical short routes, the
+`/convert/:categoryId` alias, FAQ/structured data, and a keyboard-accessible mobile menu.
+
+## Design direction and constraints
+
+The shipped redesign is a calm, high-contrast measurement studio: a dark navy hero,
+white surfaces, indigo primary actions and teal success accents. Keep typography clear and
+compact (Inter/system sans, strong heading hierarchy, restrained uppercase labels), with
+rounded cards, thin slate borders, and light depth rather than decorative UI.
+
+Core tokens in `src/index.css`:
+
+| Token | Light value | Dark value |
+| --- | --- | --- |
+| `--canvas` | `#F6F8FC` | `#0F172A` |
+| `--surface` | `#fff` | `#1E293B` |
+| `--ink` | `#0F172A` | `#F6F8FC` |
+| `--muted-ink` | `#475569` | `#CBD5E1` |
+| `--line` | `#64748B` | `#94A3B8` |
+| `--indigo` | `#4F46E5` | `#818CF8` |
+| `--success` | `#0F766E` | `#2DD4BF` |
+
+Responsive rules are intentional: support a minimum 320px viewport; prevent document/body
+horizontal overflow; use constrained `max-w-7xl` content; stack converter controls and
+cards on small screens; keep controls at least 44px high/wide; use a desktop category nav
+from `md` upward and a scrollable, keyboard-safe mobile menu below it; and contain any
+wide example table inside its own horizontal scroller. Preserve visible focus outlines,
+accessible labels/live results, and touch-sized targets.
+
+## Verification and acceptance baseline
+
+Run from the repository root:
+
+```sh
+npm ci
+npm run test:critical
+npm run test:e2e
+BASE_URL=https://qconverter.netlify.app npm run test:e2e
+npm run build
+git diff --check
+```
+
+When Playwright browsers are missing, run `npx playwright install --with-deps chromium`
+(or the platform-appropriate browser install) before E2E. The recorded shipped-redesign
+acceptance baseline is **21/21 unit tests**, **15/15 E2E tests**, **axe 4/4 with no
+serious/critical violations**, **responsive overflow 4/4**, and passing URL-state, swap,
+title, and canonical-route checks. Treat these numbers as a baseline to re-run—not as a
+claim of fresh verification for an untested change.
+
+## Deployment procedure
+
+1. Create/use a task branch; never deploy unreviewed work from `main`.
+2. Install dependencies and run critical, local E2E, build, and diff checks.
+3. Commit, push, and open a PR; merge only after review.
+4. Link the production site when needed: `npx netlify link --name qconverter`.
+5. Deploy the built output: `npx netlify deploy --prod --dir=dist`.
+6. Run production E2E: `BASE_URL=https://qconverter.netlify.app npm run test:e2e`.
+7. Remove deployment-local artifacts from the working tree (`.netlify` and its
+   `.gitignore`) and verify the final diff before handoff.
+
+Do not place Netlify tokens or other secrets in files or command output. A production
+smoke pass is evidence for that deploy only; do not generalize it to unrelated changes.
+
+## Known limits and next steps
+
+- Netlify automatic PR preview checks may fail because the external integration lacks
+  permissions; manual production deploy and the production-smoke workflow work.
+- Re-enable CodeQL only after a GHAS purchase or a decision to make the repository public.
+- Investigate and repair the Netlify integration when access is available.
+- Rerun Lighthouse after material UI or loading changes; the existing audit is not a
+  permanent performance guarantee.
