@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ArrowUpDown, Copy, RotateCcw, Share2, Star } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "./ui/button";
@@ -28,20 +28,6 @@ const HISTORY_KEY = "q-converter:history:v1";
 const FAVORITES_KEY = "q-converter:favorites:v1";
 const MAX_HISTORY = 50;
 const MAX_FAVORITES = 30;
-// Keep locally saved conversions for 30 days, limiting the lifetime of private input data.
-const SAVED_DATA_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-
-interface StoredFavorite {
-  id: string;
-  timestamp: number;
-}
-
-type StorageLike = Pick<Storage, "removeItem">;
-
-const clearStoredData = (storage: StorageLike = localStorage): void => {
-  storage.removeItem(HISTORY_KEY);
-  storage.removeItem(FAVORITES_KEY);
-};
 const LOCALES = ["en-US", "pl-PL", "de-DE", "fr-FR"];
 
 const EN_US_NUMBER = /^-?(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)$/;
@@ -106,6 +92,10 @@ const isFavoriteId = (value: unknown): value is string => {
   return parts.length === 3 && parts.every(isNonEmptyString);
 };
 
+const parseStoredHistory = (raw: string): HistoryEntry[] => {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter(isHistoryEntry).slice(0, MAX_HISTORY) : [];
 const isStoredFavorite = (value: unknown): value is StoredFavorite => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const favorite = value as Partial<StoredFavorite>;

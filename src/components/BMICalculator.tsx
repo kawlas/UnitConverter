@@ -119,7 +119,7 @@ const BMICalculator: React.FC<BMICalculatorProps> = ({ title = "BMI" }) => {
   return (
     <div className="space-y-6">
       <h2 className="font-medium text-lg">{title}</h2>
-      {error && <p id="bmi-error" className="text-sm text-red-700" role="alert">{error}</p>}
+      {error && <p className="text-sm text-red-700" role="alert">{error}</p>}
 
       <div className="grid md:grid-cols-[.75fr_1fr] gap-6">
         <div className="space-y-4">

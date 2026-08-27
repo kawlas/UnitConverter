@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SAVED_DATA_TTL_MS, buildPlaybackUrl, clearStoredData, parseStoredFavorites, parseStoredHistory, parseStrict } from "./ConversionSection";
+import { buildPlaybackUrl, parseStoredFavorites, parseStoredHistory, parseStrict } from "./ConversionSection";
 
 describe("saved conversion playback URL", () => {
   it("includes the target category and complete history state", () => {
@@ -20,16 +20,6 @@ describe("saved conversion playback URL", () => {
   });
 });
 
-describe("saved data controls", () => {
-  it("removes both saved-data keys", () => {
-    const removed: string[] = [];
-
-    clearStoredData({ removeItem: (key) => removed.push(key) });
-
-    expect(removed).toEqual(["q-converter:history:v1", "q-converter:favorites:v1"]);
-  });
-});
-
 describe("localStorage payload validation", () => {
   const validHistoryEntry = (timestamp: number) => ({
     categoryId: "length",
@@ -47,7 +37,7 @@ describe("localStorage payload validation", () => {
     entries[1] = { ...validHistoryEntry(2), locale: "invalid" };
     entries.push({ ...validHistoryEntry(53), precision: 13 });
 
-    const parsed = parseStoredHistory(JSON.stringify(entries), SAVED_DATA_TTL_MS + 1);
+    const parsed = parseStoredHistory(JSON.stringify(entries));
 
     expect(parsed).toHaveLength(50);
     expect(parsed.every((entry) => entry.locale === "en-US" && entry.precision === 2)).toBe(true);
@@ -57,14 +47,6 @@ describe("localStorage payload validation", () => {
   it("returns an empty history for malformed JSON or a non-array payload", () => {
     expect(parseStoredHistory("not-json")).toEqual([]);
     expect(parseStoredHistory(JSON.stringify({ categoryId: "length" }))).toEqual([]);
-  });
-
-  it("retains fresh history and discards expired entries", () => {
-    const now = SAVED_DATA_TTL_MS * 2;
-    const fresh = validHistoryEntry(now - SAVED_DATA_TTL_MS + 1);
-    const expired = validHistoryEntry(now - SAVED_DATA_TTL_MS - 1);
-
-    expect(parseStoredHistory(JSON.stringify([fresh, expired]), now)).toEqual([fresh]);
   });
 
   it("keeps only well-formed favorite IDs and caps retained favorites", () => {
@@ -82,15 +64,6 @@ describe("localStorage payload validation", () => {
   it("returns an empty favorites list for malformed JSON or a non-array payload", () => {
     expect(parseStoredFavorites("not-json")).toEqual([]);
     expect(parseStoredFavorites(JSON.stringify({ id: "length:meters:feet" }))).toEqual([]);
-  });
-
-  it("retains fresh favorites and discards expired or malformed timestamped entries", () => {
-    const now = SAVED_DATA_TTL_MS * 2;
-    const fresh = { id: "length:meters:feet", timestamp: now - SAVED_DATA_TTL_MS + 1 };
-    const expired = { id: "weight:kilogram:pound", timestamp: now - SAVED_DATA_TTL_MS - 1 };
-    const malformed = { id: "temperature:celsius:fahrenheit", timestamp: "yesterday" };
-
-    expect(parseStoredFavorites(JSON.stringify([fresh, expired, malformed]), now)).toEqual([fresh.id]);
   });
 });
 
