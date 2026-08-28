@@ -5,6 +5,7 @@ const badgeClasses: Record<MethodologySource["organization"], string> = {
   NIST: "border-slate-200 bg-slate-100 text-slate-700",
   IEC: "border-teal-100 bg-teal-50 text-teal-700",
   CDC: "border-rose-100 bg-rose-50 text-rose-700",
+  "King Arthur Baking": "border-amber-200 bg-amber-50 text-amber-800",
 };
 
 interface MethodologySectionProps {

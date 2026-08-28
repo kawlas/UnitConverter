@@ -2,6 +2,7 @@
 /convert/:categoryId /:categoryId 301!
 
 # Collapse trailing slashes onto the no-slash canonical paths.
+/grams-to-cups/ /grams-to-cups 301!
 /bmi/ /bmi 301!
 /power/ /power 301!
 /energy/ /energy 301!
@@ -31,6 +32,7 @@
 /volume/liters-to-gallons/ /volume/liters-to-gallons 301!
 
 # Serve each canonical clean URL from its prerendered document.
+/grams-to-cups /grams-to-cups/index.html 200
 /bmi /bmi/index.html 200
 /power /power/index.html 200
 /energy /energy/index.html 200

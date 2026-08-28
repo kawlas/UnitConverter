@@ -15,7 +15,7 @@ export default function AdSlot({ placement }: AdSlotProps) {
     >
       <div>
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Advertisement</p>
-        <p className="mt-2 text-xs text-slate-400">Reserved responsive Google ad space</p>
+        <p className="mt-2 text-xs text-slate-600">Reserved responsive Google ad space</p>
       </div>
     </aside>
   );

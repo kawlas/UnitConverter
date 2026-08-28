@@ -31,7 +31,7 @@ test("smart search accepts mixed numbers and opens normalized shareable state", 
 
   await search.fill("1 1/2 ft to cm");
 
-  await expect(page.getByRole("option", { name: /Quick conversion/ })).toContainText("45.72 cm");
+  await expect(page.getByRole("option", { name: /Instant answer/ })).toContainText("45.72 cm");
   await search.press("Enter");
   await expect(page).toHaveURL(/\/length\?/);
   expect(new URL(page.url()).searchParams.get("value")).toBe("1.5");

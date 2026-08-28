@@ -94,6 +94,32 @@ const factFaq = (question: string, answer: string): CategoryDefinition["faq"] =>
 
 const definitions: CategoryDefinition[] = [
   {
+    id: "grams-to-cups", title: "Grams to Cups", converter: "calculator",
+    units: [
+      linear("grams", "Grams", "g", 1, ["gram", "gramy"]),
+      linear("us_cups", "US Cups", "US cup", 1, ["cup", "cups", "filizanki"]),
+    ],
+    ...metadata(
+      "Ingredient-aware grams to US cups and cups to grams calculator for common baking ingredients.",
+      "US cups = grams ÷ the selected ingredient's reference grams per US cup",
+      [{ input: 120, from: "grams", to: "us_cups" }],
+      [
+        {
+          question: "How many cups is 120 grams of flour?",
+          answer: "Using the listed all-purpose flour reference of 120 grams per US cup, 120 grams is approximately 1 US cup. Measuring technique and flour brand can change the real weight.",
+        },
+        {
+          question: "Why do grams-to-cups results depend on the ingredient?",
+          answer: "Grams measure mass while cups measure volume. Flour, sugar, butter and milk pack different amounts of mass into the same cup, so a reliable estimate must identify the ingredient.",
+        },
+        {
+          question: "Which cup does this calculator use?",
+          answer: "It uses a US cooking cup. The ingredient weights are recipe references rather than a claim that every physical cup contains exactly the same mass.",
+        },
+      ],
+    ),
+  },
+  {
     id: "bmi", title: "BMI", converter: "calculator",
     units: [linear("metric", "Metric (cm/kg)", "metric", 1), linear("imperial", "Imperial (in/lbs)", "imperial", 1)],
     ...metadata(

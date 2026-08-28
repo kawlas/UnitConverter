@@ -18,7 +18,7 @@ test("fractional cups convert through smart search into shareable calculator sta
 
   await search.fill("1 1/2 cups to ml");
 
-  await expect(page.getByRole("option", { name: /Quick conversion/ })).toContainText("354.88235475 mL");
+  await expect(page.getByRole("option", { name: /Instant answer/ })).toContainText("354.88235475 mL");
   await search.press("Enter");
   await expect(page).toHaveURL(/\/volume\?/);
   expect(new URL(page.url()).searchParams.get("from")).toBe("us_cups");

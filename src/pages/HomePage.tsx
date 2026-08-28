@@ -15,7 +15,7 @@ const HOME_URL = "https://qconverter.netlify.app/";
 const SOCIAL_IMAGE_URL = "https://qconverter.netlify.app/og-q-converter.png";
 
 const faqItems = [
-  { question: "Which conversions are supported?", answer: "Fourteen unit categories: length, weight, temperature, volume, area, pressure, power, energy, speed, digital data, time, angle, fuel economy and pace, plus a BMI calculator." },
+  { question: "Which conversions are supported?", answer: "Fourteen standard unit categories, plus dedicated BMI and ingredient-aware grams-to-cups calculators." },
   { question: "How do I share a conversion?", answer: "Every conversion is encoded in the URL. Use the Share button to open the share dialog or copy the link - anyone who opens it sees exactly the same conversion." },
   { question: "How accurate are the results?", answer: "Conversions use exact standard factors (for example 1 are = 100 m² and 1 hectare = 10,000 m²) with an adjustable precision of up to 12 decimal places." },
 ];

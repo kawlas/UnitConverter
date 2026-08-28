@@ -13,6 +13,7 @@ import { convertExact } from "@/lib/conversions";
 import { getCategoryPairPages, getPairPage, pairPagePath } from "@/lib/pair-pages";
 import ConversionSection from "@/components/ConversionSection";
 import BMICalculator from "@/components/BMICalculator";
+import CookingCalculator from "@/components/CookingCalculator";
 import AdCard from "@/components/AdCard";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
@@ -227,6 +228,8 @@ export default function ConverterPage() {
               <div className="p-4 sm:p-8">
                 {category.id === "bmi" ? (
                   <BMICalculator title={category.title} />
+                ) : category.id === "grams-to-cups" ? (
+                  <CookingCalculator />
                 ) : (
                   <ConversionSection
                     title={category.title}

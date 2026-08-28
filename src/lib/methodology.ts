@@ -1,6 +1,6 @@
 import { getCategory } from "./conversion-data";
 
-export type MethodologyOrganization = "BIPM" | "NIST" | "IEC" | "CDC";
+export type MethodologyOrganization = "BIPM" | "NIST" | "IEC" | "CDC" | "King Arthur Baking";
 
 export interface MethodologySource {
   readonly id: string;
@@ -39,6 +39,13 @@ export const methodologySources = {
     url: "https://www.cdc.gov/bmi/adult-calculator/index.html",
     scope: "Adult BMI formula, screening categories and interpretation limitations.",
   },
+  kingArthur: {
+    id: "king-arthur-ingredient-weight-chart",
+    organization: "King Arthur Baking",
+    title: "Ingredient Weight Chart",
+    url: "https://www.kingarthurbaking.com/learn/ingredient-weight-chart",
+    scope: "Tested recipe reference weights for common ingredients measured by volume and mass.",
+  },
 } as const satisfies Record<string, MethodologySource>;
 
 const physicalSources = [methodologySources.bipm, methodologySources.nist] as const;
@@ -46,6 +53,7 @@ const physicalSources = [methodologySources.bipm, methodologySources.nist] as co
 export const getMethodology = (categoryId: string): readonly MethodologySource[] => {
   if (!getCategory(categoryId)) return [];
   if (categoryId === "bmi") return [methodologySources.cdc];
+  if (categoryId === "grams-to-cups") return [methodologySources.nist, methodologySources.kingArthur];
   if (categoryId === "digital") return [methodologySources.bipm, methodologySources.iec];
   return physicalSources;
 };
