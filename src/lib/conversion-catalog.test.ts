@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { categories, defaultUnits } from "./conversion-data";
-import { ConversionError, convertExact } from "./conversions";
+import { ConversionError, convertAllExact, convertExact } from "./conversions";
 
 const lookupTokens = (unit: (typeof categories)[number]["units"][number]) =>
   new Set([
@@ -51,6 +51,19 @@ describe("conversion catalog invariants", () => {
             `${category.id}:${from.value}->${to.value}`,
           ).toBeCloseTo(sample, 9);
         }
+      }
+    }
+  });
+
+  it("compares every convertible source against the complete catalog", () => {
+    for (const category of categories.filter(({ converter }) => converter !== "calculator")) {
+      const sample = category.id === "temperature" ? 20 : 7.25;
+      for (const from of category.units) {
+        const results = convertAllExact(sample, from.value, category.id);
+        expect(results.map(({ unit }) => unit.value), `${category.id}:${from.value}`).toEqual(
+          category.units.map(({ value }) => value),
+        );
+        expect(results.find(({ unit }) => unit.value === from.value)?.value).toBe(sample);
       }
     }
   });

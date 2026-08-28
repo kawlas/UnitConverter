@@ -24,6 +24,7 @@ branch for every task; never work directly on `main`.
 - `src/pages/ConverterPage.tsx` — category page, formula/examples/FAQ, metadata and canonical URL.
 - `src/components/Navbar.tsx`, `Footer.tsx`, `SearchBar.tsx` — global navigation and discovery UI.
 - `src/components/ConversionSection.tsx` — inputs, URL state, conversion controls, history, favorites, sharing, locale and precision.
+- `src/components/AllUnitsComparison.tsx` — accessible, responsive table that compares one input across the complete category catalog.
 - `src/components/BMICalculator.tsx` — BMI-specific calculator UI.
 - `src/lib/conversion-data.ts` / `src/lib/conversions.ts` — typed catalog, unit definitions and exact conversion engine.
 - `src/index.css` — Tailwind v4 entry point, theme variables, base styles and overflow/accessibility guards.
@@ -40,7 +41,8 @@ is encoded in shareable URL query state (`from`, `to`, `value`, `precision`, and
 so a copied link restores the same inputs. Users can swap units, reset a category, copy or
 share a URL, save favorites, revisit recent history, and clear saved data. History and
 favorites are retained for at most 30 days and tolerate unavailable or malformed browser
-storage.
+storage. Every non-BMI category also shows the current input across all supported units;
+any comparison row can become the primary target without re-entering the value.
 
 Supported presentation behavior includes `en-US`, `pl-PL`, `de-DE`, and `fr-FR` number
 locales, precision from 0–12 decimals, category SEO metadata, canonical short routes, the

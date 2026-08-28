@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ConversionError, convert, convertExact } from "./conversions";
+import { ConversionError, convert, convertAllExact, convertExact } from "./conversions";
 
 describe("central unit catalog conversions", () => {
   it("converts ares, square metres and hectares exactly", () => {
@@ -52,5 +52,36 @@ describe("central unit catalog conversions", () => {
   it("keeps the legacy rounded API while never silently falling back", () => {
     expect(convert(1 / 3, "kilometers", "meters", "length")).toBe(333.333333);
     expect(() => convert(2, "are", "watts", "area")).toThrow();
+  });
+
+  it("converts one value to every supported unit in catalog order", () => {
+    const results = convertAllExact(1, "meters", "length");
+
+    expect(results.map(({ unit }) => unit.value)).toEqual([
+      "meters",
+      "feet",
+      "centimeters",
+      "millimeters",
+      "inches",
+      "yards",
+      "kilometers",
+      "miles",
+      "nautical_miles",
+    ]);
+    expect(results.find(({ unit }) => unit.value === "meters")?.value).toBe(1);
+    expect(results.find(({ unit }) => unit.value === "feet")?.value).toBeCloseTo(3.280839895);
+  });
+
+  it("uses custom converters and preserves their input-domain validation", () => {
+    expect(convertAllExact(7, "liters_per_100km", "fuel")).toEqual([
+      expect.objectContaining({ unit: expect.objectContaining({ value: "liters_per_100km" }), value: 7 }),
+      expect.objectContaining({ unit: expect.objectContaining({ value: "miles_per_gallon" }), value: expect.closeTo(33.6020832857) }),
+    ]);
+    expect(() => convertAllExact(0, "liters_per_100km", "fuel")).toThrowError(/positive value/i);
+  });
+
+  it("rejects unknown units and calculators in compare-all mode", () => {
+    expect(() => convertAllExact(1, "unknown", "length")).toThrow(ConversionError);
+    expect(() => convertAllExact(1, "metric", "bmi")).toThrow(ConversionError);
   });
 });

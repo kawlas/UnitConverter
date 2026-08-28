@@ -4,8 +4,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import AllUnitsComparison from "./AllUnitsComparison";
 import { CategoryDefinition, defaultUnits, getCategory, UnitDefinition } from "@/lib/conversion-data";
-import { ConversionError, convertExact } from "@/lib/conversions";
+import { ConversionError, convertAllExact, convertExact } from "@/lib/conversions";
 
 interface ConversionSectionProps {
   title?: string;
@@ -208,10 +209,11 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     examples: [],
   }), [categoryId, title, units]);
   const defaults = defaultUnits(definition);
+  const defaultInput = String(getCategory(categoryId)?.examples[0]?.input ?? 1);
   const precisionParam = searchParams.get("precision");
   const localeParam = searchParams.get("locale");
   const queryHasInvalidPreferences = (precisionParam !== null && (!/^\d+$/.test(precisionParam) || Number(precisionParam) > 12)) || (localeParam !== null && !LOCALES.includes(localeParam));
-  const [fromValue, setFromValue] = useState("0");
+  const [fromValue, setFromValue] = useState(defaultInput);
   const [fromUnit, setFromUnit] = useState(defaults.from);
   const [toUnit, setToUnit] = useState(defaults.to);
   const [precision, setPrecision] = useState(2);
@@ -253,14 +255,14 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFromUnit(nextFrom && validUnit(nextFrom) ? nextFrom : nextDefaults.from);
     setToUnit(nextTo && validUnit(nextTo) ? nextTo : nextDefaults.to);
-    setFromValue(searchParams.get("value") ?? "0");
+    setFromValue(searchParams.get("value") ?? defaultInput);
     const nextPrecision = Number(searchParams.get("precision") ?? 2);
     setPrecision(Number.isFinite(nextPrecision) ? Math.min(12, Math.max(0, nextPrecision)) : 2);
     setLocale(LOCALES.includes(searchParams.get("locale") ?? "") ? searchParams.get("locale")! : "en-US");
     setHasHydratedUrl(true);
     // URL changes (including back/forward) are the source of truth.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, categoryId]);
+  }, [searchParams, categoryId, defaultInput]);
 
   const updateUrl = (updates: Record<string, string>, replace = true) => {
     const next = new URLSearchParams(searchParams);
@@ -288,6 +290,15 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
       return { result: "", error: error instanceof ConversionError ? error.message : "Conversion failed." };
     }
   }, [categoryId, fromValue, fromUnit, hasHydratedUrl, locale, parsedValue, precision, queryHasInvalidPreferences, queryHasInvalidUnit, toUnit]);
+
+  const comparisonResults = useMemo(() => {
+    if (queryHasInvalidUnit || (hasHydratedUrl && queryHasInvalidPreferences) || parsedValue === undefined) return [];
+    try {
+      return convertAllExact(parsedValue, fromUnit, categoryId);
+    } catch {
+      return [];
+    }
+  }, [categoryId, fromUnit, hasHydratedUrl, parsedValue, queryHasInvalidPreferences, queryHasInvalidUnit]);
 
   useEffect(() => {
     if (!shouldPersistHistory({
@@ -329,8 +340,8 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   const setTo = (value: string) => { markHistoryIntent(); setToUnit(value); updateUrl({ to: value }, true); };
   const resetToDefaults = () => {
     consumeHistoryIntent();
-    setFromValue("0"); setFromUnit(defaults.from); setToUnit(defaults.to);
-    updateUrl({ value: "0", from: defaults.from, to: defaults.to, precision: String(precision), locale }, false);
+    setFromValue(defaultInput); setFromUnit(defaults.from); setToUnit(defaults.to);
+    updateUrl({ value: defaultInput, from: defaults.from, to: defaults.to, precision: String(precision), locale }, false);
     setStatus("Category conversion reset.");
   };
   const swap = () => {
@@ -378,7 +389,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <h2 className="font-medium text-lg">{title}</h2>
       <div className="grid items-center gap-4 sm:grid-cols-[minmax(70px,120px)_minmax(0,1fr)]">
         <label htmlFor={`${categoryId}-from-value`} className="text-sm font-medium">From</label>
@@ -408,6 +419,16 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
       </div>
+      <AllUnitsComparison
+        categoryId={categoryId}
+        title={title}
+        results={comparisonResults}
+        sourceUnit={fromUnit}
+        targetUnit={toUnit}
+        precision={precision}
+        locale={locale}
+        onSelectTarget={setTo}
+      />
       {(history.length > 0 || favoriteIds.length > 0) && <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
         {history.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Recent conversions</summary><ul className="mt-2 space-y-1 text-sm">{history.slice(0, 5).map((entry) => <li key={`${entry.timestamp}-${entry.input}`}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => playSavedConversion(entry.categoryId, { from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale })}>{entry.input} {entry.fromUnit} → {entry.result} {entry.toUnit}</button></li>)}</ul></details>}
         {favoriteIds.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Favorites ({favoriteIds.length})</summary><ul className="mt-2 space-y-1 text-sm">{favoriteIds.slice(0, 5).map((id) => <li key={id}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => { const [favoriteCategoryId, favoriteFrom, favoriteTo] = id.split(":"); playSavedConversion(favoriteCategoryId, { from: favoriteFrom, to: favoriteTo }); }}>{id}</button></li>)}</ul></details>}
