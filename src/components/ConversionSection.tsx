@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import AllUnitsComparison from "./AllUnitsComparison";
+import BatchConversion from "./BatchConversion";
 import { CategoryDefinition, defaultUnits, getCategory, UnitDefinition } from "@/lib/conversion-data";
 import { ConversionError, convertAllExact, convertExact } from "@/lib/conversions";
 import { isFractionLike, parseLocaleQuantity, SUPPORTED_NUMBER_LOCALES } from "@/lib/number-input";
@@ -427,6 +428,15 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
       </div>
+      <BatchConversion
+        categoryId={categoryId}
+        fromUnit={fromUnit}
+        toUnit={toUnit}
+        locale={locale}
+        precision={precision}
+        fromLabel={units.find(({ value }) => value === fromUnit)?.label ?? fromUnit}
+        toLabel={units.find(({ value }) => value === toUnit)?.label ?? toUnit}
+      />
       <AllUnitsComparison
         categoryId={categoryId}
         title={title}
