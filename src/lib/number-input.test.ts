@@ -35,7 +35,6 @@ describe("locale-aware decimal and fraction input", () => {
     "1/0",
     "1 2/2",
     "1 3/2",
-    "1 -1/2",
     "1/2/3",
     "1.5 1/2",
     "1e3",
@@ -67,6 +66,11 @@ describe("safe arithmetic expressions in quantity input", () => {
     ["20/(2+3)", "en-US", 4],
     ["(1,5+2,5)", "de-DE", 4],
     ["(12+4)*6.5", "en-US", 104],
+    ["1-2", "en-US", -1],
+    ["5 - 3", "en-US", 2],
+    ["1+.5", "en-US", 1.5],
+    [",5+1", "fr-FR", 1.5],
+    ["1+1,25", "de-DE", 2.25],
   ])("parses expression %s in %s", (raw, locale, expected) => {
     expect(parseLocaleQuantity(raw, locale)).toBe(expected);
   });
@@ -84,6 +88,8 @@ describe("safe arithmetic expressions in quantity input", () => {
     ["1 + 5 5", "en-US"],
     ["*5", "en-US"],
     ["5 + (3", "en-US"],
+    ["1,234+1", "en-US"],
+    ["5.5+1,2", "en-US"],
   ])("rejects unsafe or malformed expression %s in %s", (raw, locale) => {
     expect(parseLocaleQuantity(raw, locale)).toBeUndefined();
   });
@@ -93,5 +99,16 @@ describe("safe arithmetic expressions in quantity input", () => {
     expect(parseLocaleQuantity("1 1/2", "en-US")).toBe(1.5);
     expect(parseLocaleQuantity("1½", "en-US")).toBe(1.5);
     expect(parseLocaleQuantity("-2 ⅝", "de-DE")).toBe(-2.625);
+  });
+
+  it("treats a binary minus after a fraction-like operand as arithmetic", () => {
+    expect(parseLocaleQuantity("1 -1/2", "en-US")).toBe(0.5);
+  });
+
+  it("keeps standalone locale grouping on the number path", () => {
+    expect(parseLocaleQuantity("1,234.56", "en-US")).toBe(1234.56);
+    expect(parseLocaleQuantity("1.234,56", "de-DE")).toBe(1234.56);
+    expect(parseLocaleQuantity("12 345,67", "pl-PL")).toBe(12345.67);
+    expect(parseLocaleQuantity("12\u202f345,67", "fr-FR")).toBe(12345.67);
   });
 });

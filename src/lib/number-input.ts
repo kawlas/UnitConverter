@@ -107,6 +107,7 @@ export const isFractionLike = (raw: string): boolean =>
 
 const MAX_EXPRESSION_TOKENS = 64;
 const MAX_EXPRESSION_DEPTH = 40;
+const MAX_EXPRESSION_INPUT_LENGTH = 128;
 
 type ExpressionOp = "+" | "-" | "*" | "/";
 type ExpressionToken =
@@ -116,7 +117,8 @@ type ExpressionToken =
   | { type: "rparen" };
 
 const isExpressionLike = (value: string): boolean =>
-  ["(", ")", "+", "*", "×", "÷"].some((character) => value.includes(character));
+  ["(", ")", "+", "*", "×", "÷"].some((character) => value.includes(character))
+  || value.trim().slice(1).includes("-");
 
 const localeDecimalSeparator = (locale: string): string =>
   usesDecimalPoint(locale) ? "." : ",";
@@ -171,10 +173,10 @@ const tokenizeExpression = (raw: string, locale: string): ExpressionToken[] | un
       if (separatorCount > 0) {
         if (usesDecimalPoint(locale)) {
           const segments = literal.split(".");
-          if (segments.length !== 2 || segments[0] === "" || literal.split(",").length > 1) return undefined;
+          if (segments.length !== 2 || segments[1] === "" || literal.split(",").length > 1) return undefined;
         } else {
           const segments = literal.split(",");
-          if (segments.length !== 2 || literal.includes(".")) return undefined;
+          if (segments.length !== 2 || segments[1] === "" || literal.includes(".")) return undefined;
           literal = `${segments[0]}.${segments[1]}`;
         }
       } else if (literal.includes(".") || literal.includes(",")) {
@@ -307,7 +309,9 @@ class ExpressionParser {
 }
 
 const parseExpressionQuantity = (raw: string, locale: string): number | undefined => {
-  const tokens = tokenizeExpression(raw.trim(), locale);
+  const trimmed = raw.trim();
+  if (trimmed.length === 0 || trimmed.length > MAX_EXPRESSION_INPUT_LENGTH) return undefined;
+  const tokens = tokenizeExpression(trimmed, locale);
   if (!tokens || tokens.length === 0 || tokens.length > MAX_EXPRESSION_TOKENS) return undefined;
   const parser = new ExpressionParser(tokens);
   const result = parser.parse();
