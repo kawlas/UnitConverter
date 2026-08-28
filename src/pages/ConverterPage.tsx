@@ -176,9 +176,9 @@ export default function ConverterPage() {
 
       <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)]">
         <Navbar />
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:py-12">
+        <main className="mx-auto max-w-7xl px-4 py-2 sm:px-6 sm:py-6 lg:py-8">
           <div className="mx-auto max-w-5xl">
-            <header className="mb-7 sm:mb-10">
+            <header className="mb-2 sm:mb-5">
               <Link
                 to={pair ? `/${category.id}` : "/"}
                 className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-slate-600 transition-colors hover:text-indigo-700"
@@ -187,34 +187,16 @@ export default function ConverterPage() {
                   ? `All ${category.title.toLowerCase()} conversions`
                   : "All conversions"}
               </Link>
-              <div className="mt-6 flex flex-col gap-5 sm:mt-8 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <div className="mb-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600">
-                    <span className="h-1.5 w-1.5 rounded-full bg-teal-700" />{" "}
-                    {pair ? "Curated conversion reference" : "Measurement tool"}
-                  </div>
-                  <h1 className="text-4xl font-bold leading-tight tracking-[-0.035em] text-slate-950 sm:text-5xl">
-                    {toolName}
-                  </h1>
-                  <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-                    {heroDescription}
-                  </p>
-                </div>
-                <div className="flex shrink-0 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500 shadow-sm">
-                  <CheckCircle2
-                    aria-hidden="true"
-                    className="h-4 w-4 text-teal-700"
-                  />{" "}
-                  Precise by design
-                </div>
-              </div>
+              <h1 className="mt-3 text-2xl font-bold text-slate-950 sm:mt-4 sm:text-4xl">
+                {toolName}
+              </h1>
             </header>
 
             <section
               className="overflow-hidden rounded-[1.5rem] border border-indigo-100 bg-white shadow-[0_16px_42px_rgba(15,23,42,0.08)]"
               aria-labelledby="converter-heading"
             >
-              <div className="flex items-center justify-between gap-4 border-b border-slate-100 bg-gradient-to-r from-indigo-50/80 to-white px-5 py-4 sm:px-8">
+              <div className="flex items-center justify-between gap-4 border-b border-slate-100 bg-gradient-to-r from-indigo-50/80 to-white px-4 py-2 sm:px-8 sm:py-4">
                 <div className="flex items-center gap-3">
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
                     <Calculator aria-hidden="true" className="h-4 w-4" />
@@ -241,7 +223,7 @@ export default function ConverterPage() {
                   Updates instantly
                 </span>
               </div>
-              <div className="p-5 sm:p-8">
+              <div className="p-4 sm:p-8">
                 {category.id === "bmi" ? (
                   <BMICalculator title={category.title} />
                 ) : (
@@ -255,6 +237,23 @@ export default function ConverterPage() {
                 )}
               </div>
             </section>
+
+            <div className="mt-4 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+              <div>
+                <div className="mb-1 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600">
+                  <span className="h-1.5 w-1.5 rounded-full bg-teal-700" />{" "}
+                  {pair ? "Curated conversion reference" : "Measurement tool"}
+                </div>
+                <p className="text-sm leading-6 text-slate-600">{heroDescription}</p>
+              </div>
+              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500 shadow-sm">
+                <CheckCircle2
+                  aria-hidden="true"
+                  className="h-4 w-4 text-teal-700"
+                />{" "}
+                Precise by design
+              </div>
+            </div>
 
             <div className="mt-5 grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
               <section

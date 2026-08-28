@@ -70,29 +70,35 @@ export const AnalyticsConsentProvider = ({ children }: { children: React.ReactNo
       {children}
       {bannerVisible && (
         <section
+          role="region"
           aria-label="Analytics privacy choices"
-          className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl sm:inset-x-6 sm:flex sm:items-center sm:gap-6 sm:p-5"
+          className="fixed inset-x-3 bottom-3 z-50 mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl sm:inset-x-6 sm:flex sm:items-center sm:gap-6 sm:p-5"
         >
           <div className="min-w-0 flex-1">
-            <h2 className="text-base font-semibold text-slate-950">Your privacy, your choice</h2>
-            <p className="mt-1 text-sm leading-6 text-slate-600">
-              Optional analytics helps us improve Q Converter. It stays off unless you allow it, and conversion values are never included in analytics URLs.
+            <h2 className="hidden text-base font-semibold text-slate-950 sm:block">Your privacy, your choice</h2>
+            <p className="text-xs leading-5 text-slate-600 sm:mt-1 sm:text-sm sm:leading-6">
+              <span className="sm:hidden">Analytics is off. Values stay private.</span>
+              <span className="hidden sm:inline">Optional analytics helps us improve Q Converter. It stays off unless you allow it, and conversion values are never included in analytics URLs.</span>
             </p>
           </div>
-          <div className="mt-4 flex flex-col gap-2 sm:mt-0 sm:shrink-0">
+          <div className="mt-2 flex flex-row gap-2 sm:mt-0 sm:shrink-0">
             <button
               type="button"
               onClick={() => choose("accepted")}
-              className="min-h-11 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              aria-label="Allow optional analytics"
+              className="min-h-11 flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:flex-none sm:px-4"
             >
-              Allow optional analytics
+              <span className="sm:hidden">Allow</span>
+              <span className="hidden sm:inline">Allow optional analytics</span>
             </button>
             <button
               type="button"
               onClick={() => choose("declined")}
-              className="min-h-11 rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              aria-label="Use without analytics"
+              className="min-h-11 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:flex-none sm:px-4"
             >
-              Use without analytics
+              <span className="sm:hidden">Decline</span>
+              <span className="hidden sm:inline">Use without analytics</span>
             </button>
           </div>
         </section>
