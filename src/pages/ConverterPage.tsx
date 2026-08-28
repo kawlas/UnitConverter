@@ -16,6 +16,7 @@ import BMICalculator from "@/components/BMICalculator";
 import AdCard from "@/components/AdCard";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import AdSlot from "@/components/AdSlot";
 import MethodologySection from "@/components/MethodologySection";
 import { getMethodology } from "@/lib/methodology";
 
@@ -254,6 +255,8 @@ export default function ConverterPage() {
                 Precise by design
               </div>
             </div>
+
+            <AdSlot placement="converter-after-answer" />
 
             <div className="mt-5 grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
               <section

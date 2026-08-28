@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
+import AdSlot from "@/components/AdSlot";
 import { categories } from "@/lib/conversion-data";
 import { pairPagePath, pairPages } from "@/lib/pair-pages";
 
@@ -84,6 +85,8 @@ export default function HomePage() {
               ))}
             </div>
           </section>
+
+          <AdSlot placement="home-after-categories" />
 
           <section className="mt-14 sm:mt-20" aria-labelledby="pair-pages-heading">
             <div className="mb-6 max-w-2xl sm:mb-8">
