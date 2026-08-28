@@ -5,9 +5,9 @@ import react from "@vitejs/plugin-react-swc";
 // tempo-devtools integration removed for build stability when package is absent
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
     build: {
-      rollupOptions: {
+      rollupOptions: isSsrBuild ? undefined : {
         output: {
           manualChunks: {
             "react-vendor": ["react", "react-dom", "react-router-dom"],
@@ -25,6 +25,9 @@ export default defineConfig({
       entries: ["src/main.tsx", "src/tempobook/**/*"],
     },
     plugins: [react()],
+    define: {
+      __BUILD_YEAR__: JSON.stringify(new Date().getUTCFullYear()),
+    },
     resolve: {
       preserveSymlinks: true,
       alias: {
@@ -35,4 +38,4 @@ export default defineConfig({
       // @ts-ignore
       allowedHosts: true,
     },
-  });
+  }));

@@ -6,6 +6,10 @@ import type { RouteObject } from "react-router-dom";
 const ConverterPage = lazy(() => import("./pages/ConverterPage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 
+function TempoRoutes({ routes }: { routes: RouteObject[] }) {
+  return useRoutes(routes);
+}
+
 function App() {
   const tempoEnabled = import.meta.env.VITE_TEMPO === "true";
   const [externalRoutes, setExternalRoutes] = useState<RouteObject[]>([]);
@@ -17,8 +21,6 @@ function App() {
       .then((mod) => setExternalRoutes((mod?.default || mod?.routes || []) as RouteObject[]))
       .catch(() => setExternalRoutes([]))
   }, [tempoEnabled]);
-
-  const tempoRoutes = useRoutes(tempoEnabled ? externalRoutes : []);
 
   return (
     <Suspense
@@ -35,7 +37,7 @@ function App() {
           <Route path="/convert/:categoryId" element={<ConverterPage />} />
           {tempoEnabled && <Route path="/tempobook/*" />}
         </Routes>
-        {tempoEnabled && tempoRoutes}
+        {tempoEnabled && <TempoRoutes routes={externalRoutes} />}
       </div>
     </Suspense>
   );

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { buildPlaybackUrl, parseStoredFavorites, parseStoredHistory, parseStrict } from "./ConversionSection";
+import {
+  buildPlaybackUrl,
+  parseStoredFavorites,
+  parseStoredHistory,
+  parseStrict,
+  shouldPersistHistory,
+} from "./ConversionSection";
 
 describe("saved conversion playback URL", () => {
   it("includes the target category and complete history state", () => {
@@ -9,14 +15,14 @@ describe("saved conversion playback URL", () => {
       value: "12.5",
       precision: "4",
       locale: "pl-PL",
-    })).toBe("/convert/weight?from=kilogram&to=pound&value=12.5&precision=4&locale=pl-PL");
+    })).toBe("/weight?from=kilogram&to=pound&value=12.5&precision=4&locale=pl-PL");
   });
 
   it("includes the target category and favorite units", () => {
     expect(buildPlaybackUrl("temperature", {
       from: "celsius",
       to: "fahrenheit",
-    })).toBe("/convert/temperature?from=celsius&to=fahrenheit");
+    })).toBe("/temperature?from=celsius&to=fahrenheit");
   });
 });
 
@@ -37,7 +43,7 @@ describe("localStorage payload validation", () => {
     entries[1] = { ...validHistoryEntry(2), locale: "invalid" };
     entries.push({ ...validHistoryEntry(53), precision: 13 });
 
-    const parsed = parseStoredHistory(JSON.stringify(entries));
+    const parsed = parseStoredHistory(JSON.stringify(entries), 53);
 
     expect(parsed).toHaveLength(50);
     expect(parsed.every((entry) => entry.locale === "en-US" && entry.precision === 2)).toBe(true);
@@ -100,5 +106,50 @@ describe("parseStrict locale grammar", () => {
     expect(parseStrict("", "en-US")).toBeUndefined();
     expect(parseStrict("abc", "en-US")).toBeUndefined();
     expect(parseStrict("1e3", "en-US")).toBeUndefined();
+  });
+});
+
+describe("history persistence intent", () => {
+  const validConversion = {
+    input: "12",
+    result: "39.37",
+    parsedValue: 12,
+  };
+
+  it("does not persist the default conversion before a user interaction", () => {
+    expect(shouldPersistHistory({
+      ...validConversion,
+      input: "0",
+      result: "0",
+      parsedValue: 0,
+      intentVersion: 0,
+      persistedIntentVersion: 0,
+    })).toBe(false);
+  });
+
+  it("persists one valid conversion after a real conversion interaction", () => {
+    expect(shouldPersistHistory({
+      ...validConversion,
+      intentVersion: 1,
+      persistedIntentVersion: 0,
+    })).toBe(true);
+  });
+
+  it("does not persist the same intent again after precision or locale changes", () => {
+    expect(shouldPersistHistory({
+      ...validConversion,
+      intentVersion: 1,
+      persistedIntentVersion: 1,
+    })).toBe(false);
+  });
+
+  it("does not persist a reset that consumes the current interaction", () => {
+    expect(shouldPersistHistory({
+      input: "0",
+      result: "0",
+      parsedValue: 0,
+      intentVersion: 2,
+      persistedIntentVersion: 2,
+    })).toBe(false);
   });
 });

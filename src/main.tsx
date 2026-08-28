@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { BrowserRouter } from "react-router-dom";
@@ -22,12 +22,16 @@ if (import.meta.env.VITE_TEMPO === "true") {
 
 const basename = import.meta.env.BASE_URL;
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+const root = document.getElementById("root")!;
+const application = (
   <React.StrictMode>
     <HelmetProvider>
       <BrowserRouter basename={basename}>
         <App />
       </BrowserRouter>
     </HelmetProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
+
+if (root.hasChildNodes()) hydrateRoot(root, application);
+else createRoot(root).render(application);

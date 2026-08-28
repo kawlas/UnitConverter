@@ -1,1 +1,36 @@
-/*    /index.html   200
+# Preserve query parameters while consolidating the legacy route shape.
+/convert/:categoryId /:categoryId 301!
+
+# Collapse trailing slashes onto the no-slash canonical paths.
+/bmi/ /bmi 301!
+/power/ /power 301!
+/energy/ /energy 301!
+/speed/ /speed 301!
+/length/ /length 301!
+/weight/ /weight 301!
+/temperature/ /temperature 301!
+/volume/ /volume 301!
+/area/ /area 301!
+/pressure/ /pressure 301!
+/digital/ /digital 301!
+/time/ /time 301!
+/angle/ /angle 301!
+/fuel/ /fuel 301!
+/pace/ /pace 301!
+
+# Serve each canonical clean URL from its prerendered document.
+/bmi /bmi/index.html 200
+/power /power/index.html 200
+/energy /energy/index.html 200
+/speed /speed/index.html 200
+/length /length/index.html 200
+/weight /weight/index.html 200
+/temperature /temperature/index.html 200
+/volume /volume/index.html 200
+/area /area/index.html 200
+/pressure /pressure/index.html 200
+/digital /digital/index.html 200
+/time /time/index.html 200
+/angle /angle/index.html 200
+/fuel /fuel/index.html 200
+/pace /pace/index.html 200

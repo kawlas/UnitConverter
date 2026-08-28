@@ -36,7 +36,7 @@ const Footer = () => (
 
       <div className="mt-9 flex flex-col gap-2 border-t border-slate-200 pt-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
         <p>Free unit converter with precise, shareable conversions.</p>
-        <p>© {new Date().getFullYear()} Q Converter</p>
+        <p>© {__BUILD_YEAR__} Q Converter</p>
       </div>
     </div>
   </footer>

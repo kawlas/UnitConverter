@@ -17,6 +17,16 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 
 const HOME_TITLE = "Q Converter — Free Online Unit Converter";
+const SITE_ORIGIN = "https://qconverter.netlify.app";
+const SOCIAL_IMAGE_URL = `${SITE_ORIGIN}/og-q-converter.png`;
+
+const metaDescription = (description: string): string => {
+  const suffix = " Free converter with precise, shareable results.";
+  const combined = `${description}${suffix}`;
+  if (combined.length <= 155) return combined;
+  const shortened = combined.slice(0, 152);
+  return `${shortened.slice(0, shortened.lastIndexOf(" "))}…`;
+};
 
 export default function ConverterPage() {
   const { categoryId } = useParams();
@@ -55,8 +65,9 @@ export default function ConverterPage() {
   }
 
   // Canonical path always uses the short form /:categoryId regardless of which alias route was used
-  const canonicalPath = `/${categoryId}`;
-  const canonicalUrl = `${window.location.origin}${canonicalPath}`;
+  const canonicalPath = `/${category.id}`;
+  const canonicalUrl = `${SITE_ORIGIN}${canonicalPath}`;
+  const pageDescription = metaDescription(category.description);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -74,7 +85,7 @@ export default function ConverterPage() {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: window.location.origin,
+        item: SITE_ORIGIN,
       },
       { "@type": "ListItem", position: 2, name: `${category.title} Converter` },
     ],
@@ -95,13 +106,21 @@ export default function ConverterPage() {
         <title>{pageTitle}</title>
         <meta
           name="description"
-          content={`${category.description} Use this free ${category.title.toLowerCase()} converter with precision and shareable URLs.`}
+          content={pageDescription}
         />
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content={`${category.title} Converter`} />
         <meta property="og:description" content={category.description} />
         <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={SOCIAL_IMAGE_URL} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Q Converter — Every measurement, made clear." />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${category.title} Converter`} />
+        <meta name="twitter:description" content={pageDescription} />
+        <meta name="twitter:image" content={SOCIAL_IMAGE_URL} />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumb)}</script>
         <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>

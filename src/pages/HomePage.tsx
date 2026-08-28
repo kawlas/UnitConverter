@@ -9,6 +9,8 @@ import { categories } from "@/lib/conversion-data";
 
 const HOME_TITLE = "Q Converter — Free Online Unit Converter";
 const HOME_DESCRIPTION = "Convert length, area, pressure, digital data, time and more with a precise, shareable online unit converter.";
+const HOME_URL = "https://qconverter.netlify.app/";
+const SOCIAL_IMAGE_URL = "https://qconverter.netlify.app/og-q-converter.png";
 
 const faqItems = [
   { question: "Which conversions are supported?", answer: "Fourteen unit categories: length, weight, temperature, volume, area, pressure, power, energy, speed, digital data, time, angle, fuel economy and pace, plus a BMI calculator." },
@@ -28,12 +30,19 @@ export default function HomePage() {
       <Helmet>
         <title>{HOME_TITLE}</title>
         <meta name="description" content={HOME_DESCRIPTION} />
-        <link rel="canonical" href={`${window.location.origin}${window.location.pathname}`} />
+        <link rel="canonical" href={HOME_URL} />
         <meta property="og:type" content="website" />
         <meta property="og:title" content={HOME_TITLE} />
         <meta property="og:description" content={HOME_DESCRIPTION} />
-        <meta property="og:url" content={`${window.location.origin}${window.location.pathname}`} />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:url" content={HOME_URL} />
+        <meta property="og:image" content={SOCIAL_IMAGE_URL} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Q Converter — Every measurement, made clear." />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={HOME_TITLE} />
+        <meta name="twitter:description" content={HOME_DESCRIPTION} />
+        <meta name="twitter:image" content={SOCIAL_IMAGE_URL} />
         <script type="application/ld+json">{JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqItems.map((item) => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer } })) })}</script>
       </Helmet>
 

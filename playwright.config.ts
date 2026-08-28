@@ -17,9 +17,9 @@ export default defineConfig({
   webServer: process.env.BASE_URL
     ? undefined
     : {
-        command: "npm run preview -- --host 127.0.0.1",
+    command: "npm run build && node scripts/serve-dist.mjs",
         url: baseURL,
-        reuseExistingServer: true,
+        reuseExistingServer: false,
         timeout: 120_000,
       },
 });
