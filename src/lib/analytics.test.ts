@@ -4,6 +4,7 @@ import {
   ANALYTICS_CONSENT_TTL_MS,
   canonicalizeAnalyticsPath,
   readAnalyticsConsent,
+  sanitizeAnalyticsDimension,
   sanitizePageLocation,
   writeAnalyticsConsent,
 } from "./analytics";
@@ -38,6 +39,13 @@ describe("privacy-safe analytics", () => {
   it("groups the legacy converter alias under its canonical path", () => {
     expect(canonicalizeAnalyticsPath("/convert/length")).toBe("/length");
     expect(canonicalizeAnalyticsPath("/length/meters-to-feet")).toBe("/length/meters-to-feet");
+  });
+
+  it("accepts only bounded machine identifiers for product-event dimensions", () => {
+    expect(sanitizeAnalyticsDimension("digital_data")).toBe("digital_data");
+    expect(sanitizeAnalyticsDimension("length?value=private")).toBe("");
+    expect(sanitizeAnalyticsDimension("12.5 ft to cm")).toBe("");
+    expect(sanitizeAnalyticsDimension("a".repeat(33))).toBe("");
   });
 
   it("only accepts known, versioned consent values", () => {

@@ -8,6 +8,7 @@ import {
   MAX_BATCH_INPUT_LENGTH,
   MAX_BATCH_LINES,
 } from "@/lib/batch";
+import { trackProductEvent } from "@/lib/analytics";
 interface BatchConversionProps {
   categoryId: string;
   fromUnit: string;
@@ -67,7 +68,9 @@ export default function BatchConversion({
   const copyAll = async () => {
     const text = buildBatchCopyText(lines, fromLabel, toLabel);
     if (!text) return;
-    setNotice(await copyText(text) ? "Batch results copied." : "Unable to copy the batch results.");
+    const copied = await copyText(text);
+    if (copied) trackProductEvent("batch_results_copied", categoryId);
+    setNotice(copied ? "Batch results copied." : "Unable to copy the batch results.");
   };
 
   return (

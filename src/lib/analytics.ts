@@ -13,6 +13,16 @@ type DataLayerEntry = IArguments | unknown[];
 type Gtag = (...args: unknown[]) => void;
 let analyticsInitialized = false;
 
+export type ProductEventName =
+  | "batch_results_copied"
+  | "conversion_completed"
+  | "conversion_shared"
+  | "favorite_toggled"
+  | "result_copied"
+  | "saved_conversion_opened"
+  | "saved_data_cleared"
+  | "share_link_copied";
+
 declare global {
   interface Window {
     dataLayer?: DataLayerEntry[];
@@ -63,6 +73,9 @@ export const canonicalizeAnalyticsPath = (pathname: string): string => {
   const alias = pathname.match(/^\/convert\/([^/]+)$/);
   return alias ? `/${alias[1]}` : pathname;
 };
+
+export const sanitizeAnalyticsDimension = (value: string): string =>
+  /^[a-z][a-z0-9_]{0,31}$/.test(value) ? value : "";
 
 const consentState = (analytics: "granted" | "denied") => ({
   ad_storage: "denied",
@@ -129,4 +142,15 @@ export const trackPageView = (pathname: string, title: string): void => {
     page_referrer: sanitizePageLocation(document.referrer),
     page_title: title,
   });
+};
+
+export const trackProductEvent = (event: ProductEventName, category: string): void => {
+  if (
+    typeof window === "undefined" ||
+    !analyticsInitialized ||
+    window[`ga-disable-${GOOGLE_ANALYTICS_ID}`]
+  ) return;
+  const toolCategory = sanitizeAnalyticsDimension(category);
+  if (!toolCategory) return;
+  ensureGtag()("event", event, { tool_category: toolCategory });
 };

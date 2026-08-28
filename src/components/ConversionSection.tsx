@@ -8,6 +8,7 @@ import BatchConversion from "./BatchConversion";
 import { CategoryDefinition, defaultUnits, getCategory, UnitDefinition } from "@/lib/conversion-data";
 import { ConversionError, convertAllExact, convertExact } from "@/lib/conversions";
 import { isFractionLike, parseLocaleQuantity, SUPPORTED_NUMBER_LOCALES } from "@/lib/number-input";
+import { trackProductEvent } from "@/lib/analytics";
 
 interface ConversionSectionProps {
   title?: string;
@@ -306,6 +307,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     setSearchParams(next, { replace });
   };
   const playSavedConversion = (savedCategoryId: string, params: Record<string, string>) => {
+    trackProductEvent("saved_conversion_opened", savedCategoryId);
     if (savedCategoryId === categoryId) {
       updateUrl(params, false);
       return;
@@ -362,6 +364,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         localStorage.setItem(HISTORY_KEY, JSON.stringify(nextHistory));
         setHistory(nextHistory);
       } catch { /* Storage is optional. */ }
+      trackProductEvent("conversion_completed", categoryId);
     }, 500);
     return () => window.clearTimeout(timer);
   }, [categoryId, fromUnit, fromValue, historyIntentVersion, locale, parsedValue, precision, resultState.result, toUnit]);
@@ -402,6 +405,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
       const nextIds = next.map(({ id }) => id);
       setFavoriteIds(nextIds);
       setStatus(nextIds.includes(favoriteId) ? "Added to favorites." : "Removed from favorites.");
+      trackProductEvent("favorite_toggled", categoryId);
     } catch { setStatus("Favorites are unavailable in this browser."); }
   };
   const clearSavedData = () => {
@@ -410,6 +414,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     try {
       clearStoredData();
       setStatus("Saved data cleared.");
+      trackProductEvent("saved_data_cleared", categoryId);
     } catch {
       setStatus("Saved data could not be cleared from this browser.");
     }
@@ -421,16 +426,30 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     try {
       const url = window.location.href;
       if (navigator.share) {
-        try { await navigator.share({ title: `${title} converter`, url }); setStatus("Share dialog opened."); return; } catch { /* user cancelled or API unavailable */ }
+        try {
+          await navigator.share({ title: `${title} converter`, url });
+          setStatus("Share dialog opened.");
+          trackProductEvent("conversion_shared", categoryId);
+          return;
+        } catch { /* user cancelled or API unavailable */ }
       }
-      setStatus(await copyText(url) ? "Share URL copied." : "Unable to copy the share URL.");
+      const copied = await copyText(url);
+      if (copied) trackProductEvent("share_link_copied", categoryId);
+      setStatus(copied ? "Share URL copied." : "Unable to copy the share URL.");
     } finally {
       setIsSharing(false);
     }
   };
   const copyResult = async () => {
     if (!resultState.result) return;
-    setStatus(await copyText(resultState.result) ? "Result copied." : "Unable to copy the result.");
+    const copied = await copyText(resultState.result);
+    if (copied) trackProductEvent("result_copied", categoryId);
+    setStatus(copied ? "Result copied." : "Unable to copy the result.");
+  };
+  const copyShareUrl = async () => {
+    const copied = await copyText(window.location.href);
+    if (copied) trackProductEvent("share_link_copied", categoryId);
+    setStatus(copied ? "Share URL copied." : "Unable to copy URL.");
   };
 
   return (
@@ -472,7 +491,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         <label className="text-sm flex items-center gap-1">Locale<select aria-label="Number locale" value={locale} onChange={(e) => { setLocale(e.target.value); updateUrl({ locale: e.target.value }); }} className="min-h-11 border rounded px-2 py-1">{LOCALES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={swap} aria-label="Swap units"><ArrowUpDown className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={resetToDefaults} aria-label="Reset category"><RotateCcw className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={() => { copyText(window.location.href).then((ok) => setStatus(ok ? "Share URL copied." : "Unable to copy URL.")); }} aria-label="Copy share URL"><Link2 className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={() => void copyShareUrl()} aria-label="Copy share URL"><Link2 className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
       </div>

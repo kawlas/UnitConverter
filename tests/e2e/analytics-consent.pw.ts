@@ -27,6 +27,12 @@ test("does not contact Google analytics before consent and remembers decline", a
 
 test("loads GA only after opt-in and sends sanitized SPA page views", async ({ page }) => {
   const analyticsRequests: string[] = [];
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: () => Promise.resolve() },
+    });
+  });
   await page.route("https://www.googletagmanager.com/**", async (route) => {
     analyticsRequests.push(route.request().url());
     await route.fulfill({ status: 200, contentType: "application/javascript", body: "" });
@@ -34,6 +40,9 @@ test("loads GA only after opt-in and sends sanitized SPA page views", async ({ p
 
   await page.goto("/length?from=meters&to=feet&value=7", { waitUntil: "networkidle" });
   expect(analyticsRequests).toEqual([]);
+  await page.getByRole("textbox", { name: "From", exact: true }).fill("9");
+  await page.waitForTimeout(650);
+  expect(await page.evaluate(() => window.dataLayer)).toBeUndefined();
 
   await page.getByRole("button", { name: "Allow optional analytics" }).click();
   await expect.poll(() => analyticsRequests.length).toBe(1);
@@ -47,6 +56,28 @@ test("loads GA only after opt-in and sends sanitized SPA page views", async ({ p
   expect(firstParameters.page_location).toBe("http://127.0.0.1:4173/length");
   expect(firstParameters.page_path).toBe("/length");
   expect(JSON.stringify(firstPageView)).not.toContain("value=7");
+
+  await page.getByRole("textbox", { name: "From", exact: true }).fill("12");
+  await expect.poll(() => page.evaluate(() =>
+    (window.dataLayer ?? [])
+      .map((entry) => Array.from(entry))
+      .find((entry) => entry[0] === "event" && entry[1] === "conversion_completed"),
+  )).toBeTruthy();
+  await page.getByRole("button", { name: "Copy result" }).click();
+  await expect.poll(() => page.evaluate(() =>
+    (window.dataLayer ?? [])
+      .map((entry) => Array.from(entry))
+      .filter((entry) => entry[0] === "event" && entry[1] !== "page_view"),
+  )).toEqual(expect.arrayContaining([
+    ["event", "conversion_completed", { tool_category: "length" }],
+    ["event", "result_copied", { tool_category: "length" }],
+  ]));
+  const productEvents = await page.evaluate(() =>
+    (window.dataLayer ?? [])
+      .map((entry) => Array.from(entry))
+      .filter((entry) => entry[0] === "event" && entry[1] !== "page_view"),
+  );
+  expect(JSON.stringify(productEvents)).not.toContain("12");
 
   await page.getByRole("link", { name: /Weight conversions/i }).click();
   await expect(page).toHaveURL(/\/weight$/);
