@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { useRoutes, Routes, Route } from "react-router-dom";
 import type { RouteObject } from "react-router-dom";
+import ConnectivityStatus from "./components/ConnectivityStatus";
 // `tempo-routes` is optional at runtime; dynamically load when enabled.
 
 const ConverterPage = lazy(() => import("./pages/ConverterPage"));
@@ -31,6 +32,7 @@ function App() {
       }
     >
       <div>
+        <ConnectivityStatus />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/convert/:categoryId" element={<ConverterPage />} />

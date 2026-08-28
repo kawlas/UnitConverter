@@ -87,9 +87,10 @@ Last reviewed: 2026-08-28
    - compare-all, natural-language input and PWA experiments.
 
 The first implementation slices now cover sourced methodology, compare-all results, an
-eight-page curated pair cluster and deterministic local conversion queries in the home
-search. PWA remains an experiment; pair expansion must wait for Search Console evidence and
-continue to pass the uniqueness and real-404 quality gates.
+eight-page curated pair cluster, deterministic local conversion queries and an installable,
+offline-capable PWA. Pair expansion must wait for Search Console evidence and continue to
+pass the uniqueness and real-404 quality gates. Retention should be measured through repeat
+usage and install events only after the privacy-safe analytics release gate is enabled.
 
 ## KPIs and review windows
 
@@ -110,5 +111,7 @@ continue to pass the uniqueness and real-404 quality gates.
   and structured-data documentation.
 - web.dev: Core Web Vitals thresholds (LCP <= 2.5 s, INP <= 200 ms,
   CLS <= 0.1 at the 75th percentile).
+- MDN Progressive Web Apps: installability requires a linked web app manifest and HTTPS;
+  service workers can provide offline behavior but remain a progressive enhancement.
 - BIPM, NIST and IEC sources will be required before publishing detailed unit
   methodology or standards claims.

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { categories } from "@/lib/conversion-data";
 import { useAnalyticsConsent } from "@/components/AnalyticsConsent";
+import InstallAppButton from "@/components/InstallAppButton";
 
 const Footer = () => {
   const { analyticsAvailable, openPreferences } = useAnalyticsConsent();
@@ -41,6 +42,7 @@ const Footer = () => {
       <div className="mt-9 flex flex-col gap-2 border-t border-slate-200 pt-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
         <p>Free unit converter with precise, shareable conversions.</p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <InstallAppButton />
           {analyticsAvailable && (
             <button
               type="button"

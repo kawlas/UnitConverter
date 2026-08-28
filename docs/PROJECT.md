@@ -29,6 +29,9 @@ branch for every task; never work directly on `main`.
 - `src/lib/conversion-data.ts` / `src/lib/conversions.ts` — typed catalog, unit definitions and exact conversion engine.
 - `src/lib/pair-pages.ts` — small registry of quality-gated pair-intent pages and their unique copy and examples.
 - `src/lib/smart-query.ts` — deterministic, local parser for typed queries such as `5 ft to cm`.
+- `src/components/ConnectivityStatus.tsx`, `InstallAppButton.tsx` — progressive offline and native-install UX.
+- `public/manifest.webmanifest` — install identity, branded icons and category shortcuts.
+- `scripts/generate-service-worker.mjs` — final build step that fingerprints and precaches the current prerendered product.
 - `src/index.css` — Tailwind v4 entry point, theme variables, base styles and overflow/accessibility guards.
 - `vite.config.ts` — Vite/React plugin, aliases and production chunking.
 - `tests/e2e/smoke.pw.ts` — styling, responsive overflow, title, URL state, swap, canonical, saved controls, navigation and axe smoke tests.
@@ -56,6 +59,15 @@ the user to clarify ambiguous or incompatible units instead of guessing.
 Supported presentation behavior includes `en-US`, `pl-PL`, `de-DE`, and `fr-FR` number
 locales, precision from 0–12 decimals, category SEO metadata, canonical short routes, the
 `/convert/:categoryId` alias, FAQ/structured data, and a keyboard-accessible mobile menu.
+
+The production artifact is also an installable progressive web app. Its generated,
+content-versioned service worker precaches every canonical prerendered tool and hashed
+application asset. Navigations remain network-first for fresh HTML, then fall back to the
+matching cached canonical route without persisting conversion query values as cache keys.
+Hashed assets are cache-first, cross-origin requests are never intercepted, stale product
+caches are removed during activation, and registration failure never blocks the converter.
+An install action appears only when the browser exposes its native install prompt; a small
+live status explains when the product is operating offline.
 
 Optional GA4 analytics is blocked at build time unless
 `VITE_GA4_MANUAL_PAGEVIEWS_READY=true`. Before enabling that flag, the GA4 web stream must
@@ -119,6 +131,8 @@ claim of fresh verification for an untested change.
 
 1. Create/use a task branch; never deploy unreviewed work from `main`.
 2. Install dependencies and run critical, local E2E, build, and diff checks.
+   Confirm that `dist/manifest.webmanifest`, the PWA/touch icons and the generated `dist/sw.js`
+   exist; the PWA E2E test verifies a controlled page and a real offline conversion.
 3. Commit, push, and open a PR; merge only after review.
 4. Link the production site when needed: `npx netlify link --name qconverter`.
 5. Deploy the built output: `npx netlify deploy --prod --dir=dist`.
@@ -137,3 +151,6 @@ smoke pass is evidence for that deploy only; do not generalize it to unrelated c
 - Investigate and repair the Netlify integration when access is available.
 - Rerun Lighthouse after material UI or loading changes; the existing audit is not a
   permanent performance guarantee.
+- Native install promotion varies by browser and platform. The app remains fully usable
+  when `beforeinstallprompt` is unavailable and relies on the browser's own Add to Home
+  Screen or Add to Dock flow.

@@ -58,3 +58,14 @@ const application = (
 
 if (isHydrating) hydrateRoot(root, application);
 else createRoot(root).render(application);
+
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    void navigator.serviceWorker.register("/sw.js", {
+      scope: "/",
+      updateViaCache: "none",
+    }).catch(() => {
+      // Offline support is a progressive enhancement; the converter remains usable without it.
+    });
+  });
+}
