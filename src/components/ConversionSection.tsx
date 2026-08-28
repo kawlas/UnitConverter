@@ -442,7 +442,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         {favoriteIds.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Favorites ({favoriteIds.length})</summary><ul className="mt-2 space-y-1 text-sm">{favoriteIds.slice(0, 5).map((id) => <li key={id}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => { const [favoriteCategoryId, favoriteFrom, favoriteTo] = id.split(":"); playSavedConversion(favoriteCategoryId, { from: favoriteFrom, to: favoriteTo }); }}>{id}</button></li>)}</ul></details>}
         <Button type="button" variant="outline" size="sm" onClick={clearSavedData}>Clear saved data</Button>
       </div>}
-      <p className="sr-only" role="status" aria-live="polite">{status}</p>
+      {status && <p className="mt-2 text-sm text-slate-500" role="status" aria-live="polite">{status}</p>}
     </div>
   );
 };

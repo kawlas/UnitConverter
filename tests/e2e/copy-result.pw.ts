@@ -19,7 +19,9 @@ test("copies the exact visible localized result without its unit", async ({ page
 
   await page.getByRole("button", { name: "Copy result" }).click();
 
-  await expect(page.getByRole("status")).toHaveText("Result copied.");
+  const status = page.getByRole("status");
+  await expect(status).toBeVisible();
+  await expect(status).toHaveText("Result copied.");
   expect(await page.evaluate(() =>
     (window as typeof window & { __copiedConversionResult?: string }).__copiedConversionResult,
   )).toBe("3,2808");
@@ -44,5 +46,9 @@ test("keeps the result action touch-sized without mobile overflow", async ({ pag
   await expect(copyResult).toBeVisible();
   const box = await copyResult.boundingBox();
   expect(box?.height).toBeGreaterThanOrEqual(44);
+
+  await page.getByRole("button", { name: "Toggle favorite" }).click();
+  await expect(page.getByRole("status")).toBeVisible();
+  await expect(page.getByRole("status")).toHaveText("Added to favorites.");
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 });
