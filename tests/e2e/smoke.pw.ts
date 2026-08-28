@@ -39,7 +39,7 @@ test("canonical routes ship meaningful HTML before JavaScript runs", async ({ re
   const lengthHtml = await (await request.get("/length")).text();
 
   expect(homeHtml).toContain("<h1");
-  expect(homeHtml).toContain("Make every measurement make sense.");
+  expect(homeHtml).toContain("Convert anything. Just ask.");
   expect(homeHtml).toContain('rel="canonical" href="https://qconverter.netlify.app/"');
   expect(homeHtml).toContain('property="og:image" content="https://qconverter.netlify.app/og-q-converter.png"');
   expect(lengthHtml).toContain("<h1");
