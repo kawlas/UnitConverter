@@ -416,7 +416,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
           </Button>
         </div>
       </div>
-      <p id={`${categoryId}-fraction-hint`} className="text-xs leading-5 text-slate-500">Decimals and fractions supported: {locale === "en-US" ? "12.5" : "12,5"}, 3/8, 1 1/2 or ½.</p>
+      <p id={`${categoryId}-fraction-hint`} className="text-xs leading-5 text-slate-500">Decimals and fractions supported: {locale === "en-US" ? "12.5" : "12,5"}, 3/8, 1 1/2 or ½. Simple arithmetic like {locale === "en-US" ? "(12*4)+6.5" : "(1,5+2,5)"} also works.</p>
       {resultState.error && <p id={`${categoryId}-conversion-error`} className="text-sm text-red-700" role="alert">{resultState.error}</p>}
       <div className="flex flex-wrap justify-end gap-2">
         <label className="text-sm flex items-center gap-1">Precision<select aria-label="Decimal precision" value={precision} onChange={(e) => { const next = Number(e.target.value); setPrecision(next); updateUrl({ precision: String(next) }); }} className="min-h-11 border rounded px-2 py-1">{Array.from({ length: 13 }, (_, index) => <option key={index} value={index}>{index}</option>)}</select></label>
