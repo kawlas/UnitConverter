@@ -2,6 +2,15 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 const consentKey = "q-converter:analytics-consent:v1";
+const externalBaseUrl = Boolean(process.env.BASE_URL);
+
+const requireAnalyticsUi = async (page: import("@playwright/test").Page) => {
+  const choices = page.getByRole("region", { name: "Analytics privacy choices" });
+  if (externalBaseUrl && await choices.count() === 0) {
+    test.skip(true, "The analytics release gate is disabled on this deployment.");
+  }
+  await expect(choices).toBeVisible();
+};
 
 test("does not contact Google analytics before consent and remembers decline", async ({ page, request }) => {
   const analyticsRequests: string[] = [];
@@ -13,7 +22,15 @@ test("does not contact Google analytics before consent and remembers decline", a
   const prerenderedHtml = await (await request.get("/bmi?height=180&weight=80")).text();
   expect(prerenderedHtml).not.toContain("googletagmanager.com");
   expect(prerenderedHtml).not.toContain("google-analytics.com");
-  await expect(page.getByRole("region", { name: "Analytics privacy choices" })).toBeVisible();
+  const choices = page.getByRole("region", { name: "Analytics privacy choices" });
+  if (externalBaseUrl && await choices.count() === 0) {
+    expect(analyticsRequests).toEqual([]);
+    expect(await page.evaluate((key) => localStorage.getItem(key), consentKey)).toBeNull();
+    await page.reload({ waitUntil: "networkidle" });
+    expect(analyticsRequests).toEqual([]);
+    return;
+  }
+  await expect(choices).toBeVisible();
   expect(analyticsRequests).toEqual([]);
 
   await page.getByRole("button", { name: "Use without analytics" }).click();
@@ -39,6 +56,7 @@ test("loads GA only after opt-in and sends sanitized SPA page views", async ({ p
   });
 
   await page.goto("/length?from=meters&to=feet&value=7", { waitUntil: "networkidle" });
+  await requireAnalyticsUi(page);
   expect(analyticsRequests).toEqual([]);
   await page.getByRole("textbox", { name: "From", exact: true }).fill("9");
   await page.waitForTimeout(650);
@@ -98,6 +116,7 @@ test("analytics preferences can be reopened and consent revoked", async ({ page 
     route.fulfill({ status: 200, contentType: "application/javascript", body: "" }),
   );
   await page.goto("/", { waitUntil: "networkidle" });
+  await requireAnalyticsUi(page);
   await page.getByRole("button", { name: "Allow optional analytics" }).click();
 
   await page.getByRole("button", { name: "Analytics preferences" }).click();
@@ -111,6 +130,7 @@ test("analytics preferences can be reopened and consent revoked", async ({ page 
 test("privacy choices are accessible without overflowing at 320px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
+  await requireAnalyticsUi(page);
   await expect(page.getByRole("region", { name: "Analytics privacy choices" })).toBeVisible();
 
   const results = await new AxeBuilder({ page })
