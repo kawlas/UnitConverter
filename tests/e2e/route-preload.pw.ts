@@ -19,7 +19,7 @@ const cases: Case[] = [
 
 const pagePreloadPattern = (name: string) =>
     new RegExp(
-        `<link rel="modulepreload" crossorigin href="/assets/${name}-[A-Za-z0-9_]+\\.js">`,
+        `<link rel="modulepreload" crossorigin href="/assets/${name}-[A-Za-z0-9_-]+\\.js">`,
     );
 
 const pageChunkPreloadCount = (html: string) =>
