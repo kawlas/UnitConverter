@@ -92,6 +92,10 @@ The app then loads GA4 only after an explicit opt-in, sends manual SPA pageviews
 flag, no analytics UI or Google analytics script is shipped. Recheck the external GA4
 setting before every environment enables the flag; the repository cannot enforce a
 property-side setting.
+After opt-in, bounded product events measure completed conversions, result/link copying,
+native sharing, favorite changes, saved-conversion playback, saved-data clearing and batch
+copying. Event payloads contain only an allowlisted event name and a validated category ID;
+they never include entered values, unit selections, result text or URL query parameters.
 
 ## Design direction and constraints
 
