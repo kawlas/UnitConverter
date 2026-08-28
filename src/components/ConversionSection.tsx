@@ -3,7 +3,6 @@ import { ArrowUpDown, ClipboardCopy, Link2, RotateCcw, Share2, Star } from "luci
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import AllUnitsComparison from "./AllUnitsComparison";
 import BatchConversion from "./BatchConversion";
 import { CategoryDefinition, defaultUnits, getCategory, UnitDefinition } from "@/lib/conversion-data";
@@ -441,18 +440,26 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         <label htmlFor={`${categoryId}-from-value`} className="text-sm font-medium">From</label>
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
           <Input id={`${categoryId}-from-value`} type="text" inputMode="text" value={fromValue} onChange={(e) => setValue(e.target.value)} className="min-h-11 w-full sm:w-[120px]" placeholder="0" autoCapitalize="off" spellCheck={false} maxLength={120} aria-invalid={Boolean(resultState.error)} aria-describedby={`${categoryId}-fraction-hint${resultState.error ? ` ${categoryId}-conversion-error` : ""}`} />
-          <Select value={fromUnit} onValueChange={setFrom}>
-            <SelectTrigger aria-label="Source unit" className="min-h-11 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
-            <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
-          </Select>
+          <select
+            aria-label="Source unit"
+            value={fromUnit}
+            onChange={(event) => setFrom(event.target.value)}
+            className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-1 sm:w-[170px]"
+          >
+            {units.map((unit) => <option key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</option>)}
+          </select>
         </div>
         <label htmlFor={`${categoryId}-result`} className="text-sm font-medium">To</label>
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
           <Input id={`${categoryId}-result`} type="text" value={resultState.result} readOnly className="min-h-11 w-full sm:w-[120px]" aria-live="polite" aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
-          <Select value={toUnit} onValueChange={setTo}>
-            <SelectTrigger aria-label="Target unit" className="min-h-11 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
-            <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
-          </Select>
+          <select
+            aria-label="Target unit"
+            value={toUnit}
+            onChange={(event) => setTo(event.target.value)}
+            className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-1 sm:w-[170px]"
+          >
+            {units.map((unit) => <option key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</option>)}
+          </select>
           <Button type="button" variant="outline" className="min-h-11 w-full shrink-0 sm:w-auto" onClick={() => void copyResult()} disabled={!resultState.result}>
             <ClipboardCopy aria-hidden="true" className="mr-2 h-4 w-4" /> Copy result
           </Button>

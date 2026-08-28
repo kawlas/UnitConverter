@@ -5,7 +5,6 @@ import { calculateAdultBmi, type BmiHeightUnit, type BmiWeightUnit } from "@/lib
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 interface BMICalculatorProps {
   title?: string;
@@ -110,15 +109,17 @@ const BMICalculator = ({ title = "BMI" }: BMICalculatorProps) => {
             <label htmlFor="bmi-height" className="mb-2 block text-sm font-medium text-slate-800">Height</label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <Input id="bmi-height" type="text" inputMode="decimal" value={height} onChange={(event) => changeHeight(event.target.value)} className="min-h-11 flex-1" placeholder="e.g. 170" aria-invalid={Boolean(error)} aria-describedby={error ? "bmi-error" : "bmi-guidance"} />
-              <Select value={heightUnit} onValueChange={(value) => changeHeightUnit(value as BmiHeightUnit)}>
-                <SelectTrigger aria-label="Height unit" className="min-h-11 w-full sm:w-[150px]"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cm">Centimeters</SelectItem>
-                  <SelectItem value="meters">Meters</SelectItem>
-                  <SelectItem value="inches">Inches</SelectItem>
-                  <SelectItem value="feet">Feet</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                aria-label="Height unit"
+                value={heightUnit}
+                onChange={(event) => changeHeightUnit(event.target.value as BmiHeightUnit)}
+                className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-1 sm:w-[150px]"
+              >
+                <option value="cm">Centimeters</option>
+                <option value="meters">Meters</option>
+                <option value="inches">Inches</option>
+                <option value="feet">Feet</option>
+              </select>
             </div>
           </div>
 
@@ -126,13 +127,15 @@ const BMICalculator = ({ title = "BMI" }: BMICalculatorProps) => {
             <label htmlFor="bmi-weight" className="mb-2 block text-sm font-medium text-slate-800">Weight</label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <Input id="bmi-weight" type="text" inputMode="decimal" value={weight} onChange={(event) => changeWeight(event.target.value)} className="min-h-11 flex-1" placeholder="e.g. 70" aria-invalid={Boolean(error)} aria-describedby={error ? "bmi-error" : "bmi-guidance"} />
-              <Select value={weightUnit} onValueChange={(value) => changeWeightUnit(value as BmiWeightUnit)}>
-                <SelectTrigger aria-label="Weight unit" className="min-h-11 w-full sm:w-[150px]"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="kg">Kilograms</SelectItem>
-                  <SelectItem value="lbs">Pounds</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                aria-label="Weight unit"
+                value={weightUnit}
+                onChange={(event) => changeWeightUnit(event.target.value as BmiWeightUnit)}
+                className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-1 sm:w-[150px]"
+              >
+                <option value="kg">Kilograms</option>
+                <option value="lbs">Pounds</option>
+              </select>
             </div>
           </div>
           <p id="bmi-guidance" className="text-xs leading-5 text-slate-500">Values stay in the URL so this calculation can be bookmarked or shared.</p>
