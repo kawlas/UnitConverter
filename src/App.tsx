@@ -1,6 +1,5 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
-import { useRoutes, Routes, Route } from "react-router-dom";
-import type { RouteObject } from "react-router-dom";
+import { Route, Routes, useRoutes, type RouteObject } from "react-router-dom";
 import ConnectivityStatus from "./components/ConnectivityStatus";
 // `tempo-routes` is optional at runtime; dynamically load when enabled.
 
