@@ -5,8 +5,13 @@ import { HelmetProvider } from "react-helmet-async";
 import { StaticRouter } from "react-router";
 import App from "./App";
 import { categories } from "./lib/conversion-data";
+import { pairPagePath, pairPages } from "./lib/pair-pages";
 
-export const prerenderRoutes = ["/", ...categories.map(({ id }) => `/${id}`)];
+export const prerenderRoutes = [
+  "/",
+  ...categories.map(({ id }) => `/${id}`),
+  ...pairPages.map(pairPagePath),
+];
 
 export const render = (url: string): Promise<string> =>
   new Promise((resolve, reject) => {

@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
 import { categories } from "@/lib/conversion-data";
+import { pairPagePath, pairPages } from "@/lib/pair-pages";
 
 const HOME_TITLE = "Q Converter — Free Online Unit Converter";
 const HOME_DESCRIPTION = "Convert length, area, pressure, digital data, time and more with a precise, shareable online unit converter.";
@@ -92,6 +93,29 @@ export default function HomePage() {
                 <Link key={category.id} to={`/${category.id}`} className="group flex min-h-36 flex-col justify-between rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_4px_18px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-[0_14px_30px_rgba(15,23,42,0.09)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
                   <div className="flex items-start justify-between gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-xs font-bold text-slate-600 transition-colors group-hover:bg-indigo-50 group-hover:text-indigo-600">{String(index + 1).padStart(2, "0")}</span><ArrowRight aria-hidden="true" className="h-4 w-4 text-slate-500 transition group-hover:translate-x-1 group-hover:text-indigo-600" /></div>
                   <div className="mt-6"><h3 className="font-semibold tracking-tight text-slate-950">{category.title}</h3><p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{category.description}</p><p className="mt-3 text-[11px] font-medium uppercase tracking-[0.12em] text-slate-600">{category.units.slice(0, 4).map((unit) => unit.symbol).join(" · ")}</p></div>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-14 sm:mt-20" aria-labelledby="pair-pages-heading">
+            <div className="mb-6 max-w-2xl sm:mb-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600">Quick references</p>
+              <h2 id="pair-pages-heading" className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Common unit conversions</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600 sm:text-base">Focused pages with a live calculator, formula, worked examples and transparent measurement sources.</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {pairPages.map((pair) => (
+                <Link
+                  key={pair.id}
+                  to={pairPagePath(pair)}
+                  className="group flex min-h-28 flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_18px_rgba(15,23,42,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-600">{pair.categoryId}</span>
+                  <span className="mt-4 flex items-center justify-between gap-3 text-sm font-semibold text-slate-950 group-hover:text-indigo-700">
+                    {pair.title.replace(" Converter", "")}
+                    <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-500 transition group-hover:translate-x-1 group-hover:text-indigo-600" />
+                  </span>
                 </Link>
               ))}
             </div>

@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { categories as categoryDefinitions } from "./conversion-data";
+import { pairPagePath, pairPages } from "./pair-pages";
 
 const projectFile = (...segments: string[]) =>
   readFileSync(join(process.cwd(), ...segments), "utf8");
@@ -9,6 +10,7 @@ const projectFile = (...segments: string[]) =>
 const canonicalPaths = [
   "/",
   ...categoryDefinitions.map(({ id }) => `/${id}`),
+  ...pairPages.map(pairPagePath),
 ];
 
 describe("crawler and route contracts", () => {
@@ -46,12 +48,14 @@ describe("crawler and route contracts", () => {
     expect(redirectLines[0]).toBe(
       "/convert/:categoryId /:categoryId 301!",
     );
-    const categoryPaths = canonicalPaths.slice(1);
-    expect(redirectLines.slice(1, 1 + categoryPaths.length)).toEqual(
-      categoryPaths.map((path) => `${path}/ ${path} 301!`),
+    const categoryPaths = categoryDefinitions.map(({ id }) => `/${id}`);
+    const pairPaths = pairPages.map(pairPagePath);
+    const trailingSlashPaths = [...categoryPaths, ...pairPaths];
+    expect(redirectLines.slice(1, 1 + trailingSlashPaths.length)).toEqual(
+      trailingSlashPaths.map((path) => `${path}/ ${path} 301!`),
     );
-    expect(redirectLines.slice(1 + categoryPaths.length)).toEqual(
-      canonicalPaths.slice(1).map((path) => `${path} ${path}/index.html 200`),
+    expect(redirectLines.slice(1 + trailingSlashPaths.length)).toEqual(
+      trailingSlashPaths.map((path) => `${path} ${path}/index.html 200`),
     );
     expect(redirectLines.some((line) => line.startsWith("/* "))).toBe(false);
   });

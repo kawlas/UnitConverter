@@ -17,6 +17,14 @@
 /angle/ /angle 301!
 /fuel/ /fuel 301!
 /pace/ /pace 301!
+/length/meters-to-feet/ /length/meters-to-feet 301!
+/length/kilometers-to-miles/ /length/kilometers-to-miles 301!
+/length/centimeters-to-inches/ /length/centimeters-to-inches 301!
+/weight/kilograms-to-pounds/ /weight/kilograms-to-pounds 301!
+/weight/pounds-to-kilograms/ /weight/pounds-to-kilograms 301!
+/temperature/celsius-to-fahrenheit/ /temperature/celsius-to-fahrenheit 301!
+/temperature/fahrenheit-to-celsius/ /temperature/fahrenheit-to-celsius 301!
+/volume/liters-to-gallons/ /volume/liters-to-gallons 301!
 
 # Serve each canonical clean URL from its prerendered document.
 /bmi /bmi/index.html 200
@@ -34,3 +42,11 @@
 /angle /angle/index.html 200
 /fuel /fuel/index.html 200
 /pace /pace/index.html 200
+/length/meters-to-feet /length/meters-to-feet/index.html 200
+/length/kilometers-to-miles /length/kilometers-to-miles/index.html 200
+/length/centimeters-to-inches /length/centimeters-to-inches/index.html 200
+/weight/kilograms-to-pounds /weight/kilograms-to-pounds/index.html 200
+/weight/pounds-to-kilograms /weight/pounds-to-kilograms/index.html 200
+/temperature/celsius-to-fahrenheit /temperature/celsius-to-fahrenheit/index.html 200
+/temperature/fahrenheit-to-celsius /temperature/fahrenheit-to-celsius/index.html 200
+/volume/liters-to-gallons /volume/liters-to-gallons/index.html 200

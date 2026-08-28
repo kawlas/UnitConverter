@@ -33,8 +33,9 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/:categoryId" element={<ConverterPage />} />
           <Route path="/convert/:categoryId" element={<ConverterPage />} />
+          <Route path="/:categoryId/:pairId" element={<ConverterPage />} />
+          <Route path="/:categoryId" element={<ConverterPage />} />
           {tempoEnabled && <Route path="/tempobook/*" />}
         </Routes>
         {tempoEnabled && <TempoRoutes routes={externalRoutes} />}

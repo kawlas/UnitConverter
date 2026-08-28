@@ -12,6 +12,8 @@ interface ConversionSectionProps {
   title?: string;
   categoryId?: string;
   units?: readonly UnitDefinition[];
+  initialFromUnit?: string;
+  initialToUnit?: string;
 }
 
 interface HistoryEntry {
@@ -195,6 +197,8 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   title = "Length",
   categoryId = "length",
   units = getCategory(categoryId)?.units ?? [],
+  initialFromUnit,
+  initialToUnit,
 }) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -208,7 +212,11 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     faq: [],
     examples: [],
   }), [categoryId, title, units]);
-  const defaults = defaultUnits(definition);
+  const catalogDefaults = defaultUnits(definition);
+  const defaults = {
+    from: units.some(({ value }) => value === initialFromUnit) ? initialFromUnit! : catalogDefaults.from,
+    to: units.some(({ value }) => value === initialToUnit) ? initialToUnit! : catalogDefaults.to,
+  };
   const defaultInput = String(getCategory(categoryId)?.examples[0]?.input ?? 1);
   const precisionParam = searchParams.get("precision");
   const localeParam = searchParams.get("locale");
@@ -248,7 +256,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   }, [categoryId]);
 
   useEffect(() => {
-    const nextDefaults = defaultUnits(definition);
+    const nextDefaults = defaults;
     const nextFrom = searchParams.get("from");
     const nextTo = searchParams.get("to");
     // URL navigation (including browser back/forward) intentionally hydrates local controls.
@@ -262,7 +270,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     setHasHydratedUrl(true);
     // URL changes (including back/forward) are the source of truth.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams, categoryId, defaultInput]);
+  }, [searchParams, categoryId, defaultInput, initialFromUnit, initialToUnit]);
 
   const updateUrl = (updates: Record<string, string>, replace = true) => {
     const next = new URLSearchParams(searchParams);

@@ -14,6 +14,9 @@ swap, reset, precision (0–12 decimals), locale-aware formatting (`en-US`, `pl-
 `de-DE`, `fr-FR`), copy/share links, favorites, recent history, and clear saved data.
 Every non-BMI converter also displays one input across the complete category catalog and
 lets any comparison row become the primary target.
+An initial quality-gated cluster of eight pair pages adds focused formulas, worked examples
+and internal links for selected length, weight, temperature and volume conversions without
+generating a thin page for every possible combination.
 History and favorites expire from `localStorage` after 30 days. Category pages provide
 SEO metadata, structured data, canonical short routes, and a `/convert/:categoryId` alias.
 The responsive navigation includes a keyboard-accessible mobile menu.
@@ -50,7 +53,7 @@ about an untested change.
 
 - `src/App.tsx` — routing; `src/pages/HomePage.tsx` and `ConverterPage.tsx` — pages.
 - `src/components/` — `Navbar`, `Footer`, `SearchBar`, `ConversionSection`, `AllUnitsComparison`, and `BMICalculator`.
-- `src/lib/conversion-data.ts` and `src/lib/conversions.ts` — catalog and conversion engine.
+- `src/lib/conversion-data.ts`, `src/lib/conversions.ts`, and `src/lib/pair-pages.ts` — catalog, conversion engine, and curated pair-page registry.
 - `src/index.css` — Tailwind v4 entry, tokens, base and responsive constraints.
 - `vite.config.ts`, `tests/e2e/smoke.pw.ts`, `.github/workflows/production-smoke.yml`, and `netlify.toml` — build, smoke coverage, CI, and Netlify deployment.
 

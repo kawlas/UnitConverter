@@ -27,6 +27,7 @@ branch for every task; never work directly on `main`.
 - `src/components/AllUnitsComparison.tsx` — accessible, responsive table that compares one input across the complete category catalog.
 - `src/components/BMICalculator.tsx` — BMI-specific calculator UI.
 - `src/lib/conversion-data.ts` / `src/lib/conversions.ts` — typed catalog, unit definitions and exact conversion engine.
+- `src/lib/pair-pages.ts` — small registry of quality-gated pair-intent pages and their unique copy and examples.
 - `src/index.css` — Tailwind v4 entry point, theme variables, base styles and overflow/accessibility guards.
 - `vite.config.ts` — Vite/React plugin, aliases and production chunking.
 - `tests/e2e/smoke.pw.ts` — styling, responsive overflow, title, URL state, swap, canonical, saved controls, navigation and axe smoke tests.
@@ -43,6 +44,9 @@ share a URL, save favorites, revisit recent history, and clear saved data. Histo
 favorites are retained for at most 30 days and tolerate unavailable or malformed browser
 storage. Every non-BMI category also shows the current input across all supported units;
 any comparison row can become the primary target without re-entering the value.
+Eight curated pair routes provide focused formulas and worked examples for selected
+high-utility conversions. They are explicitly prerendered, self-canonical, listed in the
+sitemap and linked from their parent category; unsupported pairs remain real noindex 404s.
 
 Supported presentation behavior includes `en-US`, `pl-PL`, `de-DE`, and `fr-FR` number
 locales, precision from 0–12 decimals, category SEO metadata, canonical short routes, the

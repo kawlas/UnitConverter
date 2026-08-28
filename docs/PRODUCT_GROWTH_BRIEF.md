@@ -86,6 +86,11 @@ Last reviewed: 2026-08-28
    - a small, research-backed pair-page cluster with unique examples and tables;
    - compare-all, natural-language input and PWA experiments.
 
+The first implementation slices now cover sourced methodology, compare-all results and an
+eight-page curated pair cluster. Natural-language input and PWA remain experiments; pair
+expansion must wait for Search Console evidence and continue to pass the uniqueness and
+real-404 quality gates.
+
 ## KPIs and review windows
 
 - 0-14 days after release: all canonical URLs have complete first-response HTML;
