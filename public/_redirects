@@ -17,6 +17,10 @@
 /angle/ /angle 301!
 /fuel/ /fuel 301!
 /pace/ /pace 301!
+/length/millimeters-to-inches/ /length/millimeters-to-inches 301!
+/length/inches-to-centimeters/ /length/inches-to-centimeters 301!
+/length/inches-to-feet/ /length/inches-to-feet 301!
+/volume/milliliters-to-us-fluid-ounces/ /volume/milliliters-to-us-fluid-ounces 301!
 /length/meters-to-feet/ /length/meters-to-feet 301!
 /length/kilometers-to-miles/ /length/kilometers-to-miles 301!
 /length/centimeters-to-inches/ /length/centimeters-to-inches 301!
@@ -42,6 +46,10 @@
 /angle /angle/index.html 200
 /fuel /fuel/index.html 200
 /pace /pace/index.html 200
+/length/millimeters-to-inches /length/millimeters-to-inches/index.html 200
+/length/inches-to-centimeters /length/inches-to-centimeters/index.html 200
+/length/inches-to-feet /length/inches-to-feet/index.html 200
+/volume/milliliters-to-us-fluid-ounces /volume/milliliters-to-us-fluid-ounces/index.html 200
 /length/meters-to-feet /length/meters-to-feet/index.html 200
 /length/kilometers-to-miles /length/kilometers-to-miles/index.html 200
 /length/centimeters-to-inches /length/centimeters-to-inches/index.html 200

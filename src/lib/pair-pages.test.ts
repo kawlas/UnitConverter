@@ -21,7 +21,7 @@ describe("curated conversion pair pages", () => {
       expect(category!.converter, pairPagePath(pair)).not.toBe("calculator");
       expect(getUnit(category!, pair.fromUnit), pairPagePath(pair)).toBeDefined();
       expect(getUnit(category!, pair.toUnit), pairPagePath(pair)).toBeDefined();
-      expect(pair.id, pairPagePath(pair)).toBe(`${pair.fromUnit}-to-${pair.toUnit}`);
+      expect(pair.id, pairPagePath(pair)).toBe(`${pair.fromUnit}-to-${pair.toUnit}`.replace(/_/g, "-"));
       expect(pair.fromUnit, pairPagePath(pair)).not.toBe(pair.toUnit);
       expect(pair.examples.length, pairPagePath(pair)).toBeGreaterThanOrEqual(5);
       expect(new Set(pair.examples).size, pairPagePath(pair)).toBe(pair.examples.length);

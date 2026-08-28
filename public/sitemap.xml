@@ -16,6 +16,10 @@
   <url><loc>https://qconverter.netlify.app/angle</loc></url>
   <url><loc>https://qconverter.netlify.app/fuel</loc></url>
   <url><loc>https://qconverter.netlify.app/pace</loc></url>
+  <url><loc>https://qconverter.netlify.app/length/millimeters-to-inches</loc></url>
+  <url><loc>https://qconverter.netlify.app/length/inches-to-centimeters</loc></url>
+  <url><loc>https://qconverter.netlify.app/length/inches-to-feet</loc></url>
+  <url><loc>https://qconverter.netlify.app/volume/milliliters-to-us-fluid-ounces</loc></url>
   <url><loc>https://qconverter.netlify.app/length/meters-to-feet</loc></url>
   <url><loc>https://qconverter.netlify.app/length/kilometers-to-miles</loc></url>
   <url><loc>https://qconverter.netlify.app/length/centimeters-to-inches</loc></url>
