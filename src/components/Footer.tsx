@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import { categories } from "@/lib/conversion-data";
+import { useAnalyticsConsent } from "@/components/AnalyticsConsent";
 
-const Footer = () => (
+const Footer = () => {
+  const { analyticsAvailable, openPreferences } = useAnalyticsConsent();
+
+  return (
   <footer className="border-t border-slate-200 bg-white" aria-label="Footer">
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
       <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -36,10 +40,22 @@ const Footer = () => (
 
       <div className="mt-9 flex flex-col gap-2 border-t border-slate-200 pt-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
         <p>Free unit converter with precise, shareable conversions.</p>
-        <p>© {__BUILD_YEAR__} Q Converter</p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          {analyticsAvailable && (
+            <button
+              type="button"
+              onClick={openPreferences}
+              className="min-h-11 rounded-md font-medium text-slate-600 underline-offset-4 hover:text-indigo-700 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Analytics preferences
+            </button>
+          )}
+          <p>© {__BUILD_YEAR__} Q Converter</p>
+        </div>
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 export default Footer;

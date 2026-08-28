@@ -52,6 +52,18 @@ Supported presentation behavior includes `en-US`, `pl-PL`, `de-DE`, and `fr-FR` 
 locales, precision from 0–12 decimals, category SEO metadata, canonical short routes, the
 `/convert/:categoryId` alias, FAQ/structured data, and a keyboard-accessible mobile menu.
 
+Optional GA4 analytics is blocked at build time unless
+`VITE_GA4_MANUAL_PAGEVIEWS_READY=true`. Before enabling that flag, the GA4 web stream must
+have Enhanced Measurement → Page views → **Page changes based on browser history events**
+disabled. [Google documents that `send_page_view: false` does not disable those automatic
+history events](https://developers.google.com/analytics/devguides/collection/ga4/views#disable_page_changes_based_on_browser_history_events).
+The app then loads GA4 only after an explicit opt-in, sends manual SPA pageviews with
+`origin + pathname` (never URL query state), expires the stored choice after
+30 days, and lets the user reopen or revoke the choice from the footer. Without the build
+flag, no analytics UI or Google analytics script is shipped. Recheck the external GA4
+setting before every environment enables the flag; the repository cannot enforce a
+property-side setting.
+
 ## Design direction and constraints
 
 The shipped redesign is a calm, high-contrast measurement studio: a dark navy hero,

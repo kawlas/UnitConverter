@@ -15,7 +15,11 @@ const renderDocument = async (route) => {
     throw new Error(`Prerendered route ${route} did not resolve its Suspense boundary.`);
   }
 
-  const routeHead = rendered.slice(0, suspenseBoundary);
+  // Mark prerendered Helmet elements so the client can adopt them instead of
+  // briefly duplicating metadata during hydration.
+  const routeHead = rendered
+    .slice(0, suspenseBoundary)
+    .replace(/<(meta|link|script)(?=[ >])/g, '<$1 data-prerendered-head="true"');
   const routeBody = rendered.slice(suspenseBoundary);
   const document = template
     .replace(/\s*<title>[^<]*<\/title>/, "")
@@ -25,9 +29,9 @@ const renderDocument = async (route) => {
   const count = (pattern) => [...document.matchAll(pattern)].length;
   const expectedCanonical = `https://qconverter.netlify.app${route}`;
   const invalid = [
-    count(/<title>/g) !== 1 && "exactly one title",
-    count(/<meta name="description"/g) !== 1 && "exactly one description",
-    count(/rel="canonical"/g) !== 1 && "exactly one canonical",
+    count(/<title(?:\s[^>]*)?>/g) !== 1 && "exactly one title",
+    count(/<meta\b[^>]*name="description"/g) !== 1 && "exactly one description",
+    count(/<link\b[^>]*rel="canonical"/g) !== 1 && "exactly one canonical",
     !document.includes(`href="${expectedCanonical}"`) && `canonical ${expectedCanonical}`,
     !document.includes("<h1") && "an h1",
     route !== "/" && !document.includes("Sources &amp; methodology") && "visible methodology sources",

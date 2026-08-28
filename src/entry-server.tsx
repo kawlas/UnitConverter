@@ -6,6 +6,7 @@ import { StaticRouter } from "react-router";
 import App from "./App";
 import { categories } from "./lib/conversion-data";
 import { pairPagePath, pairPages } from "./lib/pair-pages";
+import { AnalyticsConsentProvider } from "./components/AnalyticsConsent";
 
 export const prerenderRoutes = [
   "/",
@@ -39,7 +40,9 @@ export const render = (url: string): Promise<string> =>
     const stream = renderToPipeableStream(
       <HelmetProvider>
         <StaticRouter location={url}>
-          <App />
+          <AnalyticsConsentProvider>
+            <App />
+          </AnalyticsConsentProvider>
         </StaticRouter>
       </HelmetProvider>,
       {

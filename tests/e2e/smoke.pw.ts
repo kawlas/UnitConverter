@@ -115,7 +115,10 @@ test("convert alias loads and advertises the short canonical path", async ({ pag
   await expect(page.getByRole("heading", { name: "Length Converter", exact: true })).toBeVisible();
   const canonical = page.locator('link[rel="canonical"]');
   await expect(page).toHaveURL(/\/length$/);
+  await expect(page.locator("title")).toHaveCount(1);
   await expect(canonical).toHaveAttribute("href", "https://qconverter.netlify.app/length");
+  await expect(page.locator('meta[name="description"]')).toHaveCount(1);
+  await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(3);
 });
 
 test("convert alias is a real permanent redirect that preserves query state", async ({ request }) => {
