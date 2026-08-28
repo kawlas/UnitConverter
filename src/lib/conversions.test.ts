@@ -40,6 +40,18 @@ describe("central unit catalog conversions", () => {
     expect(convertExact(1, "stone", "kilograms", "weight")).toBeCloseTo(6.35029318, 9);
   });
 
+  it("keeps US and Imperial liquid measures distinct", () => {
+    expect(convertExact(1, "gallons", "liters", "volume")).toBeCloseTo(3.785411784, 12);
+    expect(convertExact(1, "imperial_gallons", "liters", "volume")).toBeCloseTo(4.54609, 12);
+    expect(convertExact(1, "imperial_fluid_ounces", "milliliters", "volume")).toBeCloseTo(28.4130625, 10);
+  });
+
+  it("converts fuel economy with explicitly different US and UK gallons", () => {
+    expect(convertExact(7, "liters_per_100km", "miles_per_gallon", "fuel")).toBeCloseTo(33.6020833, 7);
+    expect(convertExact(7, "liters_per_100km", "miles_per_imperial_gallon", "fuel")).toBeCloseTo(40.354419476, 9);
+    expect(convertExact(30, "miles_per_gallon", "miles_per_imperial_gallon", "fuel")).toBeCloseTo(36.028497765, 9);
+  });
+
   it("prefers exact symbols and uses case-insensitive fallback only when unambiguous", () => {
     expect(convertExact(1, "kB", "B", "digital")).toBe(1000);
     expect(convertExact(1, "kb", "bit", "digital")).toBe(1000);
@@ -85,6 +97,7 @@ describe("central unit catalog conversions", () => {
     expect(convertAllExact(7, "liters_per_100km", "fuel")).toEqual([
       expect.objectContaining({ unit: expect.objectContaining({ value: "liters_per_100km" }), value: 7 }),
       expect.objectContaining({ unit: expect.objectContaining({ value: "miles_per_gallon" }), value: expect.closeTo(33.6020832857) }),
+      expect.objectContaining({ unit: expect.objectContaining({ value: "miles_per_imperial_gallon" }), value: expect.closeTo(40.354419544) }),
     ]);
     expect(() => convertAllExact(0, "liters_per_100km", "fuel")).toThrowError(/positive value/i);
   });

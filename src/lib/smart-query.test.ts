@@ -23,6 +23,8 @@ describe("deterministic smart conversion queries", () => {
     ["ile to 10 kg na gramy", "weight", "kilograms", "grams", 10, 10000],
     ["zamień 5ha na metry kwadratowe", "area", "hectare", "square_meters", 5, 50000],
     ["przelicz 7 l/100km na mpg", "fuel", "liters_per_100km", "miles_per_gallon", 7, 33.6020832857],
+    ["7 l/100km to mpg UK", "fuel", "liters_per_100km", "miles_per_imperial_gallon", 7, 40.3544195],
+    ["1 imperial gallon to liters", "volume", "imperial_gallons", "liters", 1, 4.54609],
     ["5 ft 11 in to cm", "length", "inches", "centimeters", 71, 180.34],
     ["5'11\" in cm", "length", "inches", "centimeters", 71, 180.34],
   ])("parses %s using the catalog", (query, categoryId, from, to, value, result) => {

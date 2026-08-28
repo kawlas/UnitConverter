@@ -59,6 +59,10 @@ const affine = (
 // NIST SP 811 Appendix B.9 derives US liquid measures from the exact
 // international inch and the US gallon (231 cubic inches).
 const US_LIQUID_GALLON_LITERS = 3.785411784;
+const IMPERIAL_GALLON_LITERS = 4.54609;
+const KILOMETERS_PER_MILE = 1.609344;
+const US_MPG_CONSTANT = 100 * US_LIQUID_GALLON_LITERS / KILOMETERS_PER_MILE;
+const IMPERIAL_MPG_CONSTANT = 100 * IMPERIAL_GALLON_LITERS / KILOMETERS_PER_MILE;
 const INTERNATIONAL_POUND_KILOGRAMS = 0.45359237;
 
 const metadata = (
@@ -169,9 +173,11 @@ const definitions: CategoryDefinition[] = [
     units: [
       linear("liters", "Liters", "L", 1, ["litres"]),
       linear("gallons", "US Gallons", "gal", US_LIQUID_GALLON_LITERS, ["us gallon", "us gallons"]),
+      linear("imperial_gallons", "Imperial Gallons (UK)", "imp gal", IMPERIAL_GALLON_LITERS, ["imperial gallon", "imperial gallons", "uk gallon", "uk gallons"]),
       linear("milliliters", "Milliliters", "mL", 0.001, ["ml"]),
       linear("us_cups", "US Cups", "cup", US_LIQUID_GALLON_LITERS / 16, ["cup", "cups", "us cup", "us cups"]),
       linear("us_fluid_ounces", "US Fluid Ounces", "fl oz", US_LIQUID_GALLON_LITERS / 128, ["fluid ounce", "fluid ounces", "us fluid ounce", "us fluid ounces", "floz"]),
+      linear("imperial_fluid_ounces", "Imperial Fluid Ounces (UK)", "imp fl oz", IMPERIAL_GALLON_LITERS / 160, ["imperial fluid ounce", "imperial fluid ounces", "uk fluid ounce", "uk fluid ounces"]),
       linear("us_tablespoons", "US Tablespoons", "tbsp", US_LIQUID_GALLON_LITERS / 256, ["tablespoon", "tablespoons", "us tablespoon", "us tablespoons"]),
       linear("us_teaspoons", "US Teaspoons", "tsp", US_LIQUID_GALLON_LITERS / 768, ["teaspoon", "teaspoons", "us teaspoon", "us teaspoons"]),
       linear("us_liquid_pints", "US Liquid Pints", "pt", US_LIQUID_GALLON_LITERS / 8, ["pint", "pints", "us pint", "us pints", "liquid pint", "liquid pints"]),
@@ -225,12 +231,19 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "fuel", title: "Fuel Economy", converter: "custom",
-    units: [linear("liters_per_100km", "Liters per 100 km", "L/100 km", 1, ["l/100km", "l/100 km", "litry na 100 km", "litrów na 100 km"]), linear("miles_per_gallon", "Miles per Gallon (US)", "mpg", 1, ["mpg", "mile na galon", "mil na galon"])],
-    convert: (value, from, to) => from === to ? value : 235.214583 / value,
+    units: [linear("liters_per_100km", "Liters per 100 km", "L/100 km", 1, ["l/100km", "l/100 km", "litry na 100 km", "litrów na 100 km"]), linear("miles_per_gallon", "Miles per Gallon (US)", "mpg", 1, ["mpg us", "us mpg", "mile na galon us", "mil na galon us"]), linear("miles_per_imperial_gallon", "Miles per Imperial Gallon (UK)", "mpg (UK)", 1, ["mpg uk", "uk mpg", "imperial mpg", "miles per imperial gallon"])],
+    convert: (value, from, to) => {
+      if (from === to) return value;
+      const litersPer100Km = from === "liters_per_100km"
+        ? value
+        : (from === "miles_per_gallon" ? US_MPG_CONSTANT : IMPERIAL_MPG_CONSTANT) / value;
+      if (to === "liters_per_100km") return litersPer100Km;
+      return (to === "miles_per_gallon" ? US_MPG_CONSTANT : IMPERIAL_MPG_CONSTANT) / litersPer100Km;
+    },
     validateInput: (value) => value > 0 ? undefined : "Fuel economy requires a positive value.",
-    ...metadata("Fuel economy can be expressed as volume used per distance or distance per volume.", "L/100 km × mpg = 235.214583 (US gallons)", [{ input: 7, from: "liters_per_100km", to: "miles_per_gallon" }], factFaq(
+    ...metadata("Fuel economy can be expressed as volume used per distance or distance per volume.", "L/100 km × US mpg = 235.214583; L/100 km × UK mpg = 282.480936", [{ input: 7, from: "liters_per_100km", to: "miles_per_gallon" }], factFaq(
       "Why does fuel-economy conversion use division instead of multiplication?",
-      "L/100 km measures fuel used, while US mpg measures distance traveled per fuel volume. They move in opposite directions, so their product is 235.214583.",
+      "L/100 km measures fuel used, while mpg measures distance traveled per fuel volume. They move in opposite directions. US and Imperial mpg are labelled separately because their gallons differ.",
     )),
   },
   {
