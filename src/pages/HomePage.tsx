@@ -62,9 +62,9 @@ export default function HomePage() {
                 <h1 id="hero-heading" className="max-w-3xl text-4xl font-semibold leading-[1.05] tracking-[-0.04em] sm:text-6xl lg:text-7xl">Make every measurement make sense.</h1>
                 <p className="mt-5 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">Fast, precise conversions for the units you use every day. Save your favorites, share a result, and move on with confidence.</p>
                 <div className="mt-8 max-w-2xl rounded-2xl bg-white p-1.5 text-slate-950 shadow-2xl shadow-black/20 sm:mt-10">
-                  <SearchBar placeholder="Search a category or unit" />
+                  <SearchBar placeholder="Search or type 5 ft to cm" />
                 </div>
-                <p className="mt-3 flex items-center gap-2 text-xs text-slate-400"><Search aria-hidden="true" className="h-3.5 w-3.5" /> Try “miles”, “kg”, or “temperature”</p>
+                <p className="mt-3 flex items-center gap-2 text-xs text-slate-400"><Search aria-hidden="true" className="h-3.5 w-3.5" /> Try “5 ft to cm”, “kg”, or “temperature”</p>
               </div>
               <div className="hidden lg:block">
                 <div className="border-l border-white/40 pl-8">

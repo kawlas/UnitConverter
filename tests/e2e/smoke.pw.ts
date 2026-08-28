@@ -147,7 +147,7 @@ test("search combobox supports keyboard selection", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
 
   const search = page.getByRole("combobox", {
-    name: "Search conversion categories and units",
+    name: "Search categories, units, or type a conversion",
   });
   await search.fill("length");
   await expect(search).toHaveAttribute("aria-expanded", "true");

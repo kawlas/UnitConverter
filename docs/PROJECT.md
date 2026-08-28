@@ -28,6 +28,7 @@ branch for every task; never work directly on `main`.
 - `src/components/BMICalculator.tsx` — BMI-specific calculator UI.
 - `src/lib/conversion-data.ts` / `src/lib/conversions.ts` — typed catalog, unit definitions and exact conversion engine.
 - `src/lib/pair-pages.ts` — small registry of quality-gated pair-intent pages and their unique copy and examples.
+- `src/lib/smart-query.ts` — deterministic, local parser for typed queries such as `5 ft to cm`.
 - `src/index.css` — Tailwind v4 entry point, theme variables, base styles and overflow/accessibility guards.
 - `vite.config.ts` — Vite/React plugin, aliases and production chunking.
 - `tests/e2e/smoke.pw.ts` — styling, responsive overflow, title, URL state, swap, canonical, saved controls, navigation and axe smoke tests.
@@ -47,6 +48,10 @@ any comparison row can become the primary target without re-entering the value.
 Eight curated pair routes provide focused formulas and worked examples for selected
 high-utility conversions. They are explicitly prerendered, self-canonical, listed in the
 sitemap and linked from their parent category; unsupported pairs remain real noindex 404s.
+The home search also recognizes explicit value/source/target queries such as `5 ft to cm`,
+previews the result locally and opens canonical shareable calculator state. It never calls
+an LLM or backend, preserves case-sensitive digital symbols (`b`, `B`, `kb`, `kB`) and asks
+the user to clarify ambiguous or incompatible units instead of guessing.
 
 Supported presentation behavior includes `en-US`, `pl-PL`, `de-DE`, and `fr-FR` number
 locales, precision from 0–12 decimals, category SEO metadata, canonical short routes, the
