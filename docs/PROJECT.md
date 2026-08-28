@@ -44,8 +44,9 @@ The app exposes a typed catalog of measurement categories and exact standard con
 formulas, including linear and affine units plus custom conversions and BMI. A conversion
 is encoded in shareable URL query state (`from`, `to`, `value`, `precision`, and `locale`),
 so a copied link restores the same inputs. Users can swap units, reset a category, copy or
-share a URL, save favorites, revisit recent history, and clear saved data. History and
-favorites are retained for at most 30 days and tolerate unavailable or malformed browser
+share a URL, copy the exact visible localized result, save favorites, revisit recent history,
+and clear saved data. History and favorites are retained for at most 30 days and tolerate
+unavailable or malformed browser
 storage. Every non-BMI category also shows the current input across all supported units;
 any comparison row can become the primary target without re-entering the value.
 Eight curated pair routes provide focused formulas and worked examples for selected

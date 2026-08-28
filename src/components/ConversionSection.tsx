@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowUpDown, Copy, RotateCcw, Share2, Star } from "lucide-react";
+import { ArrowUpDown, ClipboardCopy, Link2, RotateCcw, Share2, Star } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -395,6 +395,10 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
       setIsSharing(false);
     }
   };
+  const copyResult = async () => {
+    if (!resultState.result) return;
+    setStatus(await copyText(resultState.result) ? "Result copied." : "Unable to copy the result.");
+  };
 
   return (
     <div className="min-w-0 space-y-6">
@@ -415,6 +419,9 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
             <SelectTrigger aria-label="Target unit" className="min-h-11 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
             <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
           </Select>
+          <Button type="button" variant="outline" className="min-h-11 w-full shrink-0 sm:w-auto" onClick={() => void copyResult()} disabled={!resultState.result}>
+            <ClipboardCopy aria-hidden="true" className="mr-2 h-4 w-4" /> Copy result
+          </Button>
         </div>
       </div>
       {resultState.error && <p id={`${categoryId}-conversion-error`} className="text-sm text-red-700" role="alert">{resultState.error}</p>}
@@ -423,7 +430,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         <label className="text-sm flex items-center gap-1">Locale<select aria-label="Number locale" value={locale} onChange={(e) => { setLocale(e.target.value); updateUrl({ locale: e.target.value }); }} className="min-h-11 border rounded px-2 py-1">{LOCALES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={swap} aria-label="Swap units"><ArrowUpDown className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={resetToDefaults} aria-label="Reset category"><RotateCcw className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={() => { copyText(window.location.href).then((ok) => setStatus(ok ? "Share URL copied." : "Unable to copy URL.")); }} aria-label="Copy share URL"><Copy className="h-4 w-4" /></Button>
+        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={() => { copyText(window.location.href).then((ok) => setStatus(ok ? "Share URL copied." : "Unable to copy URL.")); }} aria-label="Copy share URL"><Link2 className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
       </div>
