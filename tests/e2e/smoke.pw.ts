@@ -139,7 +139,10 @@ test("saved conversion controls are available", async ({ page }) => {
   await page.goto("/length", { waitUntil: "domcontentloaded" });
 
   await page.getByRole("button", { name: "Toggle favorite" }).click();
-  await expect(page.getByText("Favorites (1)")).toBeVisible();
+  const saved = page.locator("details").filter({ hasText: "Saved conversions" });
+  await expect(saved.locator("summary")).toContainText("1 saved");
+  await saved.locator("summary").click();
+  await expect(page.getByRole("heading", { name: "Favorites" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Clear saved data" })).toBeVisible();
 });
 
@@ -224,7 +227,8 @@ test("prerendered pages hydrate cleanly with query and saved browser state", asy
 
   await page.goto("/length?from=kilometers&to=miles&value=1", { waitUntil: "networkidle" });
   await expect(page.locator("#length-result")).toHaveValue("0.62");
-  await expect(page.getByText("Favorites (1)")).toBeVisible();
+  const saved = page.locator("details").filter({ hasText: "Saved conversions" });
+  await expect(saved.locator("summary")).toContainText("1 saved");
   expect(hydrationErrors).toEqual([]);
 });
 
