@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import AllUnitsComparison from "./AllUnitsComparison";
 import { CategoryDefinition, defaultUnits, getCategory, UnitDefinition } from "@/lib/conversion-data";
 import { ConversionError, convertAllExact, convertExact } from "@/lib/conversions";
+import { isFractionLike, parseLocaleQuantity, SUPPORTED_NUMBER_LOCALES } from "@/lib/number-input";
 
 interface ConversionSectionProps {
   title?: string;
@@ -45,21 +46,7 @@ const clearStoredData = (storage: StorageLike = localStorage): void => {
   storage.removeItem(HISTORY_KEY);
   storage.removeItem(FAVORITES_KEY);
 };
-const LOCALES = ["en-US", "pl-PL", "de-DE", "fr-FR"];
-
-const EN_US_NUMBER = /^-?(?:(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?|\.\d+)$/;
-const COMMA_DECIMAL_NUMBER = /^-?(?:(?:\d{1,3}(?:\.\d{3})+|\d+)(?:,\d+)?|,\d+)$/;
-
-const parseStrict = (raw: string, locale: string): number | undefined => {
-  const value = raw.trim();
-  const pattern = locale === "en-US" ? EN_US_NUMBER : COMMA_DECIMAL_NUMBER;
-  if (!value || !pattern.test(value)) return undefined;
-  const normalized = locale === "en-US"
-    ? value.replace(/,/g, "")
-    : value.replace(/\./g, "").replace(",", ".");
-  const result = Number(normalized);
-  return Number.isFinite(result) ? result : undefined;
-};
+const LOCALES: readonly string[] = SUPPORTED_NUMBER_LOCALES;
 
 const copyText = async (text: string): Promise<boolean> => {
   if (navigator.clipboard?.writeText) {
@@ -285,12 +272,17 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     navigate(buildPlaybackUrl(savedCategoryId, params), { replace: false });
   };
 
-  const parsedValue = parseStrict(fromValue, locale);
+  const parsedValue = parseLocaleQuantity(fromValue, locale);
   const resultState = useMemo(() => {
     if (queryHasInvalidUnit) return { result: "", error: "The URL contains an unknown unit. Choose a supported unit." };
     if (hasHydratedUrl && queryHasInvalidPreferences) return { result: "", error: "The URL contains an unsupported precision or locale." };
     if (fromValue.trim() === "") return { result: "", error: "Enter a value to convert." };
-    if (parsedValue === undefined) return { result: "", error: "Enter a valid finite number (for example, 12.5)." };
+    if (parsedValue === undefined) {
+      const error = isFractionLike(fromValue)
+        ? "Enter a valid fraction with a non-zero denominator (for example, 3/8 or 1 1/2)."
+        : `Enter a valid finite number (for example, ${locale === "en-US" ? "12.5" : "12,5"}).`;
+      return { result: "", error };
+    }
     try {
       const converted = convertExact(parsedValue, fromUnit, toUnit, categoryId);
       return { result: new Intl.NumberFormat(locale, { maximumFractionDigits: precision }).format(converted), numeric: converted, error: "" };
@@ -406,7 +398,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
       <div className="grid items-center gap-4 sm:grid-cols-[minmax(70px,120px)_minmax(0,1fr)]">
         <label htmlFor={`${categoryId}-from-value`} className="text-sm font-medium">From</label>
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
-          <Input id={`${categoryId}-from-value`} type="text" inputMode="decimal" value={fromValue} onChange={(e) => setValue(e.target.value)} className="min-h-11 w-full sm:w-[120px]" placeholder="0" aria-invalid={Boolean(resultState.error)} aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
+          <Input id={`${categoryId}-from-value`} type="text" inputMode="text" value={fromValue} onChange={(e) => setValue(e.target.value)} className="min-h-11 w-full sm:w-[120px]" placeholder="0" autoCapitalize="off" spellCheck={false} maxLength={120} aria-invalid={Boolean(resultState.error)} aria-describedby={`${categoryId}-fraction-hint${resultState.error ? ` ${categoryId}-conversion-error` : ""}`} />
           <Select value={fromUnit} onValueChange={setFrom}>
             <SelectTrigger aria-label="Source unit" className="min-h-11 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
             <SelectContent>{units.map((unit) => <SelectItem key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</SelectItem>)}</SelectContent>
@@ -424,6 +416,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
           </Button>
         </div>
       </div>
+      <p id={`${categoryId}-fraction-hint`} className="text-xs leading-5 text-slate-500">Decimals and fractions supported: {locale === "en-US" ? "12.5" : "12,5"}, 3/8, 1 1/2 or ½.</p>
       {resultState.error && <p id={`${categoryId}-conversion-error`} className="text-sm text-red-700" role="alert">{resultState.error}</p>}
       <div className="flex flex-wrap justify-end gap-2">
         <label className="text-sm flex items-center gap-1">Precision<select aria-label="Decimal precision" value={precision} onChange={(e) => { const next = Number(e.target.value); setPrecision(next); updateUrl({ precision: String(next) }); }} className="min-h-11 border rounded px-2 py-1">{Array.from({ length: 13 }, (_, index) => <option key={index} value={index}>{index}</option>)}</select></label>
@@ -454,5 +447,5 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
   );
 };
 
-export { SAVED_DATA_TTL_MS, buildPlaybackUrl, clearStoredData, parseStrict, parseStoredHistory, parseStoredFavorites, shouldPersistHistory };
+export { SAVED_DATA_TTL_MS, buildPlaybackUrl, clearStoredData, parseStoredHistory, parseStoredFavorites, shouldPersistHistory };
 export default ConversionSection;

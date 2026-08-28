@@ -11,7 +11,9 @@ A precise, shareable online measurement studio for everyday unit conversions.
 Q Converter provides a typed catalog of standard conversion formulas, including linear,
 affine, custom, and BMI calculations. Each converter supports URL-restored state, unit
 swap, reset, precision (0–12 decimals), locale-aware formatting (`en-US`, `pl-PL`,
-`de-DE`, `fr-FR`), copy/share links, favorites, recent history, and clear saved data.
+`de-DE`, `fr-FR`), strict decimal and fraction input, copy/share links, favorites,
+recent history, and clear saved data. Fractions include `3/8`, mixed numbers such as
+`1 1/2`, and common vulgar characters such as `½`.
 Every non-BMI converter also displays one input across the complete category catalog and
 lets any comparison row become the primary target.
 An initial quality-gated cluster of eight pair pages adds focused formulas, worked examples

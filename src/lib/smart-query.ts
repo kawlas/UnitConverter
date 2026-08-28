@@ -1,5 +1,6 @@
 import { categories, type CategoryDefinition, type UnitDefinition } from "./conversion-data";
 import { ConversionError, convertExact } from "./conversions";
+import { isFractionLike, parseLocaleQuantity, VULGAR_FRACTION_CHARACTERS } from "./number-input";
 
 interface UnitCandidate {
   readonly category: CategoryDefinition;
@@ -85,7 +86,9 @@ const resolveUnit = (rawUnit: string): readonly UnitCandidate[] => {
   );
 };
 
-const queryPattern = /^(?:convert\s+)?([+-]?(?:(?:\d+(?:[.,]\d*)?)|(?:[.,]\d+))(?:e[+-]?\d+)?)\s*(.+?)\s+(?:to|in|into|as|=>|->|=)\s+(.+?)\s*\??$/i;
+const fractionToken = `(?:(?:\\d+\\s+)?\\d+\\s*[\\/⁄]\\s*\\d+|(?:\\d+\\s*)?[${VULGAR_FRACTION_CHARACTERS}])`;
+const decimalToken = `(?:(?:\\d+(?:[.,]\\d*)?)|(?:[.,]\\d+))(?:e[+-]?\\d+)?`;
+const queryPattern = new RegExp(`^(?:convert\\s+)?([+-]?(?:${fractionToken}|${decimalToken}))\\s*(.+?)\\s+(?:to|in|into|as|=>|->|=)\\s+(.+?)\\s*\\??$`, "i");
 
 const looksLikeGroupedThousands = (value: string): boolean =>
   /^[+-]?[1-9]\d{0,2}[.,]\d{3}$/.test(value);
@@ -118,8 +121,17 @@ export const parseSmartConversionQuery = (query: string): SmartConversionQuery =
     };
   }
 
-  const value = Number(match[1].replace(",", "."));
-  if (!Number.isFinite(value)) return { status: "invalid", message: "Enter a finite numeric value." };
+  const value = isFractionLike(match[1])
+    ? parseLocaleQuantity(match[1], "en-US")
+    : Number(match[1].replace(",", "."));
+  if (value === undefined || !Number.isFinite(value)) {
+    return {
+      status: "invalid",
+      message: isFractionLike(match[1])
+        ? "Enter a valid fraction with a non-zero denominator."
+        : "Enter a finite numeric value.",
+    };
+  }
   if (!serializeShareableValue(value)) {
     return { status: "invalid", message: "That number is outside the supported shareable input range." };
   }

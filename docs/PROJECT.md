@@ -43,7 +43,9 @@ branch for every task; never work directly on `main`.
 The app exposes a typed catalog of measurement categories and exact standard conversion
 formulas, including linear and affine units plus custom conversions and BMI. A conversion
 is encoded in shareable URL query state (`from`, `to`, `value`, `precision`, and `locale`),
-so a copied link restores the same inputs. Users can swap units, reset a category, copy or
+so a copied link restores the same inputs. Standard converters accept strict locale-aware
+decimals, ASCII or Unicode-slash fractions, mixed numbers and common vulgar fraction
+characters; malformed fractions and zero denominators are rejected. Users can swap units, reset a category, copy or
 share a URL, copy the exact visible localized result, save favorites, revisit recent history,
 and clear saved data. History and favorites are retained for at most 30 days and tolerate
 unavailable or malformed browser

@@ -88,7 +88,9 @@ Last reviewed: 2026-08-28
 
 The first implementation slices now cover sourced methodology, compare-all results, an
 eight-page curated pair cluster, deterministic local conversion queries and an installable,
-offline-capable PWA. Pair expansion must wait for Search Console evidence and continue to
+offline-capable PWA. Standard converters also accept strict fraction and mixed-number input,
+supporting cooking, construction and craft workflows without adding category-specific UI.
+Pair expansion must wait for Search Console evidence and continue to
 pass the uniqueness and real-404 quality gates. Retention should be measured through repeat
 usage and install events only after the privacy-safe analytics release gate is enabled.
 

@@ -14,6 +14,9 @@ describe("deterministic smart conversion queries", () => {
     ["8 b to B", "digital", "bits", "bytes", 8, 1],
     ["12 inches as cm", "length", "inches", "centimeters", 12, 30.48],
     ["1 square meter to sq ft", "area", "square_meters", "square_feet", 1, 10.7639104167],
+    ["1/2 inch to cm", "length", "inches", "centimeters", 0.5, 1.27],
+    ["1 1/2 ft to cm", "length", "feet", "centimeters", 1.5, 45.72],
+    ["½ liter to ml", "volume", "liters", "milliliters", 0.5, 500],
   ])("parses %s using the catalog", (query, categoryId, from, to, value, result) => {
     expect(parseSmartConversionQuery(query)).toMatchObject({
       status: "success",
@@ -38,6 +41,7 @@ describe("deterministic smart conversion queries", () => {
     expect(parseSmartConversionQuery("-500 C to F")).toMatchObject({ status: "invalid", message: expect.stringMatching(/absolute zero/i) });
     expect(parseSmartConversionQuery("0 L/100km to mpg")).toMatchObject({ status: "invalid", message: expect.stringMatching(/positive/i) });
     expect(parseSmartConversionQuery("1e-150 m to cm")).toMatchObject({ status: "invalid", message: expect.stringMatching(/shareable input range/i) });
+    expect(parseSmartConversionQuery("1/0 m to cm")).toMatchObject({ status: "invalid", message: expect.stringMatching(/fraction|denominator/i) });
   });
 
   it.each(["1,000 ft to cm", "1.000 ft to cm"])("rejects the ambiguous grouped number %s", (query) => {
