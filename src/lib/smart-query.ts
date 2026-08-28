@@ -19,6 +19,7 @@ export interface SmartConversionSuccess {
   readonly toSymbol: string;
   readonly value: number;
   readonly result: number;
+  readonly inputDisplay?: string;
 }
 
 export type SmartConversionQuery = SmartConversionSuccess | {
@@ -52,7 +53,9 @@ const normalizeUnitText = (value: string, preserveCase = false): string => {
     .replace(/[.?!]+$/g, "")
     .replace(/\s*\/\s*/g, "/")
     .replace(/\s+/g, " ");
-  return preserveCase ? normalized : normalized.toLocaleLowerCase("en-US");
+  return preserveCase
+    ? normalized
+    : normalized.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("en-US");
 };
 
 const searchableNames = (unit: UnitDefinition): readonly string[] => {
@@ -88,7 +91,11 @@ const resolveUnit = (rawUnit: string): readonly UnitCandidate[] => {
 
 const fractionToken = `(?:(?:\\d+\\s+)?\\d+\\s*[\\/⁄]\\s*\\d+|(?:\\d+\\s*)?[${VULGAR_FRACTION_CHARACTERS}])`;
 const decimalToken = `(?:(?:\\d+(?:[.,]\\d*)?)|(?:[.,]\\d+))(?:e[+-]?\\d+)?`;
-const queryPattern = new RegExp(`^(?:convert\\s+)?([+-]?(?:${fractionToken}|${decimalToken}))\\s*(.+?)\\s+(?:to|in|into|as|=>|->|=)\\s+(.+?)\\s*\\??$`, "i");
+const queryPattern = new RegExp(`^(?:(?:convert|przelicz|zamień|zamien)\\s+|(?:ile\\s+(?:to|jest))\\s+)?([+-]?(?:${fractionToken}|${decimalToken}))\\s*(.+?)\\s+(?:to|in|into|as|na|w|=>|->|=|ile\\s+to)\\s+(.+?)\\s*\\??$`, "i");
+const compoundFeetInchesPattern = new RegExp(
+  `^(?:(?:convert|przelicz|zamień|zamien)\\s+|(?:ile\\s+(?:to|jest))\\s+)?(${decimalToken})\\s*(?:ft|feet|foot|['′])\\s*(${decimalToken})\\s*(?:in|inches|inch|["″])?\\s+(?:to|in|into|as|na|w|=>|->|=)\\s+(.+?)\\s*\\??$`,
+  "i",
+);
 
 const looksLikeGroupedThousands = (value: string): boolean =>
   /^[+-]?[1-9]\d{0,2}[.,]\d{3}$/.test(value);
@@ -111,6 +118,19 @@ const serializeShareableValue = (value: number): string | undefined => {
 };
 
 export const parseSmartConversionQuery = (query: string): SmartConversionQuery => {
+  const compoundMatch = query.trim().match(compoundFeetInchesPattern);
+  if (compoundMatch) {
+    const feet = Number(compoundMatch[1].replace(",", "."));
+    const inches = Number(compoundMatch[2].replace(",", "."));
+    if (!Number.isFinite(feet) || !Number.isFinite(inches) || feet < 0 || inches < 0 || inches >= 12) {
+      return { status: "invalid", message: "Use a positive height with inches from 0 to less than 12." };
+    }
+    const parsed = parseSmartConversionQuery(`${feet * 12 + inches} inches to ${compoundMatch[3]}`);
+    return parsed.status === "success"
+      ? { ...parsed, inputDisplay: `${compoundMatch[1]} ft ${compoundMatch[2]} in` }
+      : parsed;
+  }
+
   const match = query.trim().match(queryPattern);
   if (!match) return { status: "no-match" };
 

@@ -20,6 +20,11 @@ describe("deterministic smart conversion queries", () => {
     ["1 1/2 cups to ml", "volume", "us_cups", "milliliters", 1.5, 354.88235475],
     ["2 tbsp to teaspoons", "volume", "us_tablespoons", "us_teaspoons", 2, 6],
     ["12 stone to kg", "weight", "stone", "kilograms", 12, 76.20351816],
+    ["ile to 10 kg na gramy", "weight", "kilograms", "grams", 10, 10000],
+    ["zamień 5ha na metry kwadratowe", "area", "hectare", "square_meters", 5, 50000],
+    ["przelicz 7 l/100km na mpg", "fuel", "liters_per_100km", "miles_per_gallon", 7, 33.6020832857],
+    ["5 ft 11 in to cm", "length", "inches", "centimeters", 71, 180.34],
+    ["5'11\" in cm", "length", "inches", "centimeters", 71, 180.34],
   ])("parses %s using the catalog", (query, categoryId, from, to, value, result) => {
     expect(parseSmartConversionQuery(query)).toMatchObject({
       status: "success",
@@ -51,6 +56,13 @@ describe("deterministic smart conversion queries", () => {
     expect(parseSmartConversionQuery(query)).toMatchObject({
       status: "invalid",
       message: expect.stringMatching(/without thousands separators/i),
+    });
+  });
+
+  it("rejects malformed compound heights instead of silently carrying inches", () => {
+    expect(parseSmartConversionQuery("5 ft 12 in to cm")).toMatchObject({
+      status: "invalid",
+      message: expect.stringMatching(/less than 12/i),
     });
   });
 

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ArrowRight, Check, Compass, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Compass, Sparkles } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -50,32 +50,19 @@ export default function HomePage() {
       <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)]">
         <Navbar />
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:py-14">
-          <section className="relative isolate overflow-hidden rounded-[1.75rem] bg-slate-950 px-5 py-8 text-white shadow-[0_24px_70px_rgba(15,23,42,0.16)] sm:px-10 sm:py-12 lg:px-14 lg:py-16" aria-labelledby="hero-heading">
+          <section className="relative isolate overflow-hidden rounded-[1.75rem] bg-slate-950 px-5 py-10 text-center text-white shadow-[0_24px_70px_rgba(15,23,42,0.16)] sm:px-10 sm:py-16 lg:px-14 lg:py-20" aria-labelledby="hero-heading">
             <div className="pointer-events-none absolute -right-20 -top-24 -z-10 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-32 left-1/3 -z-10 h-72 w-72 rounded-full bg-teal-400/15 blur-3xl" />
-            <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.72fr)] lg:gap-16">
-              <div>
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-indigo-100">
+            <div className="mx-auto max-w-4xl">
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-indigo-100">
                   <Sparkles aria-hidden="true" className="h-3.5 w-3.5 text-teal-300" />
-                  Measurement studio
+                  Instant unit answers
                 </div>
-                <h1 id="hero-heading" className="max-w-3xl text-4xl font-semibold leading-[1.05] tracking-[-0.04em] sm:text-6xl lg:text-7xl">Make every measurement make sense.</h1>
-                <p className="mt-5 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">Fast, precise conversions for the units you use every day. Save your favorites, share a result, and move on with confidence.</p>
-                <div className="mt-8 max-w-2xl rounded-2xl bg-white p-1.5 text-slate-950 shadow-2xl shadow-black/20 sm:mt-10">
-                  <SearchBar placeholder="Search or type 5 ft to cm" />
+                <h1 id="hero-heading" className="text-4xl font-semibold leading-[1.02] tracking-[-0.045em] sm:text-6xl lg:text-7xl">Convert anything. Just ask.</h1>
+                <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Type the conversion the way you think it. Get the answer instantly — no forms, no hunting through dropdowns.</p>
+                <div className="mx-auto mt-8 max-w-3xl sm:mt-10">
+                  <SearchBar placeholder="e.g. 10 kg to grams" />
                 </div>
-                <p className="mt-3 flex items-center gap-2 text-xs text-slate-400"><Search aria-hidden="true" className="h-3.5 w-3.5" /> Try “5 ft to cm”, “kg”, or “temperature”</p>
-              </div>
-              <div className="hidden lg:block">
-                <div className="border-l border-white/40 pl-8">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Built for clarity</p>
-                  <ul className="mt-5 space-y-4 text-sm text-slate-200">
-                    {["Exact standard conversion factors", "Shareable URLs that remember your inputs", "A calm interface on every screen"].map((item) => (
-                      <li key={item} className="flex items-start gap-3"><span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-teal-400/15 text-teal-300"><Check aria-hidden="true" className="h-3 w-3" /></span>{item}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
             </div>
           </section>
 

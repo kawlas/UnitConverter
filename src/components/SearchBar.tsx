@@ -13,6 +13,11 @@ interface SearchBarProps {
 const normalize = (value: string) => value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 const SEARCH_RESULTS_ID = "conversion-search-results";
 const SMART_CONVERSION_OPTION_ID = "conversion-search-option-smart";
+const quickExamples = [
+  "10 kg to g",
+  "5 ha to m²",
+  "7 L/100km to mpg",
+] as const;
 
 const searchOptionId = (categoryId: string): string => `conversion-search-option-${categoryId}`;
 
@@ -95,7 +100,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) closeResults();
       }}
     >
-      <div className="flex min-h-12 items-center rounded-xl border border-slate-200 bg-white shadow-[0_4px_16px_rgba(15,23,42,0.06)] transition-[border-color,box-shadow] hover:border-slate-300 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/40">
+      <div className="flex min-h-16 items-center rounded-2xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.16)] transition-[border-color,box-shadow] hover:border-slate-300 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/40">
         <Search aria-hidden="true" className="ml-4 h-5 w-5 shrink-0 text-slate-600" />
         <Input
           type="search"
@@ -139,7 +144,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
             ? SMART_CONVERSION_OPTION_ID
             : activeResult ? searchOptionId(activeResult.id) : undefined}
           aria-autocomplete="list"
-          className="min-h-12 flex-1 border-0 bg-transparent px-3 py-3 text-sm text-slate-950 shadow-none outline-none ring-0 placeholder:text-slate-600 focus-visible:outline-none focus-visible:ring-0"
+          className="min-h-16 flex-1 border-0 bg-transparent px-3 py-4 text-base font-medium text-slate-950 shadow-none outline-none ring-0 placeholder:font-normal placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-0 sm:text-lg"
         />
         {searchTerm && (
           <button
@@ -153,8 +158,24 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
         )}
       </div>
 
+      {!searchTerm && (
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-2" aria-label="Example conversions">
+          <span className="text-xs font-medium text-slate-400">Try</span>
+          {quickExamples.map((example) => (
+            <button
+              key={example}
+              type="button"
+              onClick={() => updateSearch(example)}
+              className="min-h-10 rounded-full border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-white/40 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              {example}
+            </button>
+          ))}
+        </div>
+      )}
+
       {resultsOpen && (
-        <div id={SEARCH_RESULTS_ID} role="listbox" className="absolute z-20 mt-2 w-full rounded-xl border border-slate-200 bg-white p-2 shadow-xl" aria-label="Search results">
+        <div id={SEARCH_RESULTS_ID} role="listbox" className="absolute z-20 mt-3 w-full rounded-2xl border border-slate-200 bg-white p-2 text-slate-950 shadow-2xl" aria-label="Search results">
           {smartResult && (
             <Link
               id={SMART_CONVERSION_OPTION_ID}
@@ -164,15 +185,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
               aria-selected={activeSmartResult}
               onClick={closeResults}
               onMouseEnter={() => setActiveIndex(0)}
-              className={`flex min-h-14 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-indigo-50 ${activeSmartResult ? "bg-indigo-50 text-indigo-700" : ""}`}
+              className={`flex min-h-24 cursor-pointer items-center justify-between gap-4 rounded-xl bg-indigo-50 px-4 py-3 text-sm transition-colors hover:bg-indigo-100 ${activeSmartResult ? "ring-2 ring-indigo-500 text-indigo-700" : ""}`}
             >
               <span>
-                <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600">Quick conversion</span>
-                <span className="mt-0.5 block font-medium text-slate-900">
-                  {smartResult.value} {smartResult.fromSymbol} to {smartResult.toSymbol}
+                <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600">Instant answer</span>
+                <span className="mt-1 block font-medium text-slate-700">
+                  {smartResult.inputDisplay ?? `${smartResult.value} ${smartResult.fromSymbol}`} to {smartResult.toSymbol}
                 </span>
               </span>
-              <span className="shrink-0 text-right font-semibold text-slate-950">
+              <span className="shrink-0 text-right text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">
                 {formatSmartResult(smartResult.result)} {smartResult.toSymbol}
               </span>
             </Link>

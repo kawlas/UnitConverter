@@ -146,7 +146,7 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "weight", title: "Weight", converter: "linear",
-    units: [linear("kilograms", "Kilograms", "kg", 1), linear("pounds", "Pounds", "lb", INTERNATIONAL_POUND_KILOGRAMS, ["lbs"]), linear("grams", "Grams", "g", 0.001), linear("metric_tonnes", "Metric Tonnes", "t", 1000, ["tonnes", "metric ton"]), linear("ounces", "Ounces", "oz", 0.028349523125), linear("stone", "Stone (14 lb)", "st", 14 * INTERNATIONAL_POUND_KILOGRAMS, ["stones"])],
+    units: [linear("kilograms", "Kilograms", "kg", 1, ["kilogram", "kilogramy", "kilogramów"]), linear("pounds", "Pounds", "lb", INTERNATIONAL_POUND_KILOGRAMS, ["lbs", "funt", "funty", "funtów"]), linear("grams", "Grams", "g", 0.001, ["gram", "gramy", "gramów"]), linear("metric_tonnes", "Metric Tonnes", "t", 1000, ["tonnes", "metric ton", "tona", "tony", "ton"]), linear("ounces", "Ounces", "oz", 0.028349523125), linear("stone", "Stone (14 lb)", "st", 14 * INTERNATIONAL_POUND_KILOGRAMS, ["stones"])],
     ...metadata("Weight is commonly expressed with mass units in everyday conversions, including the 14-pound British stone.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilograms", to: "pounds" }], [
       { question: "How many pounds are in one stone?", answer: "One British stone equals 14 avoirdupois pounds exactly." },
       { question: "Are the results rounded?", answer: "The calculation retains full JavaScript number precision; the precision control only formats the displayed result." },
@@ -185,7 +185,7 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "area", title: "Area", converter: "linear",
-    units: [linear("square_meters", "Square Meters", "m²", 1, ["m2", "m^2"]), linear("are", "Are", "a", 100, ["ar", "ares"]), linear("hectare", "Hectare", "ha", 10_000, ["hectares"]), linear("square_feet", "Square Feet", "ft²", 0.09290304, ["ft2", "sq ft"]), linear("square_kilometers", "Square Kilometers", "km²", 1_000_000, ["km2"]), linear("acres", "Acres", "ac", 4046.8564224, ["acre"])],
+    units: [linear("square_meters", "Square Meters", "m²", 1, ["m2", "m^2", "metr kwadratowy", "metry kwadratowe", "metrów kwadratowych"]), linear("are", "Are", "a", 100, ["ar", "ares", "ary", "arów"]), linear("hectare", "Hectare", "ha", 10_000, ["hectares", "hektar", "hektary", "hektarów"]), linear("square_feet", "Square Feet", "ft²", 0.09290304, ["ft2", "sq ft"]), linear("square_kilometers", "Square Kilometers", "km²", 1_000_000, ["km2", "kilometry kwadratowe", "kilometrów kwadratowych"]), linear("acres", "Acres", "ac", 4046.8564224, ["acre"])],
     ...metadata("Area measures two-dimensional space. One are is exactly 100 square metres and one hectare is 100 ares.", "value in target = value × source factor / target factor", [{ input: 1, from: "are", to: "square_meters" }, { input: 1, from: "hectare", to: "are" }], [
       { question: "How many square metres are in one are?", answer: "1 are (ar) = 100 m² exactly." },
       { question: "How many ares are in one hectare?", answer: "1 hectare (ha) = 100 ares = 10,000 m² exactly." },
@@ -225,7 +225,7 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "fuel", title: "Fuel Economy", converter: "custom",
-    units: [linear("liters_per_100km", "Liters per 100 km", "L/100 km", 1, ["l/100km"]), linear("miles_per_gallon", "Miles per Gallon (US)", "mpg", 1, ["mpg"])],
+    units: [linear("liters_per_100km", "Liters per 100 km", "L/100 km", 1, ["l/100km", "l/100 km", "litry na 100 km", "litrów na 100 km"]), linear("miles_per_gallon", "Miles per Gallon (US)", "mpg", 1, ["mpg", "mile na galon", "mil na galon"])],
     convert: (value, from, to) => from === to ? value : 235.214583 / value,
     validateInput: (value) => value > 0 ? undefined : "Fuel economy requires a positive value.",
     ...metadata("Fuel economy can be expressed as volume used per distance or distance per volume.", "L/100 km × mpg = 235.214583 (US gallons)", [{ input: 7, from: "liters_per_100km", to: "miles_per_gallon" }], factFaq(
