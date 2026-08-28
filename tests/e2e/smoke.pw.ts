@@ -152,6 +152,12 @@ test("search combobox supports keyboard selection", async ({ page }) => {
   await search.fill("length");
   await expect(search).toHaveAttribute("aria-expanded", "true");
 
+  await search.press("Tab");
+  await expect(page.getByRole("button", { name: "Clear search" })).toBeFocused();
+  await expect(search).not.toBeFocused();
+  await expect(page.getByRole("option").nth(0)).not.toBeFocused();
+
+  await search.focus();
   await search.press("ArrowDown");
   await expect(search).toHaveAttribute(
     "aria-activedescendant",
