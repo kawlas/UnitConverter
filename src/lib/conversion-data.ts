@@ -87,7 +87,25 @@ const definitions: CategoryDefinition[] = [
   {
     id: "bmi", title: "BMI", converter: "calculator",
     units: [linear("metric", "Metric (cm/kg)", "metric", 1), linear("imperial", "Imperial (in/lbs)", "imperial", 1)],
-    ...metadata("Body Mass Index calculator using height and weight.", "BMI = weight (kg) / height (m)²", [{ input: 70, from: "metric", to: "metric" }], commonFaq("BMI")),
+    ...metadata(
+      "Adult Body Mass Index screening calculator using height and weight.",
+      "BMI = weight (kg) / height (m)²",
+      [{ input: 70, from: "metric", to: "metric" }],
+      [
+        {
+          question: "What does adult BMI measure?",
+          answer: "BMI is a calculated screening measure that relates an adult's weight to their height. It is one health indicator and does not directly measure body fat.",
+        },
+        {
+          question: "Who is this BMI calculator for?",
+          answer: "This calculator uses adult categories for people age 20 or older. Children and teens require age- and sex-specific BMI percentiles.",
+        },
+        {
+          question: "Is a BMI result a medical diagnosis?",
+          answer: "No. BMI is a screening measure, not a diagnosis, and should be considered alongside other individual health factors with a qualified professional.",
+        },
+      ],
+    ),
   },
   {
     id: "power", title: "Power", converter: "linear",

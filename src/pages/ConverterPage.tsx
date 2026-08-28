@@ -33,8 +33,11 @@ const metaDescription = (description: string): string => {
 export default function ConverterPage() {
   const { categoryId } = useParams();
   const category = getCategory(categoryId);
+  const toolName = category
+    ? `${category.title} ${category.converter === "calculator" ? "Calculator" : "Converter"}`
+    : "";
   const pageTitle = category
-    ? `${category.title} Converter — Free Online Q Converter`
+    ? `${toolName} — Free Online Q Converter`
     : HOME_TITLE;
 
   useEffect(() => {
@@ -75,7 +78,7 @@ export default function ConverterPage() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: `${category.title} Converter`,
+    name: toolName,
     applicationCategory: "UtilitiesApplication",
     description: category.description,
     url: canonicalUrl,
@@ -90,7 +93,7 @@ export default function ConverterPage() {
         name: "Home",
         item: SITE_ORIGIN,
       },
-      { "@type": "ListItem", position: 2, name: `${category.title} Converter` },
+      { "@type": "ListItem", position: 2, name: toolName },
     ],
   };
   const faqSchema = {
@@ -113,7 +116,7 @@ export default function ConverterPage() {
         />
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content={`${category.title} Converter`} />
+        <meta property="og:title" content={toolName} />
         <meta property="og:description" content={category.description} />
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:image" content={SOCIAL_IMAGE_URL} />
@@ -121,7 +124,7 @@ export default function ConverterPage() {
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="Q Converter — Every measurement, made clear." />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${category.title} Converter`} />
+        <meta name="twitter:title" content={toolName} />
         <meta name="twitter:description" content={pageDescription} />
         <meta name="twitter:image" content={SOCIAL_IMAGE_URL} />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
@@ -148,7 +151,7 @@ export default function ConverterPage() {
                     Measurement tool
                   </div>
                   <h1 className="text-4xl font-bold leading-tight tracking-[-0.035em] text-slate-950 sm:text-5xl">
-                    {category.title} Converter
+                    {toolName}
                   </h1>
                   <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
                     {category.description}
@@ -178,10 +181,14 @@ export default function ConverterPage() {
                       id="converter-heading"
                       className="text-sm font-semibold text-slate-950"
                     >
-                      Convert {category.title.toLowerCase()}
+                      {category.converter === "calculator"
+                        ? `Calculate ${category.title}`
+                        : `Convert ${category.title.toLowerCase()}`}
                     </h2>
                     <p className="text-xs text-slate-500">
-                      Choose units and enter a value
+                      {category.converter === "calculator"
+                        ? "Enter your measurements"
+                        : "Choose units and enter a value"}
                     </p>
                   </div>
                 </div>
