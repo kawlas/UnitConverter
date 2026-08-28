@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   buildPlaybackUrl,
+  formatFavoriteId,
+  formatHistoryEntry,
   parseStoredFavorites,
   parseStoredHistory,
   shouldPersistHistory,
@@ -23,6 +25,30 @@ describe("saved conversion playback URL", () => {
       from: "celsius",
       to: "fahrenheit",
     })).toBe("/temperature?from=celsius&to=fahrenheit");
+  });
+});
+
+describe("saved conversion presentation", () => {
+  it("uses catalog titles and symbols for recent conversions", () => {
+    expect(formatHistoryEntry({
+      categoryId: "weight",
+      fromUnit: "kilograms",
+      toUnit: "pounds",
+      input: "2",
+      result: "4.41",
+    })).toEqual({
+      categoryTitle: "Weight",
+      conversion: "2 kg → 4.41 lb",
+      accessibleLabel: "Open recent Weight conversion: 2 Kilograms to 4.41 Pounds",
+    });
+  });
+
+  it("turns favorite IDs into readable catalog labels", () => {
+    expect(formatFavoriteId("volume:us_cups:milliliters")).toEqual({
+      categoryTitle: "Volume",
+      conversion: "US Cups → Milliliters",
+      accessibleLabel: "Open favorite Volume conversion: US Cups to Milliliters",
+    });
   });
 });
 

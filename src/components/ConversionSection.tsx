@@ -160,6 +160,47 @@ const readStoredFavorites = (): string[] => readStoredFavoriteEntries().map(({ i
 const buildPlaybackUrl = (categoryId: string, params: Record<string, string>): string =>
   `/${encodeURIComponent(categoryId)}?${new URLSearchParams(params).toString()}`;
 
+interface SavedConversionPresentation {
+  categoryTitle: string;
+  conversion: string;
+  accessibleLabel: string;
+}
+
+const humanizeIdentifier = (value: string): string =>
+  value
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+const describeSavedUnit = (categoryId: string, unitId: string): { label: string; symbol: string } => {
+  const category = getCategory(categoryId);
+  const unit = category ? category.units.find(({ value }) => value === unitId) : undefined;
+  const fallback = humanizeIdentifier(unitId);
+  return { label: unit?.label ?? fallback, symbol: unit?.symbol ?? fallback };
+};
+
+const formatHistoryEntry = (entry: Pick<HistoryEntry, "categoryId" | "fromUnit" | "toUnit" | "input" | "result">): SavedConversionPresentation => {
+  const categoryTitle = getCategory(entry.categoryId)?.title ?? humanizeIdentifier(entry.categoryId);
+  const from = describeSavedUnit(entry.categoryId, entry.fromUnit);
+  const to = describeSavedUnit(entry.categoryId, entry.toUnit);
+  return {
+    categoryTitle,
+    conversion: `${entry.input} ${from.symbol} → ${entry.result} ${to.symbol}`,
+    accessibleLabel: `Open recent ${categoryTitle} conversion: ${entry.input} ${from.label} to ${entry.result} ${to.label}`,
+  };
+};
+
+const formatFavoriteId = (id: string): SavedConversionPresentation => {
+  const [categoryId = id, fromUnit = "", toUnit = ""] = id.split(":");
+  const categoryTitle = getCategory(categoryId)?.title ?? humanizeIdentifier(categoryId);
+  const from = describeSavedUnit(categoryId, fromUnit);
+  const to = describeSavedUnit(categoryId, toUnit);
+  return {
+    categoryTitle,
+    conversion: `${from.label} → ${to.label}`,
+    accessibleLabel: `Open favorite ${categoryTitle} conversion: ${from.label} to ${to.label}`,
+  };
+};
+
 interface HistoryPersistenceState {
   input: string;
   result: string;
@@ -428,6 +469,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
         <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
       </div>
+      <p className="min-h-5 text-sm text-slate-500" role="status" aria-live="polite" aria-atomic="true">{status}</p>
       <BatchConversion
         categoryId={categoryId}
         fromUnit={fromUnit}
@@ -437,6 +479,60 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         fromLabel={units.find(({ value }) => value === fromUnit)?.label ?? fromUnit}
         toLabel={units.find(({ value }) => value === toUnit)?.label ?? toUnit}
       />
+      {(history.length > 0 || favoriteIds.length > 0) && (
+        <details className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_18px_rgba(15,23,42,0.04)] sm:p-5">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg font-semibold text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <span>Saved conversions</span>
+            <span className="flex items-center gap-2 text-xs font-medium text-slate-500">
+              {history.length + favoriteIds.length} saved
+              <span aria-hidden="true" className="transition-transform group-open:rotate-180">▾</span>
+            </span>
+          </summary>
+          <div className="mt-3 grid min-w-0 gap-5 border-t border-slate-200 pt-4 sm:grid-cols-2">
+            {history.length > 0 && (
+              <section aria-labelledby={`${categoryId}-recent-conversions-heading`}>
+                <h3 id={`${categoryId}-recent-conversions-heading`} className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Recent</h3>
+                <ul className="mt-2 space-y-2">
+                  {history.slice(0, 5).map((entry) => {
+                    const presentation = formatHistoryEntry(entry);
+                    return (
+                      <li key={`${entry.timestamp}-${entry.input}`}>
+                        <button type="button" aria-label={presentation.accessibleLabel} className="flex min-h-11 w-full min-w-0 flex-col items-start justify-center rounded-xl border border-slate-200 px-3 py-2 text-left transition-colors hover:border-indigo-200 hover:bg-indigo-50/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onClick={() => playSavedConversion(entry.categoryId, { from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale })}>
+                          <span className="text-xs font-medium text-slate-500">{presentation.categoryTitle}</span>
+                          <span className="max-w-full break-words text-sm font-semibold text-slate-950">{presentation.conversion}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
+            {favoriteIds.length > 0 && (
+              <section aria-labelledby={`${categoryId}-favorite-conversions-heading`}>
+                <h3 id={`${categoryId}-favorite-conversions-heading`} className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Favorites</h3>
+                <ul className="mt-2 space-y-2">
+                  {favoriteIds.slice(0, 5).map((id) => {
+                    const [favoriteCategoryId, favoriteFrom, favoriteTo] = id.split(":");
+                    const presentation = formatFavoriteId(id);
+                    return (
+                      <li key={id}>
+                        <button type="button" aria-label={presentation.accessibleLabel} className="flex min-h-11 w-full min-w-0 flex-col items-start justify-center rounded-xl border border-slate-200 px-3 py-2 text-left transition-colors hover:border-indigo-200 hover:bg-indigo-50/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onClick={() => playSavedConversion(favoriteCategoryId, { from: favoriteFrom, to: favoriteTo })}>
+                          <span className="text-xs font-medium text-slate-500">{presentation.categoryTitle}</span>
+                          <span className="max-w-full break-words text-sm font-semibold text-slate-950">{presentation.conversion}</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
+            <div className="sm:col-span-2">
+              <p id={`${categoryId}-saved-data-note`} className="mb-2 text-xs leading-5 text-slate-500">Saved only in this browser for up to 30 days.</p>
+              <Button type="button" variant="outline" size="sm" aria-describedby={`${categoryId}-saved-data-note`} onClick={clearSavedData}>Clear saved data</Button>
+            </div>
+          </div>
+        </details>
+      )}
       <AllUnitsComparison
         categoryId={categoryId}
         title={title}
@@ -447,15 +543,9 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
         locale={locale}
         onSelectTarget={setTo}
       />
-      {(history.length > 0 || favoriteIds.length > 0) && <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
-        {history.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Recent conversions</summary><ul className="mt-2 space-y-1 text-sm">{history.slice(0, 5).map((entry) => <li key={`${entry.timestamp}-${entry.input}`}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => playSavedConversion(entry.categoryId, { from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale })}>{entry.input} {entry.fromUnit} → {entry.result} {entry.toUnit}</button></li>)}</ul></details>}
-        {favoriteIds.length > 0 && <details><summary className="cursor-pointer text-sm font-medium">Favorites ({favoriteIds.length})</summary><ul className="mt-2 space-y-1 text-sm">{favoriteIds.slice(0, 5).map((id) => <li key={id}><button type="button" className="text-left text-blue-700 hover:underline" onClick={() => { const [favoriteCategoryId, favoriteFrom, favoriteTo] = id.split(":"); playSavedConversion(favoriteCategoryId, { from: favoriteFrom, to: favoriteTo }); }}>{id}</button></li>)}</ul></details>}
-        <Button type="button" variant="outline" size="sm" onClick={clearSavedData}>Clear saved data</Button>
-      </div>}
-      {status && <p className="mt-2 text-sm text-slate-500" role="status" aria-live="polite">{status}</p>}
     </div>
   );
 };
 
-export { SAVED_DATA_TTL_MS, buildPlaybackUrl, clearStoredData, parseStoredHistory, parseStoredFavorites, shouldPersistHistory };
+export { SAVED_DATA_TTL_MS, buildPlaybackUrl, clearStoredData, formatFavoriteId, formatHistoryEntry, parseStoredHistory, parseStoredFavorites, shouldPersistHistory };
 export default ConversionSection;
