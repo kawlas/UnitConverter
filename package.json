@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir .prerender && node scripts/prerender.mjs && node scripts/generate-service-worker.mjs",
+    "build": "tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir .prerender && node scripts/prerender.mjs && node scripts/generate-service-worker.mjs && node scripts/check-bundle-budget.mjs",
     "build-no-errors": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:critical": "npm test && npm run lint && npm run build",
+    "check:bundle": "node scripts/check-bundle-budget.mjs",
     "verify:deployment": "node scripts/verify-deployment.mjs",
     "preview": "vite preview"
   },
