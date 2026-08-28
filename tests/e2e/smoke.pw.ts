@@ -47,6 +47,8 @@ test("canonical routes ship meaningful HTML before JavaScript runs", async ({ re
   expect(lengthHtml).toContain('rel="canonical" href="https://qconverter.netlify.app/length"');
   expect(lengthHtml).toContain('type="application/ld+json"');
   expect(lengthHtml).toContain('name="twitter:card" content="summary_large_image"');
+  expect(lengthHtml).toContain("Sources &amp; methodology");
+  expect(lengthHtml).toContain("https://www.bipm.org/en/publications/si-brochure");
 });
 
 test("unknown routes return a real noindex 404", async ({ request }) => {

@@ -30,6 +30,7 @@ const renderDocument = async (route) => {
     count(/rel="canonical"/g) !== 1 && "exactly one canonical",
     !document.includes(`href="${expectedCanonical}"`) && `canonical ${expectedCanonical}`,
     !document.includes("<h1") && "an h1",
+    route !== "/" && !document.includes("Sources &amp; methodology") && "visible methodology sources",
     document.includes('<div id="root"></div>') && "non-empty root markup",
     document.includes("Loading...") && "resolved lazy content",
     route !== "/" && !document.includes('type="application/ld+json"') && "JSON-LD",

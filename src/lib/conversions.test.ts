@@ -31,6 +31,14 @@ describe("central unit catalog conversions", () => {
     expect(convertExact(5, "minutes_per_kilometer", "minutes_per_mile", "pace")).toBeCloseTo(8.04672);
   });
 
+  it("prefers exact symbols and uses case-insensitive fallback only when unambiguous", () => {
+    expect(convertExact(1, "kB", "B", "digital")).toBe(1000);
+    expect(convertExact(1, "kb", "bit", "digital")).toBe(1000);
+    expect(convertExact(1, "KiB", "B", "digital")).toBe(1024);
+    expect(() => convertExact(1, "KB", "B", "digital")).toThrow(ConversionError);
+    expect(convertExact(1, "ps", "watts", "power")).toBeCloseTo(735.49875);
+  });
+
   it("rejects invalid values, categories, units and unsupported calculators", () => {
     for (const value of [Number.NaN, Infinity, -Infinity]) {
       expect(() => convertExact(value, "are", "square_meters", "area")).toThrow(ConversionError);

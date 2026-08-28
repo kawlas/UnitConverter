@@ -21,6 +21,7 @@ export interface CategoryDefinition {
   readonly faq: readonly { question: string; answer: string }[];
   readonly examples: readonly { input: number; from: string; to: string }[];
   readonly convert?: (value: number, from: string, to: string) => number;
+  readonly validateInput?: (value: number, from: string, to: string) => string | undefined;
 }
 
 const linear = (
@@ -62,7 +63,7 @@ const metadata = (
   faq: CategoryDefinition["faq"] = [
     {
       question: "How accurate is this converter?",
-      answer: "Results use published conversion factors and are rounded only for display.",
+      answer: "Results use the referenced conversion factors shown on this page and are rounded only for display.",
     },
     {
       question: "Can I share a conversion?",
@@ -90,12 +91,12 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "power", title: "Power", converter: "linear",
-    units: [linear("watts", "Watts", "W", 1, ["w"]), linear("kilowatts", "Kilowatts", "kW", 1000, ["kw"]), linear("horsepower", "Horsepower", "hp", 745.699872, ["horse power"]), linear("btu_per_hour", "BTU/hour", "BTU/h", 1055.05585262 / 3600, ["btu", "btu/h"])],
+    units: [linear("watts", "Watts", "W", 1, ["w"]), linear("kilowatts", "Kilowatts", "kW", 1000, ["kw"]), linear("horsepower", "Horsepower (mechanical)", "hp", 745.6998715822702, ["horse power", "mechanical horsepower"]), linear("metric_horsepower", "Horsepower (metric)", "PS", 735.49875, ["metric hp"]), linear("btu_per_hour", "BTU/hour (International Table)", "BTU/h", 1055.05585262 / 3600, ["btu/h"])],
     ...metadata("Power is the rate at which energy is transferred.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilowatts", to: "watts" }], commonFaq("power")),
   },
   {
     id: "energy", title: "Energy", converter: "linear",
-    units: [linear("joules", "Joules", "J", 1), linear("kilowatt_hours", "Kilowatt Hours", "kWh", 3_600_000, ["kwh"]), linear("calories", "Calories", "cal", 4.184, ["cal"]), linear("btu", "BTU", "BTU", 1055.05585262)],
+    units: [linear("joules", "Joules", "J", 1), linear("kilowatt_hours", "Kilowatt Hours", "kWh", 3_600_000, ["kwh"]), linear("kilojoules", "Kilojoules", "kJ", 1000, ["kj"]), linear("calories", "Calorie (thermochemical)", "cal", 4.184, ["small calorie"]), linear("kilocalories", "Kilocalorie (food Calorie)", "kcal", 4184, ["food calorie", "calorie"]), linear("btu", "BTU (International Table)", "BTU", 1055.05585262, ["btu it"])],
     ...metadata("Energy measures the capacity to perform work.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilowatt_hours", to: "joules" }], commonFaq("energy")),
   },
   {
@@ -105,18 +106,22 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "length", title: "Length", converter: "linear",
-    units: [linear("meters", "Meters", "m", 1, ["metres"]), linear("feet", "Feet", "ft", 0.3048), linear("inches", "Inches", "in", 0.0254), linear("kilometers", "Kilometers", "km", 1000, ["kilometres"]), linear("miles", "Miles", "mi", 1609.344)],
+    units: [linear("meters", "Meters", "m", 1, ["metres"]), linear("feet", "Feet", "ft", 0.3048), linear("centimeters", "Centimeters", "cm", 0.01, ["centimetres"]), linear("millimeters", "Millimeters", "mm", 0.001, ["millimetres"]), linear("inches", "Inches", "in", 0.0254), linear("yards", "Yards", "yd", 0.9144), linear("kilometers", "Kilometers", "km", 1000, ["kilometres"]), linear("miles", "Miles", "mi", 1609.344), linear("nautical_miles", "Nautical Miles", "nmi", 1852, ["nautical mile"])],
     ...metadata("Length measures distance or dimension.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilometers", to: "miles" }], commonFaq("length")),
   },
   {
     id: "weight", title: "Weight", converter: "linear",
-    units: [linear("kilograms", "Kilograms", "kg", 1), linear("pounds", "Pounds", "lb", 0.45359237, ["lbs"]), linear("ounces", "Ounces", "oz", 0.028349523125), linear("grams", "Grams", "g", 0.001)],
+    units: [linear("kilograms", "Kilograms", "kg", 1), linear("pounds", "Pounds", "lb", 0.45359237, ["lbs"]), linear("grams", "Grams", "g", 0.001), linear("metric_tonnes", "Metric Tonnes", "t", 1000, ["tonnes", "metric ton"]), linear("ounces", "Ounces", "oz", 0.028349523125)],
     ...metadata("Weight is commonly expressed with mass units in everyday conversions.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilograms", to: "pounds" }], commonFaq("weight")),
   },
   {
     id: "temperature", title: "Temperature", converter: "affine",
-    units: [affine("celsius", "Celsius", "°C", (v) => v + 273.15, (v) => v - 273.15), affine("fahrenheit", "Fahrenheit", "°F", (v) => (v - 32) * 5 / 9 + 273.15, (v) => (v - 273.15) * 9 / 5 + 32), affine("kelvin", "Kelvin", "K", (v) => v, (v) => v)],
-    ...metadata("Temperature scales describe how hot or cold something is.", "C → K: C + 273.15; F → K: (F − 32) × 5/9 + 273.15", [{ input: 0, from: "celsius", to: "fahrenheit" }], commonFaq("temperature")),
+    units: [affine("celsius", "Celsius", "°C", (v) => v + 273.15, (v) => v - 273.15), affine("fahrenheit", "Fahrenheit", "°F", (v) => (v - 32) * 5 / 9 + 273.15, (v) => (v - 273.15) * 9 / 5 + 32), affine("kelvin", "Kelvin", "K", (v) => v, (v) => v), affine("rankine", "Rankine", "°R", (v) => v * 5 / 9, (v) => v * 9 / 5)],
+    validateInput: (value, from) => {
+      const minimumByUnit: Record<string, number> = { celsius: -273.15, fahrenheit: -459.67, kelvin: 0, rankine: 0 };
+      return value < minimumByUnit[from] ? "Temperature cannot be below absolute zero." : undefined;
+    },
+    ...metadata("Temperature scales describe how hot or cold something is.", "C → K: C + 273.15; F → K: (F − 32) × 5/9 + 273.15; R → K: R × 5/9", [{ input: 0, from: "celsius", to: "fahrenheit" }], commonFaq("temperature")),
   },
   {
     id: "volume", title: "Volume", converter: "linear",
@@ -138,7 +143,7 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "digital", title: "Digital Data", converter: "linear",
-    units: [linear("bits", "Bits", "bit", 1), linear("bytes", "Bytes", "B", 8), linear("kilobits", "Kilobits", "kb", 1000), linear("kilobytes", "Kilobytes", "kB", 8000), linear("megabytes", "Megabytes", "MB", 8_000_000), linear("gibibytes", "Gibibytes", "GiB", 8 * 1024 ** 3, ["gib"])],
+    units: [linear("bits", "Bits", "bit", 1), linear("bytes", "Bytes", "B", 8), linear("kilobits", "Kilobits", "kb", 1000), linear("kilobytes", "Kilobytes", "kB", 8000), linear("megabytes", "Megabytes", "MB", 8_000_000), linear("gigabytes", "Gigabytes", "GB", 8_000_000_000), linear("kibibytes", "Kibibytes", "KiB", 8 * 1024, ["kib"]), linear("mebibytes", "Mebibytes", "MiB", 8 * 1024 ** 2, ["mib"]), linear("gibibytes", "Gibibytes", "GiB", 8 * 1024 ** 3, ["gib"]), linear("tebibytes", "Tebibytes", "TiB", 8 * 1024 ** 4, ["tib"])],
     ...metadata("Digital data uses decimal SI units and clearly labelled binary units where applicable.", "value in target = value × source factor / target factor", [{ input: 1, from: "megabytes", to: "bytes" }], commonFaq("digital data")),
   },
   {
@@ -155,12 +160,14 @@ const definitions: CategoryDefinition[] = [
     id: "fuel", title: "Fuel Economy", converter: "custom",
     units: [linear("liters_per_100km", "Liters per 100 km", "L/100 km", 1, ["l/100km"]), linear("miles_per_gallon", "Miles per Gallon (US)", "mpg", 1, ["mpg"])],
     convert: (value, from, to) => from === to ? value : 235.214583 / value,
+    validateInput: (value) => value > 0 ? undefined : "Fuel economy requires a positive value.",
     ...metadata("Fuel economy can be expressed as volume used per distance or distance per volume.", "L/100 km × mpg = 235.214583 (US gallons)", [{ input: 7, from: "liters_per_100km", to: "miles_per_gallon" }], commonFaq("fuel economy")),
   },
   {
     id: "pace", title: "Pace", converter: "custom",
     units: [linear("minutes_per_kilometer", "Minutes per Kilometer", "min/km", 1), linear("minutes_per_mile", "Minutes per Mile", "min/mi", 1)],
     convert: (value, from, to) => from === to ? value : from === "minutes_per_kilometer" ? value * 1.609344 : value / 1.609344,
+    validateInput: (value) => value > 0 ? undefined : "Pace requires a positive value.",
     ...metadata("Running pace is the time needed to cover a distance.", "min/mi = min/km × 1.609344", [{ input: 5, from: "minutes_per_kilometer", to: "minutes_per_mile" }], commonFaq("pace")),
   },
 ];
@@ -176,11 +183,14 @@ export const getCategory = (id: string | undefined): CategoryDefinition | undefi
 
 export const getUnit = (category: CategoryDefinition, id: string): UnitDefinition | undefined => {
   const needle = id.trim().toLowerCase();
-  return category.units.find((unit) =>
-    unit.value === id ||
-    unit.aliases.some((alias) => alias.toLowerCase() === needle) ||
-    unit.symbol.toLowerCase() === needle
-  );
+  const directMatch = category.units.find((unit) => unit.value === id || unit.symbol === id) ??
+    category.units.find((unit) =>
+      unit.value.toLowerCase() === needle ||
+      unit.aliases.some((alias) => alias.toLowerCase() === needle)
+    );
+  if (directMatch) return directMatch;
+  const symbolMatches = category.units.filter((unit) => unit.symbol.toLowerCase() === needle);
+  return symbolMatches.length === 1 ? symbolMatches[0] : undefined;
 };
 
 const baselineDefaultUnits: Readonly<Record<string, { from: string; to: string }>> = {

@@ -1,7 +1,7 @@
 import { categories, getCategory, getUnit } from "./conversion-data";
 
 export class ConversionError extends Error {
-  readonly code: "INVALID_VALUE" | "UNKNOWN_CATEGORY" | "UNKNOWN_UNIT" | "UNSUPPORTED_CONVERSION" | "INVALID_RESULT";
+  readonly code: "INVALID_VALUE" | "OUT_OF_DOMAIN" | "UNKNOWN_CATEGORY" | "UNKNOWN_UNIT" | "UNSUPPORTED_CONVERSION" | "INVALID_RESULT";
 
   constructor(code: ConversionError["code"], message: string) {
     super(message);
@@ -37,6 +37,11 @@ export const convertExact = (
   if (category.converter === "calculator") {
     throw new ConversionError("UNSUPPORTED_CONVERSION", `${category.title} is a calculator, not a unit conversion.`);
   }
+  const domainError = category.validateInput?.(value, from.value, to.value);
+  if (domainError) {
+    throw new ConversionError("OUT_OF_DOMAIN", domainError);
+  }
+  if (from.value === to.value) return value;
 
   let result: number;
   if (category.converter === "custom") {

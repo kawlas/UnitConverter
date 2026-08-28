@@ -15,6 +15,8 @@ import BMICalculator from "@/components/BMICalculator";
 import AdCard from "@/components/AdCard";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import MethodologySection from "@/components/MethodologySection";
+import { getMethodology } from "@/lib/methodology";
 
 const HOME_TITLE = "Q Converter — Free Online Unit Converter";
 const SITE_ORIGIN = "https://qconverter.netlify.app";
@@ -68,6 +70,7 @@ export default function ConverterPage() {
   const canonicalPath = `/${category.id}`;
   const canonicalUrl = `${SITE_ORIGIN}${canonicalPath}`;
   const pageDescription = metaDescription(category.description);
+  const methodology = getMethodology(category.id);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -329,6 +332,7 @@ export default function ConverterPage() {
                 ))}
               </div>
             </section>
+            <MethodologySection categoryId={category.id} sources={methodology} />
             <div className="mt-8 sm:mt-10">
               <AdCard />
             </div>
