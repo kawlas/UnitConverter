@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:critical": "npm test && npm run lint && npm run build",
+    "verify:deployment": "node scripts/verify-deployment.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
