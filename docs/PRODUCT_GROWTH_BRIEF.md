@@ -90,6 +90,10 @@ The first implementation slices now cover sourced methodology, compare-all resul
 eight-page curated pair cluster, deterministic local conversion queries and an installable,
 offline-capable PWA. Standard converters also accept strict fraction and mixed-number input,
 supporting cooking, construction and craft workflows without adding category-specific UI.
+They also accept bounded arithmetic expressions, offer local batch conversion for up to
+100 values and present saved conversions as readable, privacy-scoped shortcuts. Native
+unit pickers and dead-scaffold removal reduced the converter route from 45.52 kB to
+15.00 kB gzip and compiled CSS from 83.70 kB to 50.80 kB in the 2026-08-28 release candidate.
 The existing volume and weight tools now cover explicitly named US liquid cooking measures
 and British stone, extending real utility without creating new low-value routes.
 Pair expansion must wait for Search Console evidence and continue to

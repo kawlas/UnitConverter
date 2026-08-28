@@ -25,6 +25,7 @@ branch for every task; never work directly on `main`.
 - `src/components/Navbar.tsx`, `Footer.tsx`, `SearchBar.tsx` — global navigation and discovery UI.
 - `src/components/ConversionSection.tsx` — inputs, URL state, conversion controls, history, favorites, sharing, locale and precision.
 - `src/components/AllUnitsComparison.tsx` — accessible, responsive table that compares one input across the complete category catalog.
+- `src/components/BatchConversion.tsx` — local, bounded multi-value conversion with per-row validation and copy-all output.
 - `src/components/BMICalculator.tsx` — BMI-specific calculator UI.
 - `src/lib/conversion-data.ts` / `src/lib/conversions.ts` — typed catalog, unit definitions and exact conversion engine.
 - `src/lib/pair-pages.ts` — small registry of quality-gated pair-intent pages and their unique copy and examples.
@@ -32,6 +33,8 @@ branch for every task; never work directly on `main`.
 - `src/components/ConnectivityStatus.tsx`, `InstallAppButton.tsx` — progressive offline and native-install UX.
 - `public/manifest.webmanifest` — install identity, branded icons and category shortcuts.
 - `scripts/generate-service-worker.mjs` — final build step that fingerprints and precaches the current prerendered product.
+- `scripts/check-bundle-budget.mjs` — build gate for compressed CSS and route-level JavaScript budgets.
+- `scripts/verify-deployment.mjs` — live HTTP gate for canonical HTML, redirects, crawler files, MIME, cache and security headers.
 - `src/index.css` — Tailwind v4 entry point, theme variables, base styles and overflow/accessibility guards.
 - `vite.config.ts` — Vite/React plugin, aliases and production chunking.
 - `tests/e2e/smoke.pw.ts` — styling, responsive overflow, title, URL state, swap, canonical, saved controls, navigation and axe smoke tests.
@@ -51,6 +54,9 @@ and clear saved data. History and favorites are retained for at most 30 days and
 unavailable or malformed browser
 storage. Every non-BMI category also shows the current input across all supported units;
 any comparison row can become the primary target without re-entering the value.
+An optional batch panel converts up to 100 non-empty lines locally, rejects oversized
+input as a whole and copies only successful rows. The primary unit controls use native
+select elements for accessible platform pickers and a substantially smaller route bundle.
 Cooking-oriented volume entries are explicitly labelled as US customary liquid measures
 to avoid silently mixing them with Imperial, metric-cooking or US dry variants. The weight
 catalog identifies stone as the British 14-pound unit.
@@ -121,6 +127,7 @@ Run from the repository root:
 npm ci
 npm run test:critical
 npm run test:e2e
+BASE_URL=https://qconverter.netlify.app npm run verify:deployment
 BASE_URL=https://qconverter.netlify.app npm run test:e2e
 npm run build
 git diff --check
@@ -143,6 +150,8 @@ claim of fresh verification for an untested change.
 4. Link the production site when needed: `npx netlify link --name qconverter`.
 5. Deploy the built output: `npx netlify deploy --prod --dir=dist`.
 6. Run production E2E: `BASE_URL=https://qconverter.netlify.app npm run test:e2e`.
+   Run `BASE_URL=https://qconverter.netlify.app npm run verify:deployment` first for
+   fast status, canonical, header and caching diagnostics.
 7. Remove deployment-local artifacts from the working tree (`.netlify` and its
    `.gitignore`) and verify the final diff before handoff.
 
@@ -157,6 +166,8 @@ smoke pass is evidence for that deploy only; do not generalize it to unrelated c
 - Investigate and repair the Netlify integration when access is available.
 - Rerun Lighthouse after material UI or loading changes; the existing audit is not a
   permanent performance guarantee.
+- The build now fails when the compressed converter chunk, compiled CSS or route-level
+  JavaScript exceeds its recorded budget. Adjust a budget only with a measured reason.
 - Native install promotion varies by browser and platform. The app remains fully usable
   when `beforeinstallprompt` is unavailable and relies on the browser's own Add to Home
   Screen or Add to Dock flow.
