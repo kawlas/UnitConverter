@@ -23,7 +23,7 @@ export const methodologySources = {
     organization: "NIST",
     title: "NIST Guide to the SI — conversion factors by quantity",
     url: "https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b9",
-    scope: "Reference factors and named variants for commonly used measurement units.",
+    scope: "Reference factors and named variants for commonly used units, including US liquid cooking measures and British stone.",
   },
   iec: {
     id: "iec-80000-13-2025",

@@ -31,6 +31,15 @@ describe("central unit catalog conversions", () => {
     expect(convertExact(5, "minutes_per_kilometer", "minutes_per_mile", "pace")).toBeCloseTo(8.04672);
   });
 
+  it("converts explicitly named US cooking measures and British stone", () => {
+    expect(convertExact(1, "us_cups", "milliliters", "volume")).toBeCloseTo(236.5882365, 9);
+    expect(convertExact(1, "us_cups", "us_fluid_ounces", "volume")).toBe(8);
+    expect(convertExact(1, "us_tablespoons", "us_teaspoons", "volume")).toBe(3);
+    expect(convertExact(1, "us_liquid_quarts", "us_cups", "volume")).toBe(4);
+    expect(convertExact(1, "stone", "pounds", "weight")).toBe(14);
+    expect(convertExact(1, "stone", "kilograms", "weight")).toBeCloseTo(6.35029318, 9);
+  });
+
   it("prefers exact symbols and uses case-insensitive fallback only when unambiguous", () => {
     expect(convertExact(1, "kB", "B", "digital")).toBe(1000);
     expect(convertExact(1, "kb", "bit", "digital")).toBe(1000);

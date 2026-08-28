@@ -105,6 +105,19 @@ describe("conversion catalog invariants", () => {
     expect(powerLabels).toContain("BTU/hour (International Table)");
   });
 
+  it("names US liquid-volume variants explicitly", () => {
+    const volumeLabels = categories.find(({ id }) => id === "volume")!.units.map(({ label }) => label);
+
+    expect(volumeLabels).toEqual(expect.arrayContaining([
+      "US Cups",
+      "US Fluid Ounces",
+      "US Tablespoons",
+      "US Teaspoons",
+      "US Liquid Pints",
+      "US Liquid Quarts",
+    ]));
+  });
+
   it("preserves established default conversion pairs as the catalog grows", () => {
     const expected = {
       length: { from: "meters", to: "feet" },

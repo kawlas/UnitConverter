@@ -17,6 +17,9 @@ describe("deterministic smart conversion queries", () => {
     ["1/2 inch to cm", "length", "inches", "centimeters", 0.5, 1.27],
     ["1 1/2 ft to cm", "length", "feet", "centimeters", 1.5, 45.72],
     ["½ liter to ml", "volume", "liters", "milliliters", 0.5, 500],
+    ["1 1/2 cups to ml", "volume", "us_cups", "milliliters", 1.5, 354.88235475],
+    ["2 tbsp to teaspoons", "volume", "us_tablespoons", "us_teaspoons", 2, 6],
+    ["12 stone to kg", "weight", "stone", "kilograms", 12, 76.20351816],
   ])("parses %s using the catalog", (query, categoryId, from, to, value, result) => {
     expect(parseSmartConversionQuery(query)).toMatchObject({
       status: "success",

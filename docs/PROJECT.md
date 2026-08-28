@@ -51,6 +51,9 @@ and clear saved data. History and favorites are retained for at most 30 days and
 unavailable or malformed browser
 storage. Every non-BMI category also shows the current input across all supported units;
 any comparison row can become the primary target without re-entering the value.
+Cooking-oriented volume entries are explicitly labelled as US customary liquid measures
+to avoid silently mixing them with Imperial, metric-cooking or US dry variants. The weight
+catalog identifies stone as the British 14-pound unit.
 Eight curated pair routes provide focused formulas and worked examples for selected
 high-utility conversions. They are explicitly prerendered, self-canonical, listed in the
 sitemap and linked from their parent category; unsupported pairs remain real noindex 404s.

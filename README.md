@@ -14,6 +14,8 @@ swap, reset, precision (0–12 decimals), locale-aware formatting (`en-US`, `pl-
 `de-DE`, `fr-FR`), strict decimal and fraction input, copy/share links, favorites,
 recent history, and clear saved data. Fractions include `3/8`, mixed numbers such as
 `1 1/2`, and common vulgar characters such as `½`.
+The volume catalog includes explicitly labelled US cups, fluid ounces, tablespoons,
+teaspoons, liquid pints and liquid quarts; weight includes the 14-pound British stone.
 Every non-BMI converter also displays one input across the complete category catalog and
 lets any comparison row become the primary target.
 An initial quality-gated cluster of eight pair pages adds focused formulas, worked examples

@@ -56,6 +56,11 @@ const affine = (
   fromBase,
 });
 
+// NIST SP 811 Appendix B.9 derives US liquid measures from the exact
+// international inch and the US gallon (231 cubic inches).
+const US_LIQUID_GALLON_LITERS = 3.785411784;
+const INTERNATIONAL_POUND_KILOGRAMS = 0.45359237;
+
 const metadata = (
   description: string,
   formula: string,
@@ -129,8 +134,11 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "weight", title: "Weight", converter: "linear",
-    units: [linear("kilograms", "Kilograms", "kg", 1), linear("pounds", "Pounds", "lb", 0.45359237, ["lbs"]), linear("grams", "Grams", "g", 0.001), linear("metric_tonnes", "Metric Tonnes", "t", 1000, ["tonnes", "metric ton"]), linear("ounces", "Ounces", "oz", 0.028349523125)],
-    ...metadata("Weight is commonly expressed with mass units in everyday conversions.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilograms", to: "pounds" }], commonFaq("weight")),
+    units: [linear("kilograms", "Kilograms", "kg", 1), linear("pounds", "Pounds", "lb", INTERNATIONAL_POUND_KILOGRAMS, ["lbs"]), linear("grams", "Grams", "g", 0.001), linear("metric_tonnes", "Metric Tonnes", "t", 1000, ["tonnes", "metric ton"]), linear("ounces", "Ounces", "oz", 0.028349523125), linear("stone", "Stone (14 lb)", "st", 14 * INTERNATIONAL_POUND_KILOGRAMS, ["stones"])],
+    ...metadata("Weight is commonly expressed with mass units in everyday conversions, including the 14-pound British stone.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilograms", to: "pounds" }], [
+      { question: "How many pounds are in one stone?", answer: "One British stone equals 14 avoirdupois pounds exactly." },
+      { question: "Are the results rounded?", answer: "The calculation retains full JavaScript number precision; the precision control only formats the displayed result." },
+    ]),
   },
   {
     id: "temperature", title: "Temperature", converter: "affine",
@@ -143,8 +151,22 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "volume", title: "Volume", converter: "linear",
-    units: [linear("liters", "Liters", "L", 1, ["litres"]), linear("gallons", "US Gallons", "gal", 3.785411784), linear("milliliters", "Milliliters", "mL", 0.001, ["ml"]), linear("cubic_meters", "Cubic Meters", "m³", 1000, ["m3"])],
-    ...metadata("Volume measures the amount of three-dimensional space.", "value in target = value × source factor / target factor", [{ input: 1, from: "gallons", to: "liters" }], commonFaq("volume")),
+    units: [
+      linear("liters", "Liters", "L", 1, ["litres"]),
+      linear("gallons", "US Gallons", "gal", US_LIQUID_GALLON_LITERS, ["us gallon", "us gallons"]),
+      linear("milliliters", "Milliliters", "mL", 0.001, ["ml"]),
+      linear("us_cups", "US Cups", "cup", US_LIQUID_GALLON_LITERS / 16, ["cup", "cups", "us cup", "us cups"]),
+      linear("us_fluid_ounces", "US Fluid Ounces", "fl oz", US_LIQUID_GALLON_LITERS / 128, ["fluid ounce", "fluid ounces", "us fluid ounce", "us fluid ounces", "floz"]),
+      linear("us_tablespoons", "US Tablespoons", "tbsp", US_LIQUID_GALLON_LITERS / 256, ["tablespoon", "tablespoons", "us tablespoon", "us tablespoons"]),
+      linear("us_teaspoons", "US Teaspoons", "tsp", US_LIQUID_GALLON_LITERS / 768, ["teaspoon", "teaspoons", "us teaspoon", "us teaspoons"]),
+      linear("us_liquid_pints", "US Liquid Pints", "pt", US_LIQUID_GALLON_LITERS / 8, ["pint", "pints", "us pint", "us pints", "liquid pint", "liquid pints"]),
+      linear("us_liquid_quarts", "US Liquid Quarts", "qt", US_LIQUID_GALLON_LITERS / 4, ["quart", "quarts", "us quart", "us quarts", "liquid quart", "liquid quarts"]),
+      linear("cubic_meters", "Cubic Meters", "m³", 1000, ["m3"]),
+    ],
+    ...metadata("Convert volume across metric units and explicitly labelled US liquid cups, fluid ounces, tablespoons, teaspoons, pints, quarts and gallons.", "value in target = value × source factor / target factor", [{ input: 1, from: "gallons", to: "liters" }, { input: 1.5, from: "us_cups", to: "milliliters" }], [
+      { question: "Which cup, pint and quart variants are used?", answer: "The labels identify US customary liquid measures. Imperial and US dry pints or quarts are different units and are not silently substituted." },
+      { question: "Can I enter cooking fractions?", answer: "Yes. Enter values such as 1/2, 1 1/2 or ½ and choose an explicitly labelled US cooking measure." },
+    ]),
   },
   {
     id: "area", title: "Area", converter: "linear",
