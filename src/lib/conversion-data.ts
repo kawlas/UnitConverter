@@ -77,10 +77,10 @@ const metadata = (
   ],
 ) => ({ description, formula, examples, faq });
 
-const commonFaq = (name: string): CategoryDefinition["faq"] => [
+const factFaq = (question: string, answer: string): CategoryDefinition["faq"] => [
   {
-    question: `What is a ${name} conversion?`,
-    answer: `A ${name.toLowerCase()} conversion expresses the same quantity in another supported unit.`,
+    question,
+    answer,
   },
   {
     question: "Are the results rounded?",
@@ -115,22 +115,34 @@ const definitions: CategoryDefinition[] = [
   {
     id: "power", title: "Power", converter: "linear",
     units: [linear("watts", "Watts", "W", 1, ["w"]), linear("kilowatts", "Kilowatts", "kW", 1000, ["kw"]), linear("horsepower", "Horsepower (mechanical)", "hp", 745.6998715822702, ["horse power", "mechanical horsepower"]), linear("metric_horsepower", "Horsepower (metric)", "PS", 735.49875, ["metric hp"]), linear("btu_per_hour", "BTU/hour (International Table)", "BTU/h", 1055.05585262 / 3600, ["btu/h"])],
-    ...metadata("Power is the rate at which energy is transferred.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilowatts", to: "watts" }], commonFaq("power")),
+    ...metadata("Power is the rate at which energy is transferred.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilowatts", to: "watts" }], factFaq(
+      "Are mechanical and metric horsepower the same?",
+      "No. One mechanical horsepower is 745.6998715822702 watts, while one metric horsepower (PS) is 735.49875 watts, so the variant must be named.",
+    )),
   },
   {
     id: "energy", title: "Energy", converter: "linear",
     units: [linear("joules", "Joules", "J", 1), linear("kilowatt_hours", "Kilowatt Hours", "kWh", 3_600_000, ["kwh"]), linear("kilojoules", "Kilojoules", "kJ", 1000, ["kj"]), linear("calories", "Calorie (thermochemical)", "cal", 4.184, ["small calorie"]), linear("kilocalories", "Kilocalorie (food Calorie)", "kcal", 4184, ["food calorie", "calorie"]), linear("btu", "BTU (International Table)", "BTU", 1055.05585262, ["btu it"])],
-    ...metadata("Energy measures the capacity to perform work.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilowatt_hours", to: "joules" }], commonFaq("energy")),
+    ...metadata("Energy measures the capacity to perform work.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilowatt_hours", to: "joules" }], factFaq(
+      "What is the difference between a calorie and a food Calorie?",
+      "One thermochemical calorie equals 4.184 joules. One food Calorie is a kilocalorie: 1,000 thermochemical calories, or 4,184 joules.",
+    )),
   },
   {
     id: "speed", title: "Speed", converter: "linear",
     units: [linear("mph", "Miles per Hour", "mph", 0.44704, ["mi/h"]), linear("kph", "Kilometers per Hour", "km/h", 1000 / 3600, ["kmh", "km/h"]), linear("mps", "Meters per Second", "m/s", 1, ["m/s"]), linear("knots", "Knots", "kn", 1852 / 3600, ["kt"])],
-    ...metadata("Speed measures distance travelled per unit of time.", "value in target = value × source factor / target factor", [{ input: 100, from: "kph", to: "mph" }], commonFaq("speed")),
+    ...metadata("Speed measures distance travelled per unit of time.", "value in target = value × source factor / target factor", [{ input: 100, from: "kph", to: "mph" }], factFaq(
+      "What does one knot mean?",
+      "One knot is one nautical mile per hour. Because one international nautical mile is exactly 1,852 meters, one knot equals exactly 1.852 km/h.",
+    )),
   },
   {
     id: "length", title: "Length", converter: "linear",
     units: [linear("meters", "Meters", "m", 1, ["metres"]), linear("feet", "Feet", "ft", 0.3048), linear("centimeters", "Centimeters", "cm", 0.01, ["centimetres"]), linear("millimeters", "Millimeters", "mm", 0.001, ["millimetres"]), linear("inches", "Inches", "in", 0.0254), linear("yards", "Yards", "yd", 0.9144), linear("kilometers", "Kilometers", "km", 1000, ["kilometres"]), linear("miles", "Miles", "mi", 1609.344), linear("nautical_miles", "Nautical Miles", "nmi", 1852, ["nautical mile"])],
-    ...metadata("Length measures distance or dimension.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilometers", to: "miles" }], commonFaq("length")),
+    ...metadata("Length measures distance or dimension.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilometers", to: "miles" }], factFaq(
+      "How long are an inch and a foot exactly?",
+      "The international inch is exactly 25.4 millimeters. One foot is exactly 12 inches, so it equals exactly 0.3048 meters.",
+    )),
   },
   {
     id: "weight", title: "Weight", converter: "linear",
@@ -147,7 +159,10 @@ const definitions: CategoryDefinition[] = [
       const minimumByUnit: Record<string, number> = { celsius: -273.15, fahrenheit: -459.67, kelvin: 0, rankine: 0 };
       return value < minimumByUnit[from] ? "Temperature cannot be below absolute zero." : undefined;
     },
-    ...metadata("Temperature scales describe how hot or cold something is.", "C → K: C + 273.15; F → K: (F − 32) × 5/9 + 273.15; R → K: R × 5/9", [{ input: 0, from: "celsius", to: "fahrenheit" }], commonFaq("temperature")),
+    ...metadata("Temperature scales describe how hot or cold something is.", "C → K: C + 273.15; F → K: (F − 32) × 5/9 + 273.15; R → K: R × 5/9", [{ input: 0, from: "celsius", to: "fahrenheit" }], factFaq(
+      "What is absolute zero on each supported scale?",
+      "Absolute zero is 0 K, 0 °R, −273.15 °C or −459.67 °F. The converter rejects any input below the corresponding limit.",
+    )),
   },
   {
     id: "volume", title: "Volume", converter: "linear",
@@ -179,36 +194,54 @@ const definitions: CategoryDefinition[] = [
   {
     id: "pressure", title: "Pressure", converter: "linear",
     units: [linear("pascals", "Pascals", "Pa", 1, ["pa"]), linear("kilopascals", "Kilopascals", "kPa", 1000, ["kpa"]), linear("bar", "Bar", "bar", 100000), linear("psi", "Pounds per Square Inch", "psi", 6894.757293168), linear("atmospheres", "Atmospheres", "atm", 101325, ["atm"])],
-    ...metadata("Pressure is force distributed over an area.", "value in target = value × source factor / target factor", [{ input: 1, from: "atmospheres", to: "pascals" }], commonFaq("pressure")),
+    ...metadata("Pressure is force distributed over an area.", "value in target = value × source factor / target factor", [{ input: 1, from: "atmospheres", to: "pascals" }], factFaq(
+      "How are bar and standard atmosphere defined in pascals?",
+      "One bar equals exactly 100,000 pascals. One standard atmosphere equals exactly 101,325 pascals, so the two units are close but not equal.",
+    )),
   },
   {
     id: "digital", title: "Digital Data", converter: "linear",
     units: [linear("bits", "Bits", "bit", 1), linear("bytes", "Bytes", "B", 8), linear("kilobits", "Kilobits", "kb", 1000), linear("kilobytes", "Kilobytes", "kB", 8000), linear("megabytes", "Megabytes", "MB", 8_000_000), linear("gigabytes", "Gigabytes", "GB", 8_000_000_000), linear("kibibytes", "Kibibytes", "KiB", 8 * 1024, ["kib"]), linear("mebibytes", "Mebibytes", "MiB", 8 * 1024 ** 2, ["mib"]), linear("gibibytes", "Gibibytes", "GiB", 8 * 1024 ** 3, ["gib"]), linear("tebibytes", "Tebibytes", "TiB", 8 * 1024 ** 4, ["tib"])],
-    ...metadata("Digital data uses decimal SI units and clearly labelled binary units where applicable.", "value in target = value × source factor / target factor", [{ input: 1, from: "megabytes", to: "bytes" }], commonFaq("digital data")),
+    ...metadata("Digital data uses decimal SI units and clearly labelled binary units where applicable.", "value in target = value × source factor / target factor", [{ input: 1, from: "megabytes", to: "bytes" }], factFaq(
+      "What is the difference between kB and KiB?",
+      "A kilobyte (kB) is 1,000 bytes, while a kibibyte (KiB) is 1,024 bytes. Symbols are case-sensitive: lowercase b means bits and uppercase B means bytes.",
+    )),
   },
   {
     id: "time", title: "Time", converter: "linear",
     units: [linear("seconds", "Seconds", "s", 1), linear("minutes", "Minutes", "min", 60), linear("hours", "Hours", "h", 3600), linear("days", "Days", "d", 86400), linear("weeks", "Weeks", "wk", 604800)],
-    ...metadata("Time converts durations using exact SI seconds for the supported units.", "value in target = value × source factor / target factor", [{ input: 1, from: "hours", to: "minutes" }], commonFaq("time")),
+    ...metadata("Time converts durations using exact SI seconds for the supported units.", "value in target = value × source factor / target factor", [{ input: 1, from: "hours", to: "minutes" }], factFaq(
+      "Does this converter treat months and years as fixed durations?",
+      "No. It converts only fixed durations from seconds through seven-day weeks. Calendar months and years vary in length and are intentionally not guessed.",
+    )),
   },
   {
     id: "angle", title: "Angle", converter: "linear",
     units: [linear("degrees", "Degrees", "°", 1), linear("radians", "Radians", "rad", 180 / Math.PI), linear("gradians", "Gradians", "gon", 0.9)],
-    ...metadata("Angle measurements describe rotation.", "value in target = value × source factor / target factor", [{ input: 180, from: "degrees", to: "radians" }], commonFaq("angle")),
+    ...metadata("Angle measurements describe rotation.", "value in target = value × source factor / target factor", [{ input: 180, from: "degrees", to: "radians" }], factFaq(
+      "How do degrees, radians and gradians describe a full turn?",
+      "One full turn is 360 degrees, 2π radians or 400 gradians. The converter preserves π-based precision until it formats the displayed result.",
+    )),
   },
   {
     id: "fuel", title: "Fuel Economy", converter: "custom",
     units: [linear("liters_per_100km", "Liters per 100 km", "L/100 km", 1, ["l/100km"]), linear("miles_per_gallon", "Miles per Gallon (US)", "mpg", 1, ["mpg"])],
     convert: (value, from, to) => from === to ? value : 235.214583 / value,
     validateInput: (value) => value > 0 ? undefined : "Fuel economy requires a positive value.",
-    ...metadata("Fuel economy can be expressed as volume used per distance or distance per volume.", "L/100 km × mpg = 235.214583 (US gallons)", [{ input: 7, from: "liters_per_100km", to: "miles_per_gallon" }], commonFaq("fuel economy")),
+    ...metadata("Fuel economy can be expressed as volume used per distance or distance per volume.", "L/100 km × mpg = 235.214583 (US gallons)", [{ input: 7, from: "liters_per_100km", to: "miles_per_gallon" }], factFaq(
+      "Why does fuel-economy conversion use division instead of multiplication?",
+      "L/100 km measures fuel used, while US mpg measures distance traveled per fuel volume. They move in opposite directions, so their product is 235.214583.",
+    )),
   },
   {
     id: "pace", title: "Pace", converter: "custom",
     units: [linear("minutes_per_kilometer", "Minutes per Kilometer", "min/km", 1), linear("minutes_per_mile", "Minutes per Mile", "min/mi", 1)],
     convert: (value, from, to) => from === to ? value : from === "minutes_per_kilometer" ? value * 1.609344 : value / 1.609344,
     validateInput: (value) => value > 0 ? undefined : "Pace requires a positive value.",
-    ...metadata("Running pace is the time needed to cover a distance.", "min/mi = min/km × 1.609344", [{ input: 5, from: "minutes_per_kilometer", to: "minutes_per_mile" }], commonFaq("pace")),
+    ...metadata("Running pace is the time needed to cover a distance.", "min/mi = min/km × 1.609344", [{ input: 5, from: "minutes_per_kilometer", to: "minutes_per_mile" }], factFaq(
+      "How do minutes per kilometer and minutes per mile relate?",
+      "Multiply minutes per kilometer by 1.609344 to get minutes per mile. Divide minutes per mile by 1.609344 for the reverse conversion.",
+    )),
   },
 ];
 
