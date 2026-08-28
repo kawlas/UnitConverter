@@ -11,7 +11,16 @@ A precise, shareable online measurement studio for everyday unit conversions.
 Q Converter provides a typed catalog of standard conversion formulas, including linear,
 affine, custom, and BMI calculations. Each converter supports URL-restored state, unit
 swap, reset, precision (0–12 decimals), locale-aware formatting (`en-US`, `pl-PL`,
-`de-DE`, `fr-FR`), copy/share links, favorites, recent history, and clear saved data.
+`de-DE`, `fr-FR`), strict decimal and fraction input, copy/share links, favorites,
+recent history, and clear saved data. Fractions include `3/8`, mixed numbers such as
+`1 1/2`, and common vulgar characters such as `½`.
+The volume catalog includes explicitly labelled US cups, fluid ounces, tablespoons,
+teaspoons, liquid pints and liquid quarts; weight includes the 14-pound British stone.
+Every non-BMI converter also displays one input across the complete category catalog and
+lets any comparison row become the primary target.
+An initial quality-gated cluster of eight pair pages adds focused formulas, worked examples
+and internal links for selected length, weight, temperature and volume conversions without
+generating a thin page for every possible combination.
 History and favorites expire from `localStorage` after 30 days. Category pages provide
 SEO metadata, structured data, canonical short routes, and a `/convert/:categoryId` alias.
 The responsive navigation includes a keyboard-accessible mobile menu.
@@ -47,8 +56,8 @@ about an untested change.
 ## Code map
 
 - `src/App.tsx` — routing; `src/pages/HomePage.tsx` and `ConverterPage.tsx` — pages.
-- `src/components/` — `Navbar`, `Footer`, `SearchBar`, `ConversionSection`, and `BMICalculator`.
-- `src/lib/conversion-data.ts` and `src/lib/conversions.ts` — catalog and conversion engine.
+- `src/components/` — `Navbar`, `Footer`, `SearchBar`, `ConversionSection`, `AllUnitsComparison`, and `BMICalculator`.
+- `src/lib/conversion-data.ts`, `src/lib/conversions.ts`, and `src/lib/pair-pages.ts` — catalog, conversion engine, and curated pair-page registry.
 - `src/index.css` — Tailwind v4 entry, tokens, base and responsive constraints.
 - `vite.config.ts`, `tests/e2e/smoke.pw.ts`, `.github/workflows/production-smoke.yml`, and `netlify.toml` — build, smoke coverage, CI, and Netlify deployment.
 

@@ -1,0 +1,114 @@
+import { describe, expect, it } from "vitest";
+import { parseLocaleQuantity } from "./number-input";
+
+describe("locale-aware decimal and fraction input", () => {
+  it.each([
+    ["1,234.56", "en-US", 1234.56],
+    ["1.234,56", "de-DE", 1234.56],
+    ["12 345,67", "pl-PL", 12345.67],
+    ["12\u202f345,67", "fr-FR", 12345.67],
+    ["12,5", "pl-PL", 12.5],
+    [".5", "en-US", 0.5],
+    [",5", "fr-FR", 0.5],
+  ])("parses %s in %s", (raw, locale, expected) => {
+    expect(parseLocaleQuantity(raw, locale)).toBe(expected);
+  });
+
+  it.each([
+    ["3/8", "en-US", 0.375],
+    ["3 ⁄ 8", "de-DE", 0.375],
+    ["1 1/2", "en-US", 1.5],
+    ["-1 1/2", "pl-PL", -1.5],
+    ["1,234 1/2", "en-US", 1234.5],
+    ["1.234 1/2", "de-DE", 1234.5],
+    ["12 345 1/2", "pl-PL", 12345.5],
+    ["12\u202f345 1/2", "fr-FR", 12345.5],
+    ["½", "fr-FR", 0.5],
+    ["1½", "en-US", 1.5],
+    ["-2 ⅝", "de-DE", -2.625],
+    ["7/4", "en-US", 1.75],
+  ])("parses fractional quantity %s in %s", (raw, locale, expected) => {
+    expect(parseLocaleQuantity(raw, locale)).toBe(expected);
+  });
+
+  it.each([
+    "1/0",
+    "1 2/2",
+    "1 3/2",
+    "1/2/3",
+    "1.5 1/2",
+    "1e3",
+    "NaN",
+    "Infinity",
+    "",
+  ])("rejects unsafe or malformed quantity %s", (raw) => {
+    expect(parseLocaleQuantity(raw, "en-US")).toBeUndefined();
+  });
+
+  it("keeps locale separator rules strict for decimal input", () => {
+    expect(parseLocaleQuantity("1,2", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity("1.2", "de-DE")).toBeUndefined();
+    expect(parseLocaleQuantity("1,23,4", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity("1 234.5", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity("1.234,5", "pl-PL")).toBeUndefined();
+  });
+});
+
+describe("safe arithmetic expressions in quantity input", () => {
+  it.each([
+    ["(12*4)+6.5", "en-US", 54.5],
+    ["10÷4", "en-US", 2.5],
+    ["12 / 4", "en-US", 3],
+    ["2 × 3 + 4", "en-US", 10],
+    ["-3+5", "en-US", 2],
+    ["-(3+4)", "en-US", -7],
+    ["5 * -2", "en-US", -10],
+    ["20/(2+3)", "en-US", 4],
+    ["(1,5+2,5)", "de-DE", 4],
+    ["(12+4)*6.5", "en-US", 104],
+    ["1-2", "en-US", -1],
+    ["5 - 3", "en-US", 2],
+    ["1+.5", "en-US", 1.5],
+    [",5+1", "fr-FR", 1.5],
+    ["1+1,25", "de-DE", 2.25],
+  ])("parses expression %s in %s", (raw, locale, expected) => {
+    expect(parseLocaleQuantity(raw, locale)).toBe(expected);
+  });
+
+  it.each([
+    ["1 + 1/0", "en-US"],
+    ["10/0 + 2", "en-US"],
+    ["(2)(3)", "en-US"],
+    ["2(3)", "en-US"],
+    ["2 3", "en-US"],
+    ["5 +", "en-US"],
+    ["()", "en-US"],
+    ["(1,5+2,5)", "en-US"],
+    ["1e3+1", "en-US"],
+    ["1 + 5 5", "en-US"],
+    ["*5", "en-US"],
+    ["5 + (3", "en-US"],
+    ["1,234+1", "en-US"],
+    ["5.5+1,2", "en-US"],
+  ])("rejects unsafe or malformed expression %s in %s", (raw, locale) => {
+    expect(parseLocaleQuantity(raw, locale)).toBeUndefined();
+  });
+
+  it("keeps standalone fractions, mixed and vulgar input on the fraction path", () => {
+    expect(parseLocaleQuantity("3/8", "en-US")).toBe(0.375);
+    expect(parseLocaleQuantity("1 1/2", "en-US")).toBe(1.5);
+    expect(parseLocaleQuantity("1½", "en-US")).toBe(1.5);
+    expect(parseLocaleQuantity("-2 ⅝", "de-DE")).toBe(-2.625);
+  });
+
+  it("treats a binary minus after a fraction-like operand as arithmetic", () => {
+    expect(parseLocaleQuantity("1 -1/2", "en-US")).toBe(0.5);
+  });
+
+  it("keeps standalone locale grouping on the number path", () => {
+    expect(parseLocaleQuantity("1,234.56", "en-US")).toBe(1234.56);
+    expect(parseLocaleQuantity("1.234,56", "de-DE")).toBe(1234.56);
+    expect(parseLocaleQuantity("12 345,67", "pl-PL")).toBe(12345.67);
+    expect(parseLocaleQuantity("12\u202f345,67", "fr-FR")).toBe(12345.67);
+  });
+});

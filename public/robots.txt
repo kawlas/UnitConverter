@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://qconverter.netlify.app/sitemap.xml

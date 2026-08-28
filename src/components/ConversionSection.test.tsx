@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { buildPlaybackUrl, parseStoredFavorites, parseStoredHistory, parseStrict } from "./ConversionSection";
+import {
+  buildPlaybackUrl,
+  formatFavoriteId,
+  formatHistoryEntry,
+  parseStoredFavorites,
+  parseStoredHistory,
+  shouldPersistHistory,
+} from "./ConversionSection";
+import { parseLocaleQuantity } from "@/lib/number-input";
 
 describe("saved conversion playback URL", () => {
   it("includes the target category and complete history state", () => {
@@ -9,14 +17,38 @@ describe("saved conversion playback URL", () => {
       value: "12.5",
       precision: "4",
       locale: "pl-PL",
-    })).toBe("/convert/weight?from=kilogram&to=pound&value=12.5&precision=4&locale=pl-PL");
+    })).toBe("/weight?from=kilogram&to=pound&value=12.5&precision=4&locale=pl-PL");
   });
 
   it("includes the target category and favorite units", () => {
     expect(buildPlaybackUrl("temperature", {
       from: "celsius",
       to: "fahrenheit",
-    })).toBe("/convert/temperature?from=celsius&to=fahrenheit");
+    })).toBe("/temperature?from=celsius&to=fahrenheit");
+  });
+});
+
+describe("saved conversion presentation", () => {
+  it("uses catalog titles and symbols for recent conversions", () => {
+    expect(formatHistoryEntry({
+      categoryId: "weight",
+      fromUnit: "kilograms",
+      toUnit: "pounds",
+      input: "2",
+      result: "4.41",
+    })).toEqual({
+      categoryTitle: "Weight",
+      conversion: "2 kg → 4.41 lb",
+      accessibleLabel: "Open recent Weight conversion: 2 Kilograms to 4.41 Pounds",
+    });
+  });
+
+  it("turns favorite IDs into readable catalog labels", () => {
+    expect(formatFavoriteId("volume:us_cups:milliliters")).toEqual({
+      categoryTitle: "Volume",
+      conversion: "US Cups → Milliliters",
+      accessibleLabel: "Open favorite Volume conversion: US Cups to Milliliters",
+    });
   });
 });
 
@@ -37,7 +69,7 @@ describe("localStorage payload validation", () => {
     entries[1] = { ...validHistoryEntry(2), locale: "invalid" };
     entries.push({ ...validHistoryEntry(53), precision: 13 });
 
-    const parsed = parseStoredHistory(JSON.stringify(entries));
+    const parsed = parseStoredHistory(JSON.stringify(entries), 53);
 
     expect(parsed).toHaveLength(50);
     expect(parsed.every((entry) => entry.locale === "en-US" && entry.precision === 2)).toBe(true);
@@ -67,38 +99,83 @@ describe("localStorage payload validation", () => {
   });
 });
 
-describe("parseStrict locale grammar", () => {
+describe("locale quantity grammar", () => {
   it("rejects malformed separators in en-US", () => {
-    expect(parseStrict("1,2", "en-US")).toBeUndefined();
-    expect(parseStrict(",5", "en-US")).toBeUndefined();
-    expect(parseStrict("1,23", "en-US")).toBeUndefined();
-    expect(parseStrict("1,234,56.7", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity("1,2", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity(",5", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity("1,23", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity("1,234,56.7", "en-US")).toBeUndefined();
   });
 
   it("accepts valid en-US formats", () => {
-    expect(parseStrict("1,234.56", "en-US")).toBe(1234.56);
-    expect(parseStrict("1234.56", "en-US")).toBe(1234.56);
-    expect(parseStrict("1,234,567", "en-US")).toBe(1234567);
-    expect(parseStrict(".5", "en-US")).toBe(0.5);
-    expect(parseStrict("-1,234.5", "en-US")).toBe(-1234.5);
+    expect(parseLocaleQuantity("1,234.56", "en-US")).toBe(1234.56);
+    expect(parseLocaleQuantity("1234.56", "en-US")).toBe(1234.56);
+    expect(parseLocaleQuantity("1,234,567", "en-US")).toBe(1234567);
+    expect(parseLocaleQuantity(".5", "en-US")).toBe(0.5);
+    expect(parseLocaleQuantity("-1,234.5", "en-US")).toBe(-1234.5);
   });
 
   it("mirrors the grammar for comma-decimal locales (de-DE)", () => {
-    expect(parseStrict("1.234,56", "de-DE")).toBe(1234.56);
-    expect(parseStrict("1234,56", "de-DE")).toBe(1234.56);
-    expect(parseStrict("1,5", "de-DE")).toBe(1.5);
-    expect(parseStrict(",5", "de-DE")).toBe(0.5);
-    expect(parseStrict("1.2", "de-DE")).toBeUndefined();
-    expect(parseStrict("1.23", "de-DE")).toBeUndefined();
-    expect(parseStrict("1.2.345", "de-DE")).toBeUndefined();
+    expect(parseLocaleQuantity("1.234,56", "de-DE")).toBe(1234.56);
+    expect(parseLocaleQuantity("1234,56", "de-DE")).toBe(1234.56);
+    expect(parseLocaleQuantity("1,5", "de-DE")).toBe(1.5);
+    expect(parseLocaleQuantity(",5", "de-DE")).toBe(0.5);
+    expect(parseLocaleQuantity("1.2", "de-DE")).toBeUndefined();
+    expect(parseLocaleQuantity("1.23", "de-DE")).toBeUndefined();
+    expect(parseLocaleQuantity("1.2.345", "de-DE")).toBeUndefined();
   });
 
   it("keeps plain decimals working across locales and rejects garbage", () => {
-    expect(parseStrict("12.5", "en-US")).toBe(12.5);
-    expect(parseStrict("12,5", "pl-PL")).toBe(12.5);
-    expect(parseStrict("0", "fr-FR")).toBe(0);
-    expect(parseStrict("", "en-US")).toBeUndefined();
-    expect(parseStrict("abc", "en-US")).toBeUndefined();
-    expect(parseStrict("1e3", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity("12.5", "en-US")).toBe(12.5);
+    expect(parseLocaleQuantity("12,5", "pl-PL")).toBe(12.5);
+    expect(parseLocaleQuantity("0", "fr-FR")).toBe(0);
+    expect(parseLocaleQuantity("", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity("abc", "en-US")).toBeUndefined();
+    expect(parseLocaleQuantity("1e3", "en-US")).toBeUndefined();
+  });
+});
+
+describe("history persistence intent", () => {
+  const validConversion = {
+    input: "12",
+    result: "39.37",
+    parsedValue: 12,
+  };
+
+  it("does not persist the default conversion before a user interaction", () => {
+    expect(shouldPersistHistory({
+      ...validConversion,
+      input: "0",
+      result: "0",
+      parsedValue: 0,
+      intentVersion: 0,
+      persistedIntentVersion: 0,
+    })).toBe(false);
+  });
+
+  it("persists one valid conversion after a real conversion interaction", () => {
+    expect(shouldPersistHistory({
+      ...validConversion,
+      intentVersion: 1,
+      persistedIntentVersion: 0,
+    })).toBe(true);
+  });
+
+  it("does not persist the same intent again after precision or locale changes", () => {
+    expect(shouldPersistHistory({
+      ...validConversion,
+      intentVersion: 1,
+      persistedIntentVersion: 1,
+    })).toBe(false);
+  });
+
+  it("does not persist a reset that consumes the current interaction", () => {
+    expect(shouldPersistHistory({
+      input: "0",
+      result: "0",
+      parsedValue: 0,
+      intentVersion: 2,
+      persistedIntentVersion: 2,
+    })).toBe(false);
   });
 });

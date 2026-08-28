@@ -1,7 +1,7 @@
-import { categories, getCategory, getUnit } from "./conversion-data";
+import { categories, getCategory, getUnit, type UnitDefinition } from "./conversion-data";
 
 export class ConversionError extends Error {
-  readonly code: "INVALID_VALUE" | "UNKNOWN_CATEGORY" | "UNKNOWN_UNIT" | "UNSUPPORTED_CONVERSION" | "INVALID_RESULT";
+  readonly code: "INVALID_VALUE" | "OUT_OF_DOMAIN" | "UNKNOWN_CATEGORY" | "UNKNOWN_UNIT" | "UNSUPPORTED_CONVERSION" | "INVALID_RESULT";
 
   constructor(code: ConversionError["code"], message: string) {
     super(message);
@@ -37,6 +37,11 @@ export const convertExact = (
   if (category.converter === "calculator") {
     throw new ConversionError("UNSUPPORTED_CONVERSION", `${category.title} is a calculator, not a unit conversion.`);
   }
+  const domainError = category.validateInput?.(value, from.value, to.value);
+  if (domainError) {
+    throw new ConversionError("OUT_OF_DOMAIN", domainError);
+  }
+  if (from.value === to.value) return value;
 
   let result: number;
   if (category.converter === "custom") {
@@ -56,6 +61,35 @@ export const convertExact = (
     throw new ConversionError("INVALID_RESULT", "The conversion result is outside the supported range.");
   }
   return result;
+};
+
+export interface UnitConversionResult {
+  readonly unit: UnitDefinition;
+  readonly value: number;
+}
+
+/** Converts one quantity to every unit in its catalog category without formatting. */
+export const convertAllExact = (
+  value: number,
+  fromUnit: string,
+  categoryId: string,
+): readonly UnitConversionResult[] => {
+  assertFinite(value);
+  const category = getCategory(categoryId);
+  if (!category) {
+    throw new ConversionError("UNKNOWN_CATEGORY", `Unknown category: ${categoryId}`);
+  }
+  if (category.converter === "calculator") {
+    throw new ConversionError("UNSUPPORTED_CONVERSION", `${category.title} is a calculator, not a unit conversion.`);
+  }
+  if (!getUnit(category, fromUnit)) {
+    throw new ConversionError("UNKNOWN_UNIT", "Select a supported source unit.");
+  }
+
+  return category.units.map((unit) => ({
+    unit,
+    value: convertExact(value, fromUnit, unit.value, categoryId),
+  }));
 };
 
 /** Backwards-compatible API. It validates strictly and rounds for legacy callers. */
