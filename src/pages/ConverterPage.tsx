@@ -180,30 +180,17 @@ export default function ConverterPage() {
           <div>
             <header className="mb-3 sm:mb-4">
               <nav aria-label="Breadcrumb">
-                <ol className="flex min-h-11 flex-wrap items-center gap-1.5 text-xs font-semibold text-slate-500 sm:text-sm">
+                <ol className="flex min-h-11 flex-wrap items-center gap-1.5 text-xs font-semibold text-slate-600 sm:text-sm">
                   <li>
                     <Link
-                      to="/"
+                      to={pair ? `/${category.id}` : "/"}
                       className="inline-flex min-h-11 items-center gap-1.5 rounded-md transition-colors duration-150 hover:text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
                       <ArrowLeft aria-hidden="true" className="h-3.5 w-3.5" />
-                      Converters
+                      {pair ? `All ${category.title} conversions` : "Converters"}
                     </Link>
                   </li>
                   <li aria-hidden="true" className="text-slate-300">/</li>
-                  {pair && (
-                    <>
-                      <li>
-                        <Link
-                          to={`/${category.id}`}
-                          className="inline-flex min-h-11 items-center rounded-md transition-colors duration-150 hover:text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                        >
-                          {category.title}
-                        </Link>
-                      </li>
-                      <li aria-hidden="true" className="text-slate-300">/</li>
-                    </>
-                  )}
                   <li aria-current="page" className="min-w-0 truncate text-slate-700">
                     {pair && fromUnit && toUnit
                       ? `${fromUnit.label} to ${toUnit.label}`

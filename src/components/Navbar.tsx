@@ -80,7 +80,7 @@ export default function Navbar() {
             className="flex min-h-12 min-w-12 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 md:min-w-0 md:px-3"
             aria-expanded={isMenuOpen}
             aria-controls="mobile-navigation"
-            aria-label={isMenuOpen ? "Close all categories" : "Open all categories"}
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
             {isMenuOpen ? <X aria-hidden="true" className="h-5 w-5 md:h-4 md:w-4" /> : <Menu aria-hidden="true" className="h-5 w-5 md:hidden" />}
             <span className="hidden md:inline">All categories</span>
