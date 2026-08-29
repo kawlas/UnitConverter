@@ -113,7 +113,7 @@ const compoundFeetInchesPattern = new RegExp(
   "i",
 );
 const metricHeightPattern = new RegExp(
-  `^(?:${queryCommand}\\s+|(?:ile\\s+(?:to|jest))\\s+)?(${decimalToken})\\s*(cm|centimeters?|centimetres?|m|meters?|metres?)\\s+${queryConnector}\\s+(?:feet|foot|ft)(?:\\s*(?:and|\\+|plus)\\s*(?:inches|inch|in))?\\s*\\??$`,
+  `^(?:${queryCommand}\\s+|(?:ile\\s+(?:to|jest))\\s+)?(${decimalToken})\\s*(cm|centimeters?|centimetres?|m|meters?|metres?)\\s+${queryConnector}\\s+(?:feet|foot|ft)\\s*(?:and|\\+|plus)\\s*(?:inches|inch|in)\\s*\\??$`,
   "i",
 );
 

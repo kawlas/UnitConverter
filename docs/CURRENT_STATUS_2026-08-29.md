@@ -15,11 +15,11 @@ Make Q Converter the fastest trustworthy answer to everyday conversion questions
 - Responsive primary controls, keyboard navigation, copy/share actions, URL-restored state, local history/favorites, privacy-gated analytics, prerendered HTML, crawler files and an offline-capable PWA.
 - Advertising components are layout-stable placeholders only; real ads require an approved publisher account, consent configuration and performance review.
 
-## Branch and review state
+## Release and review state
 
-- Release-candidate work is staged through review branches and must be merged in dependency order only after explicit approval.
-- The current height work lives on `feat/height-converter-20260829` and is based on the home instant-answer branch.
-- GitHub CLI authentication returned `401 Bad credentials` during this update, so open-PR state could not be refreshed from GitHub. Local Git history remains intact; no merge or deployment was performed.
+- The release candidate was staged and reviewed as a linear stack: growth foundation, home instant-answer UX, then the height calculator.
+- The user explicitly approved the merge on 2026-08-29. The stack is merged in dependency order only after local checks and required GitHub checks pass.
+- An invalid `GITHUB_TOKEN` environment override initially caused a `401`; the secret was never printed, and GitHub access was restored by using the authenticated keyring session.
 
 ## What is completed in this branch
 
