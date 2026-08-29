@@ -40,15 +40,25 @@ for (const path of canonicalPaths) {
   expect(!body.includes("Loading..."), `${label} contains resolved content`);
 }
 
-const redirectChecks = [
-  ["/convert/length?value=12", "/length?value=12"],
-  ["/length/?value=12", "/length?value=12"],
-];
+const redirectChecks = [["/convert/length?value=12", "/length?value=12"]];
 for (const [source, target] of redirectChecks) {
   const { response } = await request(source, { redirect: "manual" });
   expect(response.status === 301, `${source} returns 301`);
   const location = response.headers.get("location");
   expect(Boolean(location) && new URL(location, baseUrl).pathname + new URL(location, baseUrl).search === target, `${source} redirects to ${target}`);
+}
+
+const trailingSlashChecks = [
+  ["/length/?value=12", "/length"],
+  ["/length/meters-to-feet/?value=2", "/length/meters-to-feet"],
+];
+for (const [source, canonicalPath] of trailingSlashChecks) {
+  const { response, body } = await request(source, { redirect: "manual" });
+  expect(response.status === 200, `${source} returns 200 without a redirect loop`);
+  expect(
+    body.includes(`href="${new URL(canonicalPath, canonicalOrigin).href}"`),
+    `${source} advertises ${canonicalPath} as canonical`,
+  );
 }
 
 const missing = await request("/__deployment-verifier-missing-route__");

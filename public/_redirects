@@ -1,62 +1,34 @@
 # Preserve query parameters while consolidating the legacy route shape.
 /convert/:categoryId /:categoryId 301!
 
-# Collapse trailing slashes onto the no-slash canonical paths.
-/grams-to-cups/ /grams-to-cups 301!
-/bmi/ /bmi 301!
-/power/ /power 301!
-/energy/ /energy 301!
-/speed/ /speed 301!
-/length/ /length 301!
-/weight/ /weight 301!
-/temperature/ /temperature 301!
-/volume/ /volume 301!
-/area/ /area 301!
-/pressure/ /pressure 301!
-/digital/ /digital 301!
-/time/ /time 301!
-/angle/ /angle 301!
-/fuel/ /fuel 301!
-/pace/ /pace 301!
-/length/millimeters-to-inches/ /length/millimeters-to-inches 301!
-/length/inches-to-centimeters/ /length/inches-to-centimeters 301!
-/length/inches-to-feet/ /length/inches-to-feet 301!
-/volume/milliliters-to-us-fluid-ounces/ /volume/milliliters-to-us-fluid-ounces 301!
-/length/meters-to-feet/ /length/meters-to-feet 301!
-/length/kilometers-to-miles/ /length/kilometers-to-miles 301!
-/length/centimeters-to-inches/ /length/centimeters-to-inches 301!
-/weight/kilograms-to-pounds/ /weight/kilograms-to-pounds 301!
-/weight/pounds-to-kilograms/ /weight/pounds-to-kilograms 301!
-/temperature/celsius-to-fahrenheit/ /temperature/celsius-to-fahrenheit 301!
-/temperature/fahrenheit-to-celsius/ /temperature/fahrenheit-to-celsius 301!
-/volume/liters-to-gallons/ /volume/liters-to-gallons 301!
-
-# Serve each canonical clean URL from its prerendered document.
-/grams-to-cups /grams-to-cups/index.html 200
-/bmi /bmi/index.html 200
-/power /power/index.html 200
-/energy /energy/index.html 200
-/speed /speed/index.html 200
-/length /length/index.html 200
-/weight /weight/index.html 200
-/temperature /temperature/index.html 200
-/volume /volume/index.html 200
-/area /area/index.html 200
-/pressure /pressure/index.html 200
-/digital /digital/index.html 200
-/time /time/index.html 200
-/angle /angle/index.html 200
-/fuel /fuel/index.html 200
-/pace /pace/index.html 200
-/length/millimeters-to-inches /length/millimeters-to-inches/index.html 200
-/length/inches-to-centimeters /length/inches-to-centimeters/index.html 200
-/length/inches-to-feet /length/inches-to-feet/index.html 200
-/volume/milliliters-to-us-fluid-ounces /volume/milliliters-to-us-fluid-ounces/index.html 200
-/length/meters-to-feet /length/meters-to-feet/index.html 200
-/length/kilometers-to-miles /length/kilometers-to-miles/index.html 200
-/length/centimeters-to-inches /length/centimeters-to-inches/index.html 200
-/weight/kilograms-to-pounds /weight/kilograms-to-pounds/index.html 200
-/weight/pounds-to-kilograms /weight/pounds-to-kilograms/index.html 200
-/temperature/celsius-to-fahrenheit /temperature/celsius-to-fahrenheit/index.html 200
-/temperature/fahrenheit-to-celsius /temperature/fahrenheit-to-celsius/index.html 200
-/volume/liters-to-gallons /volume/liters-to-gallons/index.html 200
+# Serve each clean URL (with or without a trailing slash) from its prerendered
+# document. Netlify normalizes trailing slashes before matching redirect rules,
+# so a slash-removal 301 would redirect the normalized path to itself.
+/grams-to-cups /grams-to-cups/index.html 200!
+/bmi /bmi/index.html 200!
+/power /power/index.html 200!
+/energy /energy/index.html 200!
+/speed /speed/index.html 200!
+/length /length/index.html 200!
+/weight /weight/index.html 200!
+/temperature /temperature/index.html 200!
+/volume /volume/index.html 200!
+/area /area/index.html 200!
+/pressure /pressure/index.html 200!
+/digital /digital/index.html 200!
+/time /time/index.html 200!
+/angle /angle/index.html 200!
+/fuel /fuel/index.html 200!
+/pace /pace/index.html 200!
+/length/millimeters-to-inches /length/millimeters-to-inches/index.html 200!
+/length/inches-to-centimeters /length/inches-to-centimeters/index.html 200!
+/length/inches-to-feet /length/inches-to-feet/index.html 200!
+/volume/milliliters-to-us-fluid-ounces /volume/milliliters-to-us-fluid-ounces/index.html 200!
+/length/meters-to-feet /length/meters-to-feet/index.html 200!
+/length/kilometers-to-miles /length/kilometers-to-miles/index.html 200!
+/length/centimeters-to-inches /length/centimeters-to-inches/index.html 200!
+/weight/kilograms-to-pounds /weight/kilograms-to-pounds/index.html 200!
+/weight/pounds-to-kilograms /weight/pounds-to-kilograms/index.html 200!
+/temperature/celsius-to-fahrenheit /temperature/celsius-to-fahrenheit/index.html 200!
+/temperature/fahrenheit-to-celsius /temperature/fahrenheit-to-celsius/index.html 200!
+/volume/liters-to-gallons /volume/liters-to-gallons/index.html 200!

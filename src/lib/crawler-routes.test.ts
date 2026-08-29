@@ -48,15 +48,14 @@ describe("crawler and route contracts", () => {
     expect(redirectLines[0]).toBe(
       "/convert/:categoryId /:categoryId 301!",
     );
-    const categoryPaths = categoryDefinitions.map(({ id }) => `/${id}`);
-    const pairPaths = pairPages.map(pairPagePath);
-    const trailingSlashPaths = [...categoryPaths, ...pairPaths];
-    expect(redirectLines.slice(1, 1 + trailingSlashPaths.length)).toEqual(
-      trailingSlashPaths.map((path) => `${path}/ ${path} 301!`),
+    const prerenderedPaths = [
+      ...categoryDefinitions.map(({ id }) => `/${id}`),
+      ...pairPages.map(pairPagePath),
+    ];
+    expect(redirectLines.slice(1)).toEqual(
+      prerenderedPaths.map((path) => `${path} ${path}/index.html 200!`),
     );
-    expect(redirectLines.slice(1 + trailingSlashPaths.length)).toEqual(
-      trailingSlashPaths.map((path) => `${path} ${path}/index.html 200`),
-    );
+    expect(redirectLines.some((line) => /\/\s+\/.*301!$/.test(line))).toBe(false);
     expect(redirectLines.some((line) => line.startsWith("/* "))).toBe(false);
   });
 
