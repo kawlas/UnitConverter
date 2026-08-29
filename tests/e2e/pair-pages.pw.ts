@@ -76,14 +76,16 @@ test("pair query state hydrates cleanly", async ({ page }) => {
   expect(hydrationErrors).toEqual([]);
 });
 
-test("pair routes preserve real 404s and canonical trailing-slash redirects", async ({ request }) => {
+test("pair routes preserve real 404s and canonical trailing-slash documents", async ({ request }) => {
   const unknown = await request.get("/length/meters-to-missing", { maxRedirects: 0 });
   expect(unknown.status()).toBe(404);
   expect(await unknown.text()).toContain('name="robots" content="noindex, follow"');
 
   const trailing = await request.get("/length/meters-to-feet/?value=2", { maxRedirects: 0 });
-  expect(trailing.status()).toBe(301);
-  expect(trailing.headers().location).toBe("/length/meters-to-feet?value=2");
+  expect(trailing.status()).toBe(200);
+  expect(await trailing.text()).toContain(
+    'rel="canonical" href="https://qconverter.netlify.app/length/meters-to-feet"',
+  );
 });
 
 test("pair page remains accessible without horizontal overflow at 320px", async ({ page }) => {

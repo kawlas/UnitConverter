@@ -41,15 +41,6 @@ createServer(async (request, response) => {
     return;
   }
 
-  if (url.pathname.length > 1 && url.pathname.endsWith("/")) {
-    const canonicalPath = url.pathname.slice(0, -1);
-    if (await resolvePublicFile(canonicalPath)) {
-      response.writeHead(301, { location: `${canonicalPath}${url.search}` });
-      response.end();
-      return;
-    }
-  }
-
   const publicFile = await resolvePublicFile(decodeURIComponent(url.pathname));
   const outputFile = publicFile ?? join(distDirectory, "404.html");
   response.writeHead(publicFile ? 200 : 404, {

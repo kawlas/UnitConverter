@@ -128,11 +128,13 @@ test("convert alias is a real permanent redirect that preserves query state", as
   expect(response.headers().location).toBe("/length?value=12");
 });
 
-test("trailing slash redirects to the no-slash canonical URL", async ({ request }) => {
+test("trailing slash serves the same no-slash canonical document", async ({ request }) => {
   const response = await request.get("/length/?value=12", { maxRedirects: 0 });
 
-  expect(response.status()).toBe(301);
-  expect(response.headers().location).toBe("/length?value=12");
+  expect(response.status()).toBe(200);
+  expect(await response.text()).toContain(
+    'rel="canonical" href="https://qconverter.netlify.app/length"',
+  );
 });
 
 test("saved conversion controls are available", async ({ page }) => {
