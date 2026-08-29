@@ -127,6 +127,47 @@ test("analytics preferences can be reopened and consent revoked", async ({ page 
   expect(await page.evaluate(() => window["ga-disable-G-DW273J3JPK"])).toBe(true);
 });
 
+test("search funnel reports only the selected tool category", async ({ page }) => {
+  await page.route("https://www.googletagmanager.com/**", (route) =>
+    route.fulfill({ status: 200, contentType: "application/javascript", body: "" }),
+  );
+  await page.goto("/", { waitUntil: "networkidle" });
+  await requireAnalyticsUi(page);
+  await page.getByRole("button", { name: "Allow optional analytics" }).click();
+
+  const search = page.getByRole("combobox", {
+    name: "Search categories, units, or type a conversion",
+  });
+  await search.fill("5 ft to cm");
+  await search.press("Enter");
+  await expect(page).toHaveURL(/\/length\?from=feet&to=centimeters&value=5$/);
+
+  const smartEvent = await page.evaluate(() =>
+    (window.dataLayer ?? [])
+      .map((entry) => Array.from(entry))
+      .find((entry) => entry[0] === "event" && entry[1] === "smart_query_opened"),
+  );
+  expect(smartEvent).toEqual(["event", "smart_query_opened", { tool_category: "length" }]);
+  expect(JSON.stringify(smartEvent)).not.toContain("5 ft to cm");
+  expect(JSON.stringify(smartEvent)).not.toContain("value=5");
+
+  await page.goto("/");
+  await page.getByRole("combobox", {
+    name: "Search categories, units, or type a conversion",
+  }).fill("weight");
+  await page.getByRole("combobox", {
+    name: "Search categories, units, or type a conversion",
+  }).press("Enter");
+  await expect(page).toHaveURL(/\/weight$/);
+
+  const categoryEvent = await page.evaluate(() =>
+    (window.dataLayer ?? [])
+      .map((entry) => Array.from(entry))
+      .find((entry) => entry[0] === "event" && entry[1] === "category_search_opened"),
+  );
+  expect(categoryEvent).toEqual(["event", "category_search_opened", { tool_category: "weight" }]);
+});
+
 test("privacy choices are accessible without overflowing at 320px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/", { waitUntil: "domcontentloaded" });

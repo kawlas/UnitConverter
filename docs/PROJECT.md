@@ -94,8 +94,10 @@ setting before every environment enables the flag; the repository cannot enforce
 property-side setting.
 After opt-in, bounded product events measure completed conversions, result/link copying,
 native sharing, favorite changes, saved-conversion playback, saved-data clearing and batch
-copying. Event payloads contain only an allowlisted event name and a validated category ID;
-they never include entered values, unit selections, result text or URL query parameters.
+copying. They also distinguish a successful instant conversion query from a successful
+single-category search selection. Event payloads contain only an allowlisted event name and
+a validated category ID; they never include search text, entered values, unit selections,
+result text or URL query parameters.
 
 ## Design direction and constraints
 
