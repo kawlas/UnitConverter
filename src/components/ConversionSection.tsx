@@ -454,48 +454,122 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
 
   return (
     <div className="min-w-0 space-y-6">
-      <h2 className="font-medium text-lg">{title}</h2>
-      <div className="grid items-center gap-4 sm:grid-cols-[minmax(70px,120px)_minmax(0,1fr)]">
-        <label htmlFor={`${categoryId}-from-value`} className="text-sm font-medium">From</label>
-        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
-          <Input id={`${categoryId}-from-value`} type="text" inputMode="text" value={fromValue} onChange={(e) => setValue(e.target.value)} className="min-h-11 w-full sm:w-[120px]" placeholder="0" autoCapitalize="off" spellCheck={false} maxLength={120} aria-invalid={Boolean(resultState.error)} aria-describedby={`${categoryId}-fraction-hint${resultState.error ? ` ${categoryId}-conversion-error` : ""}`} />
-          <select
-            aria-label="Source unit"
-            value={fromUnit}
-            onChange={(event) => setFrom(event.target.value)}
-            className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-1 sm:w-[170px]"
-          >
-            {units.map((unit) => <option key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</option>)}
-          </select>
+      <section aria-labelledby={`${categoryId}-conversion-workspace-heading`} className="min-w-0 rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-[0_18px_50px_rgba(11,16,32,0.08)] sm:p-6 lg:p-8">
+        <h2 id={`${categoryId}-conversion-workspace-heading`} className="sr-only">{title} conversion workspace</h2>
+
+        <div className="grid min-w-0 items-center gap-4 md:grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)] md:gap-5">
+          <div className="min-w-0">
+            <label htmlFor={`${categoryId}-from-value`} className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">From</label>
+            <Input
+              id={`${categoryId}-from-value`}
+              type="text"
+              inputMode="text"
+              value={fromValue}
+              onChange={(event) => setValue(event.target.value)}
+              className="h-[72px] min-h-[72px] w-full rounded-2xl border-2 border-indigo-500 bg-indigo-50 px-4 text-[clamp(2.75rem,6vw,4.5rem)] font-bold tracking-[-0.045em] text-indigo-950 shadow-inner outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/25 sm:px-5"
+              placeholder="0"
+              autoCapitalize="off"
+              spellCheck={false}
+              maxLength={120}
+              aria-invalid={Boolean(resultState.error)}
+              aria-describedby={`${categoryId}-fraction-hint${resultState.error ? ` ${categoryId}-conversion-error` : ""}`}
+            />
+            <div className="relative mt-3">
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-indigo-600">▾</span>
+              <select
+                aria-label="Source unit"
+                value={fromUnit}
+                onChange={(event) => setFrom(event.target.value)}
+                className="min-h-12 w-full appearance-none rounded-xl border border-indigo-200 bg-white px-4 py-3 pr-10 text-base font-semibold text-indigo-950 shadow-sm outline-none transition-colors hover:border-indigo-400 hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2"
+              >
+                {units.map((unit) => <option key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center md:pt-7">
+            <Button
+              type="button"
+              onClick={swap}
+              aria-label="Swap units"
+              className="h-14 min-h-14 w-14 min-w-14 rounded-full bg-indigo-600 p-0 text-white shadow-lg shadow-indigo-600/25 transition-colors hover:bg-indigo-700 focus-visible:ring-4 focus-visible:ring-indigo-500/30 md:h-16 md:min-h-16 md:w-16 md:min-w-16"
+            >
+              <ArrowUpDown aria-hidden="true" className="h-6 w-6 md:rotate-90" />
+            </Button>
+          </div>
+
+          <div className="min-w-0">
+            <label htmlFor={`${categoryId}-result`} className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">To</label>
+            <div className="relative min-w-0">
+              <Input
+                id={`${categoryId}-result`}
+                type="text"
+                value={resultState.result}
+                readOnly
+                className="h-[72px] min-h-[72px] w-full rounded-2xl border-2 border-teal-600 bg-teal-50/80 px-4 pr-16 text-[clamp(2.75rem,6vw,4.5rem)] font-bold tracking-[-0.045em] text-teal-950 shadow-inner sm:px-5 sm:pr-28"
+                aria-live="polite"
+                aria-atomic="true"
+                aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                className="absolute right-2 top-1/2 h-12 min-h-12 min-w-12 -translate-y-1/2 rounded-xl border-teal-200 bg-white px-3 font-semibold text-teal-800 shadow-sm transition-colors hover:bg-teal-700 hover:text-white focus-visible:ring-2 focus-visible:ring-teal-700 sm:px-4"
+                onClick={() => void copyResult()}
+                disabled={!resultState.result}
+                aria-label="Copy result"
+              >
+                <ClipboardCopy aria-hidden="true" className="h-5 w-5 sm:mr-2" />
+                <span className="hidden sm:inline">Copy</span>
+              </Button>
+            </div>
+            <div className="relative mt-3">
+              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-teal-700">▾</span>
+              <select
+                aria-label="Target unit"
+                value={toUnit}
+                onChange={(event) => setTo(event.target.value)}
+                className="min-h-12 w-full appearance-none rounded-xl border border-teal-200 bg-white px-4 py-3 pr-10 text-base font-semibold text-teal-950 shadow-sm outline-none transition-colors hover:border-teal-500 hover:bg-teal-50 focus-visible:ring-2 focus-visible:ring-teal-700 focus-visible:ring-offset-2"
+              >
+                {units.map((unit) => <option key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</option>)}
+              </select>
+            </div>
+          </div>
         </div>
-        <label htmlFor={`${categoryId}-result`} className="text-sm font-medium">To</label>
-        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
-          <Input id={`${categoryId}-result`} type="text" value={resultState.result} readOnly className="min-h-11 w-full sm:w-[120px]" aria-live="polite" aria-describedby={resultState.error ? `${categoryId}-conversion-error` : undefined} />
-          <select
-            aria-label="Target unit"
-            value={toUnit}
-            onChange={(event) => setTo(event.target.value)}
-            className="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-1 sm:w-[170px]"
-          >
-            {units.map((unit) => <option key={unit.value} value={unit.value}>{unit.label} ({unit.symbol ?? unit.value})</option>)}
-          </select>
-          <Button type="button" variant="outline" className="min-h-11 w-full shrink-0 sm:w-auto" onClick={() => void copyResult()} disabled={!resultState.result}>
-            <ClipboardCopy aria-hidden="true" className="mr-2 h-4 w-4" /> Copy result
-          </Button>
+
+        <p id={`${categoryId}-fraction-hint`} className="mt-4 text-xs leading-5 text-slate-500">Enter a decimal, fraction or quick calculation — for example {locale === "en-US" ? "12.5, 3/8 or (12*4)+6.5" : "12,5, 3/8 or (1,5+2,5)"}.</p>
+        {resultState.error && <p id={`${categoryId}-conversion-error`} className="mt-2 text-sm font-medium text-red-700" role="alert">{resultState.error}</p>}
+
+        <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-end">
+            <label className="text-xs font-semibold text-slate-600">
+              <span className="mb-1 block">Precision</span>
+              <select aria-label="Decimal precision" value={precision} onChange={(event) => { const next = Number(event.target.value); setPrecision(next); updateUrl({ precision: String(next) }); }} className="min-h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-800 outline-none hover:border-indigo-300 hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-600 sm:w-auto">{Array.from({ length: 13 }, (_, index) => <option key={index} value={index}>{index} decimals</option>)}</select>
+            </label>
+            <label className="text-xs font-semibold text-slate-600">
+              <span className="mb-1 block">Locale</span>
+              <select aria-label="Number locale" value={locale} onChange={(event) => { setLocale(event.target.value); updateUrl({ locale: event.target.value }); }} className="min-h-12 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-800 outline-none hover:border-indigo-300 hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-600 sm:w-auto">{LOCALES.map((item) => <option key={item} value={item}>{item}</option>)}</select>
+            </label>
+            <Button type="button" variant="outline" className="min-h-12 border-slate-200 bg-slate-50 px-3 text-slate-700 hover:bg-white" onClick={resetToDefaults}>
+              <RotateCcw aria-hidden="true" className="mr-2 h-4 w-4" /> Reset
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+            <Button type="button" variant="outline" className="min-h-12 border-indigo-100 bg-indigo-50 px-3 text-indigo-700 hover:bg-indigo-600 hover:text-white" onClick={() => void copyShareUrl()} aria-label="Copy share URL">
+              <Link2 aria-hidden="true" className="h-4 w-4 sm:mr-2" /><span className="hidden sm:inline">Link</span>
+            </Button>
+            <Button type="button" variant="outline" className="min-h-12 border-indigo-100 bg-indigo-50 px-3 text-indigo-700 hover:bg-indigo-600 hover:text-white" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}>
+              <Share2 aria-hidden="true" className="h-4 w-4 sm:mr-2" /><span className="hidden sm:inline">Share</span>
+            </Button>
+            <Button type="button" variant="outline" className="min-h-12 border-teal-100 bg-teal-50 px-3 text-teal-800 hover:bg-teal-700 hover:text-white" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}>
+              <Star aria-hidden="true" className={`h-4 w-4 sm:mr-2 ${isFavorite ? "fill-current" : ""}`} /><span className="hidden sm:inline">{isFavorite ? "Saved" : "Save"}</span>
+            </Button>
+          </div>
         </div>
-      </div>
-      <p id={`${categoryId}-fraction-hint`} className="text-xs leading-5 text-slate-500">Decimals and fractions supported: {locale === "en-US" ? "12.5" : "12,5"}, 3/8, 1 1/2 or ½. Simple arithmetic like {locale === "en-US" ? "(12*4)+6.5" : "(1,5+2,5)"} also works.</p>
-      {resultState.error && <p id={`${categoryId}-conversion-error`} className="text-sm text-red-700" role="alert">{resultState.error}</p>}
-      <div className="flex flex-wrap justify-end gap-2">
-        <label className="text-sm flex items-center gap-1">Precision<select aria-label="Decimal precision" value={precision} onChange={(e) => { const next = Number(e.target.value); setPrecision(next); updateUrl({ precision: String(next) }); }} className="min-h-11 border rounded px-2 py-1">{Array.from({ length: 13 }, (_, index) => <option key={index} value={index}>{index}</option>)}</select></label>
-        <label className="text-sm flex items-center gap-1">Locale<select aria-label="Number locale" value={locale} onChange={(e) => { setLocale(e.target.value); updateUrl({ locale: e.target.value }); }} className="min-h-11 border rounded px-2 py-1">{LOCALES.map((item) => <option key={item} value={item}>{item}</option>)}</select></label>
-        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={swap} aria-label="Swap units"><ArrowUpDown className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={resetToDefaults} aria-label="Reset category"><RotateCcw className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={() => void copyShareUrl()} aria-label="Copy share URL"><Link2 className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={share} aria-label="Share conversion" disabled={isSharing} aria-busy={isSharing}><Share2 className="h-4 w-4" /></Button>
-        <Button variant="ghost" size="icon" className="min-h-11 min-w-11" onClick={toggleFavorite} aria-label="Toggle favorite" aria-pressed={isFavorite}><Star className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} /></Button>
-      </div>
-      <p className="min-h-5 text-sm text-slate-500" role="status" aria-live="polite" aria-atomic="true">{status}</p>
+        <p className="mt-3 min-h-5 text-sm text-slate-500" role="status" aria-live="polite" aria-atomic="true">{status}</p>
+      </section>
+
       <BatchConversion
         categoryId={categoryId}
         fromUnit={fromUnit}
@@ -507,7 +581,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
       />
       {(history.length > 0 || favoriteIds.length > 0) && (
         <details className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_4px_18px_rgba(15,23,42,0.04)] sm:p-5">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-lg font-semibold text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-lg font-semibold text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
             <span>Saved conversions</span>
             <span className="flex items-center gap-2 text-xs font-medium text-slate-500">
               {history.length + favoriteIds.length} saved
@@ -523,7 +597,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                     const presentation = formatHistoryEntry(entry);
                     return (
                       <li key={`${entry.timestamp}-${entry.input}`}>
-                        <button type="button" aria-label={presentation.accessibleLabel} className="flex min-h-11 w-full min-w-0 flex-col items-start justify-center rounded-xl border border-slate-200 px-3 py-2 text-left transition-colors hover:border-indigo-200 hover:bg-indigo-50/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onClick={() => playSavedConversion(entry.categoryId, { from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale })}>
+                        <button type="button" aria-label={presentation.accessibleLabel} className="flex min-h-12 w-full min-w-0 flex-col items-start justify-center rounded-xl border border-slate-200 px-3 py-2 text-left transition-colors hover:border-indigo-200 hover:bg-indigo-50/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onClick={() => playSavedConversion(entry.categoryId, { from: entry.fromUnit, to: entry.toUnit, value: entry.input, precision: String(entry.precision), locale: entry.locale })}>
                           <span className="text-xs font-medium text-slate-500">{presentation.categoryTitle}</span>
                           <span className="max-w-full break-words text-sm font-semibold text-slate-950">{presentation.conversion}</span>
                         </button>
@@ -542,7 +616,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
                     const presentation = formatFavoriteId(id);
                     return (
                       <li key={id}>
-                        <button type="button" aria-label={presentation.accessibleLabel} className="flex min-h-11 w-full min-w-0 flex-col items-start justify-center rounded-xl border border-slate-200 px-3 py-2 text-left transition-colors hover:border-indigo-200 hover:bg-indigo-50/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onClick={() => playSavedConversion(favoriteCategoryId, { from: favoriteFrom, to: favoriteTo })}>
+                        <button type="button" aria-label={presentation.accessibleLabel} className="flex min-h-12 w-full min-w-0 flex-col items-start justify-center rounded-xl border border-slate-200 px-3 py-2 text-left transition-colors hover:border-indigo-200 hover:bg-indigo-50/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onClick={() => playSavedConversion(favoriteCategoryId, { from: favoriteFrom, to: favoriteTo })}>
                           <span className="text-xs font-medium text-slate-500">{presentation.categoryTitle}</span>
                           <span className="max-w-full break-words text-sm font-semibold text-slate-950">{presentation.conversion}</span>
                         </button>
@@ -554,7 +628,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
             )}
             <div className="sm:col-span-2">
               <p id={`${categoryId}-saved-data-note`} className="mb-2 text-xs leading-5 text-slate-500">Saved only in this browser for up to 30 days.</p>
-              <Button type="button" variant="outline" size="sm" aria-describedby={`${categoryId}-saved-data-note`} onClick={clearSavedData}>Clear saved data</Button>
+              <Button type="button" variant="outline" size="sm" className="min-h-12" aria-describedby={`${categoryId}-saved-data-note`} onClick={clearSavedData}>Clear saved data</Button>
             </div>
           </div>
         </details>

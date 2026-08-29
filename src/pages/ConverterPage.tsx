@@ -2,8 +2,6 @@ import { useEffect } from "react";
 import {
   ArrowLeft,
   ArrowUpRight,
-  Calculator,
-  CheckCircle2,
   Info,
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
@@ -178,85 +176,75 @@ export default function ConverterPage() {
 
       <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)]">
         <Navbar />
-        <main className="mx-auto max-w-7xl px-4 py-2 sm:px-6 sm:py-6 lg:py-8">
-          <div className="mx-auto max-w-5xl">
-            <header className="mb-2 sm:mb-5">
-              <Link
-                to={pair ? `/${category.id}` : "/"}
-                className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-slate-600 transition-colors hover:text-indigo-700"
-              >
-                <ArrowLeft aria-hidden="true" className="h-4 w-4" /> {pair
-                  ? `All ${category.title.toLowerCase()} conversions`
-                  : "All conversions"}
-              </Link>
-              <h1 className="mt-3 text-2xl font-bold text-slate-950 sm:mt-4 sm:text-4xl">
+        <main className="mx-auto max-w-4xl px-4 py-3 sm:px-6 sm:py-5 lg:py-6">
+          <div>
+            <header className="mb-3 sm:mb-4">
+              <nav aria-label="Breadcrumb">
+                <ol className="flex min-h-11 flex-wrap items-center gap-1.5 text-xs font-semibold text-slate-500 sm:text-sm">
+                  <li>
+                    <Link
+                      to="/"
+                      className="inline-flex min-h-11 items-center gap-1.5 rounded-md transition-colors duration-150 hover:text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    >
+                      <ArrowLeft aria-hidden="true" className="h-3.5 w-3.5" />
+                      Converters
+                    </Link>
+                  </li>
+                  <li aria-hidden="true" className="text-slate-300">/</li>
+                  {pair && (
+                    <>
+                      <li>
+                        <Link
+                          to={`/${category.id}`}
+                          className="inline-flex min-h-11 items-center rounded-md transition-colors duration-150 hover:text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                        >
+                          {category.title}
+                        </Link>
+                      </li>
+                      <li aria-hidden="true" className="text-slate-300">/</li>
+                    </>
+                  )}
+                  <li aria-current="page" className="min-w-0 truncate text-slate-700">
+                    {pair && fromUnit && toUnit
+                      ? `${fromUnit.label} to ${toUnit.label}`
+                      : category.title}
+                  </li>
+                </ol>
+              </nav>
+              <h1 className="mt-1 text-[1.75rem] font-bold leading-[1.05] tracking-[-0.035em] text-slate-950 sm:text-4xl">
                 {toolName}
               </h1>
             </header>
 
-            <section
-              className="overflow-hidden rounded-[1.5rem] border border-indigo-100 bg-white shadow-[0_16px_42px_rgba(15,23,42,0.08)]"
-              aria-labelledby="converter-heading"
-            >
-              <div className="flex items-center justify-between gap-4 border-b border-slate-100 bg-gradient-to-r from-indigo-50/80 to-white px-4 py-2 sm:px-8 sm:py-4">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
-                    <Calculator aria-hidden="true" className="h-4 w-4" />
-                  </span>
-                  <div>
-                    <h2
-                      id="converter-heading"
-                      className="text-sm font-semibold text-slate-950"
-                    >
-                      {pair && fromUnit && toUnit
-                        ? `Convert ${fromUnit.label.toLowerCase()} to ${toUnit.label.toLowerCase()}`
-                        : category.converter === "calculator"
-                        ? `Calculate ${category.title}`
-                        : `Convert ${category.title.toLowerCase()}`}
-                    </h2>
-                    <p className="text-xs text-slate-500">
-                      {category.converter === "calculator"
-                        ? "Enter your measurements"
-                        : "Choose units and enter a value"}
-                    </p>
-                  </div>
-                </div>
-                <span className="hidden text-xs font-medium text-slate-600 sm:block">
-                  Updates instantly
-                </span>
-              </div>
-              <div className="p-4 sm:p-8">
+            {category.id === "bmi" || category.id === "grams-to-cups" ? (
+              <section
+                className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-[0_18px_50px_rgba(11,16,32,0.08)] sm:p-6"
+                aria-labelledby="converter-heading"
+              >
+                <h2 id="converter-heading" className="sr-only">
+                  {category.id === "bmi" ? `Calculate ${category.title}` : "Convert cooking measurements"}
+                </h2>
                 {category.id === "bmi" ? (
                   <BMICalculator title={category.title} />
-                ) : category.id === "grams-to-cups" ? (
-                  <CookingCalculator />
                 ) : (
-                  <ConversionSection
-                    title={category.title}
-                    units={category.units}
-                    categoryId={category.id}
-                    initialFromUnit={pair?.fromUnit}
-                    initialToUnit={pair?.toUnit}
-                  />
+                  <CookingCalculator />
                 )}
-              </div>
-            </section>
+              </section>
+            ) : (
+              <ConversionSection
+                title={category.title}
+                units={category.units}
+                categoryId={category.id}
+                initialFromUnit={pair?.fromUnit}
+                initialToUnit={pair?.toUnit}
+              />
+            )}
 
-            <div className="mt-4 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-              <div>
-                <div className="mb-1 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600">
-                  <span className="h-1.5 w-1.5 rounded-full bg-teal-700" />{" "}
-                  {pair ? "Curated conversion reference" : "Measurement tool"}
-                </div>
-                <p className="text-sm leading-6 text-slate-600">{heroDescription}</p>
-              </div>
-              <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500 shadow-sm">
-                <CheckCircle2
-                  aria-hidden="true"
-                  className="h-4 w-4 text-teal-700"
-                />{" "}
-                Precise by design
-              </div>
+            <div className="mt-3 flex flex-col gap-2 border-b border-slate-200 pb-4 sm:mt-4 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
+              <p className="max-w-3xl text-sm leading-6 text-slate-600">{heroDescription}</p>
+              <span className="inline-flex w-fit shrink-0 items-center rounded-full border border-teal-200 bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-800">
+                {pair ? "Curated reference" : "Sourced factors"}
+              </span>
             </div>
 
             <AdSlot placement="converter-after-answer" />
