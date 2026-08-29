@@ -38,6 +38,32 @@ describe("deterministic smart conversion queries", () => {
     });
   });
 
+  it.each([
+    ["10 cm in Zoll", "length", "centimeters", "inches", 10, 3.937007874],
+    ["5 kg in englische Pfund", "weight", "kilograms", "pounds", 5, 11.0231131092],
+    ["2 Hektar in Quadratmeter", "area", "hectare", "square_meters", 2, 20000],
+    ["10 cm en pouces", "length", "centimeters", "inches", 10, 3.937007874],
+    ["2 hectares en mètres carrés", "area", "hectare", "square_meters", 2, 20000],
+    ["rechne 10 cm in Zoll", "length", "centimeters", "inches", 10, 3.937007874],
+    ["convertir 5 kg en livres anglaises", "weight", "kilograms", "pounds", 5, 11.0231131092],
+  ])("parses localized query %s", (query, categoryId, from, to, value, result) => {
+    expect(parseSmartConversionQuery(query)).toMatchObject({
+      status: "success",
+      categoryId,
+      from,
+      to,
+      value,
+      result: expect.closeTo(result),
+    });
+  });
+
+  it.each(["5 kg in Pfund", "5 kg en livres"])("clarifies culturally ambiguous unit %s", (query) => {
+    expect(parseSmartConversionQuery(query)).toMatchObject({
+      status: "ambiguous",
+      message: expect.stringMatching(/500 g|international|lb/i),
+    });
+  });
+
   it("preserves case-sensitive digital symbols and rejects ambiguous casing", () => {
     expect(parseSmartConversionQuery("1 KB to B")).toMatchObject({
       status: "ambiguous",
