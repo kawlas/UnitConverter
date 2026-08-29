@@ -168,7 +168,7 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "length", title: "Length", converter: "linear",
-    units: [linear("meters", "Meters", "m", 1, ["metres"]), linear("feet", "Feet", "ft", 0.3048), linear("centimeters", "Centimeters", "cm", 0.01, ["centimetres"]), linear("millimeters", "Millimeters", "mm", 0.001, ["millimetres"]), linear("inches", "Inches", "in", 0.0254), linear("yards", "Yards", "yd", 0.9144), linear("kilometers", "Kilometers", "km", 1000, ["kilometres"]), linear("miles", "Miles", "mi", 1609.344), linear("nautical_miles", "Nautical Miles", "nmi", 1852, ["nautical mile"])],
+    units: [linear("meters", "Meters", "m", 1, ["metres"]), linear("feet", "Feet", "ft", 0.3048), linear("centimeters", "Centimeters", "cm", 0.01, ["centimetres", "zentimeter"]), linear("millimeters", "Millimeters", "mm", 0.001, ["millimetres"]), linear("inches", "Inches", "in", 0.0254, ["zoll", "pouce", "pouces"]), linear("yards", "Yards", "yd", 0.9144), linear("kilometers", "Kilometers", "km", 1000, ["kilometres"]), linear("miles", "Miles", "mi", 1609.344), linear("nautical_miles", "Nautical Miles", "nmi", 1852, ["nautical mile"])],
     ...metadata("Length measures distance or dimension.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilometers", to: "miles" }], factFaq(
       "How long are an inch and a foot exactly?",
       "The international inch is exactly 25.4 millimeters. One foot is exactly 12 inches, so it equals exactly 0.3048 meters.",
@@ -176,7 +176,7 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "weight", title: "Weight", converter: "linear",
-    units: [linear("kilograms", "Kilograms", "kg", 1, ["kilogram", "kilogramy", "kilogramów"]), linear("pounds", "Pounds", "lb", INTERNATIONAL_POUND_KILOGRAMS, ["lbs", "funt", "funty", "funtów"]), linear("grams", "Grams", "g", 0.001, ["gram", "gramy", "gramów"]), linear("metric_tonnes", "Metric Tonnes", "t", 1000, ["tonnes", "metric ton", "tona", "tony", "ton"]), linear("ounces", "Ounces", "oz", 0.028349523125), linear("stone", "Stone (14 lb)", "st", 14 * INTERNATIONAL_POUND_KILOGRAMS, ["stones"])],
+    units: [linear("kilograms", "Kilograms", "kg", 1, ["kilogram", "kilogramy", "kilogramów", "kilogramm", "kilogramme", "kilogrammes", "kilo", "kilos"]), linear("pounds", "Pounds", "lb", INTERNATIONAL_POUND_KILOGRAMS, ["lbs", "funt", "funty", "funtów", "englisches pfund", "englische pfund", "englischen pfund", "livre anglaise", "livres anglaises"]), linear("grams", "Grams", "g", 0.001, ["gram", "gramy", "gramów", "gramm", "gramme", "grammes"]), linear("metric_tonnes", "Metric Tonnes", "t", 1000, ["tonnes", "metric ton", "tona", "tony", "ton"]), linear("ounces", "Ounces", "oz", 0.028349523125), linear("stone", "Stone (14 lb)", "st", 14 * INTERNATIONAL_POUND_KILOGRAMS, ["stones"])],
     ...metadata("Weight is commonly expressed with mass units in everyday conversions, including the 14-pound British stone.", "value in target = value × source factor / target factor", [{ input: 1, from: "kilograms", to: "pounds" }], [
       { question: "How many pounds are in one stone?", answer: "One British stone equals 14 avoirdupois pounds exactly." },
       { question: "Are the results rounded?", answer: "The calculation retains full JavaScript number precision; the precision control only formats the displayed result." },
@@ -217,7 +217,7 @@ const definitions: CategoryDefinition[] = [
   },
   {
     id: "area", title: "Area", converter: "linear",
-    units: [linear("square_meters", "Square Meters", "m²", 1, ["m2", "m^2", "metr kwadratowy", "metry kwadratowe", "metrów kwadratowych"]), linear("are", "Are", "a", 100, ["ar", "ares", "ary", "arów"]), linear("hectare", "Hectare", "ha", 10_000, ["hectares", "hektar", "hektary", "hektarów"]), linear("square_feet", "Square Feet", "ft²", 0.09290304, ["ft2", "sq ft"]), linear("square_kilometers", "Square Kilometers", "km²", 1_000_000, ["km2", "kilometry kwadratowe", "kilometrów kwadratowych"]), linear("acres", "Acres", "ac", 4046.8564224, ["acre"])],
+    units: [linear("square_meters", "Square Meters", "m²", 1, ["m2", "m^2", "metr kwadratowy", "metry kwadratowe", "metrów kwadratowych", "quadratmeter", "metre carre", "metres carres", "mètre carré", "mètres carrés"]), linear("are", "Are", "a", 100, ["ar", "ares", "ary", "arów"]), linear("hectare", "Hectare", "ha", 10_000, ["hectares", "hektar", "hektary", "hektarów"]), linear("square_feet", "Square Feet", "ft²", 0.09290304, ["ft2", "sq ft"]), linear("square_kilometers", "Square Kilometers", "km²", 1_000_000, ["km2", "kilometry kwadratowe", "kilometrów kwadratowych"]), linear("acres", "Acres", "ac", 4046.8564224, ["acre"])],
     ...metadata("Area measures two-dimensional space. One are is exactly 100 square metres and one hectare is 100 ares.", "value in target = value × source factor / target factor", [{ input: 1, from: "are", to: "square_meters" }, { input: 1, from: "hectare", to: "are" }], [
       { question: "How many square metres are in one are?", answer: "1 are (ar) = 100 m² exactly." },
       { question: "How many ares are in one hectare?", answer: "1 hectare (ha) = 100 ares = 10,000 m² exactly." },
