@@ -48,6 +48,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
   }, [searchTerm]);
   const smartConversion = useMemo(() => parseSmartConversionQuery(searchTerm), [searchTerm]);
   const smartResult = smartConversion.status === "success" ? smartConversion : undefined;
+  const smartAnswer = smartResult
+    ? smartResult.resultDisplay ?? `${formatSmartResult(smartResult.result)} ${smartResult.toSymbol}`
+    : "";
   const resultCount = results.length + (smartResult ? 1 : 0);
 
   const updateSearch = (value: string) => {
@@ -80,7 +83,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
   const copySmartResult = async () => {
     if (!smartResult) return;
     const source = smartResult.inputDisplay ?? `${smartResult.value} ${smartResult.fromSymbol}`;
-    const answer = `${source} = ${formatSmartResult(smartResult.result)} ${smartResult.toSymbol}`;
+    const answer = `${source} = ${smartAnswer}`;
     try {
       await navigator.clipboard.writeText(answer);
       trackProductEvent("result_copied", smartResult.categoryId);
@@ -225,7 +228,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
                   </span>
                 </span>
                 <span className="max-w-[58%] shrink-0 break-words text-right text-[0.95rem] font-bold tracking-tight text-slate-950 sm:max-w-none sm:text-2xl">
-                  {formatSmartResult(smartResult.result)} {smartResult.toSymbol}
+                  {smartAnswer}
                 </span>
               </Link>
             )}

@@ -32,7 +32,7 @@ Last reviewed: 2026-08-28
 ## Verified product facts
 
 - React 19, TypeScript, Vite 7 and Tailwind 4 hosted on Netlify.
-- Fifteen tools: fourteen conversion categories and a BMI calculator.
+- Seventeen tools in the current release candidate: fourteen standard categories plus dedicated height, BMI and ingredient-aware grams-to-cups calculators.
 - The conversion engine supports linear, affine and custom formulas.
 - Conversion URL state includes units, value, precision and number locale.
 - Favorites and history use browser storage with a 30-day TTL.
@@ -87,7 +87,7 @@ Last reviewed: 2026-08-28
    - compare-all, natural-language input and PWA experiments.
 
 The first implementation slices now cover sourced methodology, compare-all results, an
-eight-page curated pair cluster, deterministic local conversion queries and an installable,
+22-page curated pair cluster, deterministic local conversion queries and an installable,
 offline-capable PWA. Standard converters also accept strict fraction and mixed-number input,
 supporting cooking, construction and craft workflows without adding category-specific UI.
 They also accept bounded arithmetic expressions, offer local batch conversion for up to

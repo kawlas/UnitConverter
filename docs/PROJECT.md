@@ -27,6 +27,8 @@ branch for every task; never work directly on `main`.
 - `src/components/AllUnitsComparison.tsx` — accessible, responsive table that compares one input across the complete category catalog.
 - `src/components/BatchConversion.tsx` — local, bounded multi-value conversion with per-row validation and copy-all output.
 - `src/components/BMICalculator.tsx` — BMI-specific calculator UI.
+- `src/components/HeightCalculator.tsx` — exact two-way centimeters ↔ feet-plus-inches calculator with shareable state.
+- `src/components/CookingCalculator.tsx` — ingredient-aware grams ↔ US cups calculator.
 - `src/lib/conversion-data.ts` / `src/lib/conversions.ts` — typed catalog, unit definitions and exact conversion engine.
 - `src/lib/pair-pages.ts` — small registry of quality-gated pair-intent pages and their unique copy and examples.
 - `src/lib/smart-query.ts` — deterministic, local parser for typed queries such as `5 ft to cm`.
@@ -44,7 +46,8 @@ branch for every task; never work directly on `main`.
 ## Product behavior
 
 The app exposes a typed catalog of measurement categories and exact standard conversion
-formulas, including linear and affine units plus custom conversions and BMI. A conversion
+formulas, including linear and affine units plus custom conversions and dedicated height,
+BMI and cooking calculators. A standard conversion
 is encoded in shareable URL query state (`from`, `to`, `value`, `precision`, and `locale`),
 so a copied link restores the same inputs. Standard converters accept strict locale-aware
 decimals, ASCII or Unicode-slash fractions, mixed numbers and common vulgar fraction
@@ -52,7 +55,7 @@ characters; malformed fractions and zero denominators are rejected. Users can sw
 share a URL, copy the exact visible localized result, save favorites, revisit recent history,
 and clear saved data. History and favorites are retained for at most 30 days and tolerate
 unavailable or malformed browser
-storage. Every non-BMI category also shows the current input across all supported units;
+storage. Every standard category also shows the current input across all supported units;
 any comparison row can become the primary target without re-entering the value.
 An optional batch panel converts up to 100 non-empty lines locally, rejects oversized
 input as a whole and copies only successful rows. The primary unit controls use native
@@ -60,13 +63,17 @@ select elements for accessible platform pickers and a substantially smaller rout
 Cooking-oriented volume entries are explicitly labelled as US customary liquid measures
 to avoid silently mixing them with Imperial, metric-cooking or US dry variants. The weight
 catalog identifies stone as the British 14-pound unit.
-Eight curated pair routes provide focused formulas and worked examples for selected
+Twenty-two curated pair routes provide focused formulas and worked examples for selected
 high-utility conversions. They are explicitly prerendered, self-canonical, listed in the
 sitemap and linked from their parent category; unsupported pairs remain real noindex 404s.
 The home search also recognizes explicit value/source/target queries such as `5 ft to cm`,
 previews the result locally and opens canonical shareable calculator state. It never calls
 an LLM or backend, preserves case-sensitive digital symbols (`b`, `B`, `kb`, `kB`) and asks
 the user to clarify ambiguous or incompatible units instead of guessing.
+The special height intent `180 cm in feet and inches` is resolved locally into a natural
+compound result and opens `/height` with exact, shareable state. The height calculator
+accepts non-negative centimeters or whole feet plus an inch remainder below 12, uses the
+exact international inch definition, and keeps rounding as presentation only.
 
 Supported presentation behavior includes `en-US`, `pl-PL`, `de-DE`, and `fr-FR` number
 locales, precision from 0–12 decimals, category SEO metadata, canonical short routes, the

@@ -94,6 +94,23 @@ const factFaq = (question: string, answer: string): CategoryDefinition["faq"] =>
 
 const definitions: CategoryDefinition[] = [
   {
+    id: "height", title: "Height", converter: "calculator",
+    units: [
+      linear("centimeters", "Centimeters", "cm", 1, ["centimeter", "centimetres", "height in cm"]),
+      linear("feet_inches", "Feet + inches", "ft + in", 1, ["feet and inches", "foot and inches", "height in feet"]),
+    ],
+    ...metadata(
+      "Convert human height between centimeters and feet plus inches without calculating the remainder yourself.",
+      "total inches = centimeters ÷ 2.54; feet = floor(total inches ÷ 12); inches = the remainder",
+      [{ input: 180, from: "centimeters", to: "feet_inches" }],
+      [
+        { question: "How tall is 180 cm in feet and inches?", answer: "180 centimeters is approximately 5 feet 10.87 inches, commonly rounded to 5 feet 11 inches." },
+        { question: "How is height converted to feet and inches?", answer: "Divide centimeters by 2.54 to get total inches. Divide by 12 for whole feet and keep the remaining inches. 1 inch = 2.54 centimeters exactly." },
+        { question: "Can I convert feet and inches back to centimeters?", answer: "Yes. Enter whole feet and an inch remainder below 12, then swap direction. The calculator preserves the exact value in the shareable URL." },
+      ],
+    ),
+  },
+  {
     id: "grams-to-cups", title: "Grams to Cups", converter: "calculator",
     units: [
       linear("grams", "Grams", "g", 1, ["gram", "gramy"]),

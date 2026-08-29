@@ -106,6 +106,34 @@ describe("deterministic smart conversion queries", () => {
     expect(buildSmartConversionUrl(parsed)).toBe("/length?from=feet&to=centimeters&value=5");
   });
 
+  it("answers metric height queries in feet and inches without mental arithmetic", () => {
+    const parsed = parseSmartConversionQuery("180 cm in feet and inches");
+    expect(parsed).toMatchObject({
+      status: "success",
+      categoryId: "height",
+      inputDisplay: "180 cm",
+      resultDisplay: "5 ft 10.87 in",
+    });
+    if (parsed.status !== "success") return;
+    expect(buildSmartConversionUrl(parsed)).toBe(
+      "/height?direction=cm-to-feet-inches&cm=180&precision=2",
+    );
+  });
+
+  it("keeps an explicit decimal-feet query in the standard length converter", () => {
+    const parsed = parseSmartConversionQuery("180 cm to feet");
+    expect(parsed).toMatchObject({
+      status: "success",
+      categoryId: "length",
+      from: "centimeters",
+      to: "feet",
+    });
+    if (parsed.status !== "success") return;
+    expect(buildSmartConversionUrl(parsed)).toBe(
+      "/length?from=centimeters&to=feet&value=180",
+    );
+  });
+
   it("resolves every published non-calculator example through catalog names", () => {
     for (const category of categories.filter(({ converter }) => converter !== "calculator")) {
       const example = category.examples[0];

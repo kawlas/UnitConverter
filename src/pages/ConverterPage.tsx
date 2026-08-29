@@ -12,6 +12,7 @@ import { getCategoryPairPages, getPairPage, pairPagePath } from "@/lib/pair-page
 import ConversionSection from "@/components/ConversionSection";
 import BMICalculator from "@/components/BMICalculator";
 import CookingCalculator from "@/components/CookingCalculator";
+import HeightCalculator from "@/components/HeightCalculator";
 import AdCard from "@/components/AdCard";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
@@ -203,16 +204,22 @@ export default function ConverterPage() {
               </h1>
             </header>
 
-            {category.id === "bmi" || category.id === "grams-to-cups" ? (
+            {category.id === "bmi" || category.id === "grams-to-cups" || category.id === "height" ? (
               <section
                 className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-[0_18px_50px_rgba(11,16,32,0.08)] sm:p-6"
                 aria-labelledby="converter-heading"
               >
                 <h2 id="converter-heading" className="sr-only">
-                  {category.id === "bmi" ? `Calculate ${category.title}` : "Convert cooking measurements"}
+                  {category.id === "bmi"
+                    ? `Calculate ${category.title}`
+                    : category.id === "height"
+                      ? "Convert height"
+                      : "Convert cooking measurements"}
                 </h2>
                 {category.id === "bmi" ? (
                   <BMICalculator title={category.title} />
+                ) : category.id === "height" ? (
+                  <HeightCalculator />
                 ) : (
                   <CookingCalculator />
                 )}

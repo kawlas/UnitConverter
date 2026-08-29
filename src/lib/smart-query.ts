@@ -1,6 +1,7 @@
 import { categories, type CategoryDefinition, type UnitDefinition } from "./conversion-data";
 import { ConversionError, convertExact } from "./conversions";
 import { isFractionLike, parseLocaleQuantity, VULGAR_FRACTION_CHARACTERS } from "./number-input";
+import { formatFeetInches } from "./height";
 
 interface UnitCandidate {
   readonly category: CategoryDefinition;
@@ -20,6 +21,8 @@ export interface SmartConversionSuccess {
   readonly value: number;
   readonly result: number;
   readonly inputDisplay?: string;
+  readonly resultDisplay?: string;
+  readonly destination?: string;
 }
 
 export type SmartConversionQuery = SmartConversionSuccess | {
@@ -109,6 +112,10 @@ const compoundFeetInchesPattern = new RegExp(
   `^(?:${queryCommand}\\s+|(?:ile\\s+(?:to|jest))\\s+)?(${decimalToken})\\s*(?:ft|feet|foot|['′])\\s*(${decimalToken})\\s*(?:in|inches|inch|["″])?\\s+${queryConnector}\\s+(.+?)\\s*\\??$`,
   "i",
 );
+const metricHeightPattern = new RegExp(
+  `^(?:${queryCommand}\\s+|(?:ile\\s+(?:to|jest))\\s+)?(${decimalToken})\\s*(cm|centimeters?|centimetres?|m|meters?|metres?)\\s+${queryConnector}\\s+(?:feet|foot|ft)\\s*(?:and|\\+|plus)\\s*(?:inches|inch|in)\\s*\\??$`,
+  "i",
+);
 
 const looksLikeGroupedThousands = (value: string): boolean =>
   /^[+-]?[1-9]\d{0,2}[.,]\d{3}$/.test(value);
@@ -131,6 +138,36 @@ const serializeShareableValue = (value: number): string | undefined => {
 };
 
 export const parseSmartConversionQuery = (query: string): SmartConversionQuery => {
+  const metricHeightMatch = query.trim().match(metricHeightPattern);
+  if (metricHeightMatch) {
+    const inputValue = Number(metricHeightMatch[1].replace(",", "."));
+    if (!Number.isFinite(inputValue) || inputValue < 0) {
+      return { status: "invalid", message: "Enter zero or a positive height." };
+    }
+    const sourceUnit = normalizeUnitText(metricHeightMatch[2]);
+    const centimeters = sourceUnit.startsWith("m") && sourceUnit !== "millimeters"
+      ? inputValue * 100
+      : inputValue;
+    const cmValue = serializeShareableValue(centimeters);
+    if (!cmValue) return { status: "invalid", message: "That height is outside the supported shareable input range." };
+    return {
+      status: "success",
+      categoryId: "height",
+      categoryTitle: "Height",
+      from: "centimeters",
+      fromLabel: "Centimeters",
+      fromSymbol: "cm",
+      to: "feet_inches",
+      toLabel: "Feet and inches",
+      toSymbol: "ft + in",
+      value: centimeters,
+      result: centimeters / 2.54,
+      inputDisplay: `${metricHeightMatch[1]} ${metricHeightMatch[2]}`,
+      resultDisplay: formatFeetInches(centimeters, 2),
+      destination: `/height?direction=cm-to-feet-inches&cm=${encodeURIComponent(cmValue)}&precision=2`,
+    };
+  }
+
   const compoundMatch = query.trim().match(compoundFeetInchesPattern);
   if (compoundMatch) {
     const feet = Number(compoundMatch[1].replace(",", "."));
@@ -219,6 +256,7 @@ export const parseSmartConversionQuery = (query: string): SmartConversionQuery =
 };
 
 export const buildSmartConversionUrl = (conversion: SmartConversionSuccess): string => {
+  if (conversion.destination) return conversion.destination;
   const value = serializeShareableValue(conversion.value);
   if (!value) throw new Error("Smart conversion value is not shareable.");
   const params = new URLSearchParams({
