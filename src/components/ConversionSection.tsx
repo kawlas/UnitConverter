@@ -466,6 +466,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
               inputMode="text"
               value={fromValue}
               onChange={(event) => setValue(event.target.value)}
+              onFocus={(event) => event.currentTarget.select()}
               className="h-[72px] min-h-[72px] w-full rounded-2xl border-2 border-indigo-500 bg-indigo-50 px-4 text-[clamp(2.75rem,6vw,4.5rem)] font-bold tracking-[-0.045em] text-indigo-950 shadow-inner outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/25 sm:px-5"
               placeholder="0"
               autoCapitalize="off"

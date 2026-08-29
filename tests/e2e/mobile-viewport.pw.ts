@@ -4,6 +4,19 @@ const MOBILE = { width: 320, height: 568 };
 const DESKTOP = { width: 1280, height: 800 };
 
 test.describe("320x568 mobile viewport", () => {
+  test("first typing replaces the prefilled value", async ({ page }) => {
+    await page.setViewportSize(MOBILE);
+    await page.goto("/length?value=12", { waitUntil: "networkidle" });
+
+    const input = page.getByRole("textbox", { name: "From" });
+    await expect(input).toHaveValue("12");
+    await input.click();
+    await input.pressSequentially("5");
+
+    await expect(input).toHaveValue("5");
+    await expect(page.getByRole("textbox", { name: "To" })).toHaveValue("16.4");
+  });
+
   test("complete primary conversion flow stays above the fold", async ({ page }) => {
     await page.setViewportSize(MOBILE);
     await page.addInitScript(() => {
