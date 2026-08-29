@@ -4,14 +4,29 @@ import { convertExact } from "./conversions";
 import { getPairPage, pairPagePath, pairPages } from "./pair-pages";
 
 describe("curated conversion pair pages", () => {
-  it("keeps the initial cluster deliberately small and unique", () => {
+  it("keeps the evidence-backed cluster controlled and unique", () => {
     expect(pairPages.length).toBeGreaterThanOrEqual(6);
-    expect(pairPages.length).toBeLessThanOrEqual(12);
+    expect(pairPages.length).toBeLessThanOrEqual(22);
     expect(new Set(pairPages.map(pairPagePath)).size).toBe(pairPages.length);
     expect(new Set(pairPages.map(({ title }) => title)).size).toBe(pairPages.length);
     expect(new Set(pairPages.map(({ description }) => description)).size).toBe(pairPages.length);
     expect(new Set(pairPages.map(({ intro }) => intro)).size).toBe(pairPages.length);
     expect(new Set(pairPages.map(({ formula }) => formula)).size).toBe(pairPages.length);
+  });
+
+  it("includes the first researched demand expansion", () => {
+    expect(pairPages.map(pairPagePath)).toEqual(expect.arrayContaining([
+      "/length/miles-to-kilometers",
+      "/speed/mph-to-kph",
+      "/weight/grams-to-ounces",
+      "/volume/us-cups-to-milliliters",
+      "/weight/stone-to-kilograms",
+      "/area/square-feet-to-square-meters",
+      "/area/hectare-to-square-meters",
+      "/area/square-meters-to-hectare",
+      "/fuel/miles-per-gallon-to-liters-per-100km",
+      "/fuel/miles-per-imperial-gallon-to-liters-per-100km",
+    ]));
   });
 
   it("references only supported pairs and computes every published example", () => {

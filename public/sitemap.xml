@@ -29,4 +29,14 @@
   <url><loc>https://qconverter.netlify.app/temperature/celsius-to-fahrenheit</loc></url>
   <url><loc>https://qconverter.netlify.app/temperature/fahrenheit-to-celsius</loc></url>
   <url><loc>https://qconverter.netlify.app/volume/liters-to-gallons</loc></url>
+  <url><loc>https://qconverter.netlify.app/length/miles-to-kilometers</loc></url>
+  <url><loc>https://qconverter.netlify.app/speed/mph-to-kph</loc></url>
+  <url><loc>https://qconverter.netlify.app/weight/grams-to-ounces</loc></url>
+  <url><loc>https://qconverter.netlify.app/volume/us-cups-to-milliliters</loc></url>
+  <url><loc>https://qconverter.netlify.app/weight/stone-to-kilograms</loc></url>
+  <url><loc>https://qconverter.netlify.app/area/square-feet-to-square-meters</loc></url>
+  <url><loc>https://qconverter.netlify.app/area/hectare-to-square-meters</loc></url>
+  <url><loc>https://qconverter.netlify.app/area/square-meters-to-hectare</loc></url>
+  <url><loc>https://qconverter.netlify.app/fuel/miles-per-gallon-to-liters-per-100km</loc></url>
+  <url><loc>https://qconverter.netlify.app/fuel/miles-per-imperial-gallon-to-liters-per-100km</loc></url>
 </urlset>
