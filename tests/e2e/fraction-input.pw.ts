@@ -52,7 +52,7 @@ test("fraction guidance is accessible without overflowing at 320px", async ({ pa
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto("/length");
 
-  await expect(page.getByText(/Decimals and fractions supported/)).toBeVisible();
+  await expect(page.getByText(/Enter a decimal, fraction or quick calculation/)).toBeVisible();
   const results = await new AxeBuilder({ page }).include("main").analyze();
   expect(results.violations).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
