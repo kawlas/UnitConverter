@@ -51,19 +51,19 @@ export default function HomePage() {
       <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)]">
         <Navbar />
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:py-14">
-          <section className="relative isolate overflow-hidden rounded-[1.75rem] bg-slate-950 px-5 py-10 text-center text-white shadow-[0_24px_70px_rgba(15,23,42,0.16)] sm:px-10 sm:py-16 lg:px-14 lg:py-20" aria-labelledby="hero-heading">
+          <section className="relative isolate overflow-hidden rounded-[1.75rem] bg-slate-950 px-3 py-6 text-center text-white shadow-[0_24px_70px_rgba(15,23,42,0.16)] sm:px-10 sm:py-16 lg:px-14 lg:py-20" aria-labelledby="hero-heading">
             <div className="pointer-events-none absolute -right-20 -top-24 -z-10 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-32 left-1/3 -z-10 h-72 w-72 rounded-full bg-teal-400/15 blur-3xl" />
             <div className="mx-auto max-w-4xl">
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-indigo-100">
+                <div className="mb-5 hidden items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-indigo-100 sm:inline-flex">
                   <Sparkles aria-hidden="true" className="h-3.5 w-3.5 text-teal-300" />
                   Instant unit answers
                 </div>
-                <h1 id="hero-heading" className="text-4xl font-semibold leading-[1.02] tracking-[-0.045em] sm:text-6xl lg:text-7xl">Convert anything. Just ask.</h1>
-                <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Type the conversion the way you think it. Get the answer instantly — no forms, no hunting through dropdowns.</p>
-                <div className="mx-auto mt-8 max-w-3xl sm:mt-10">
+                <h1 id="hero-heading" className="text-[1.85rem] font-semibold leading-[1.02] tracking-[-0.045em] sm:text-6xl lg:text-7xl">Convert anything. Just ask.</h1>
+                <div className="mx-auto mt-5 max-w-3xl sm:mt-10">
                   <SearchBar placeholder="e.g. 10 kg to grams" />
                 </div>
+                <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:mt-5 sm:text-lg sm:leading-7">Type the conversion the way you think it. Get the answer instantly — no forms, no hunting through dropdowns.</p>
             </div>
           </section>
 
