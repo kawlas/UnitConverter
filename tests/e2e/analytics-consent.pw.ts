@@ -127,7 +127,8 @@ test("analytics preferences can be reopened and consent revoked", async ({ page 
   expect(await page.evaluate(() => window["ga-disable-G-DW273J3JPK"])).toBe(true);
 });
 
-test("search funnel reports only the selected tool category", async ({ page }) => {
+test("search funnel reports only the selected tool category", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-write"]);
   await page.route("https://www.googletagmanager.com/**", (route) =>
     route.fulfill({ status: 200, contentType: "application/javascript", body: "" }),
   );
@@ -138,6 +139,17 @@ test("search funnel reports only the selected tool category", async ({ page }) =
   const search = page.getByRole("combobox", {
     name: "Search categories, units, or type a conversion",
   });
+  await search.fill("10 kg to g");
+  await page.getByRole("button", { name: "Copy instant answer" }).click();
+  const copyEvent = await page.evaluate(() =>
+    (window.dataLayer ?? [])
+      .map((entry) => Array.from(entry))
+      .find((entry) => entry[0] === "event" && entry[1] === "result_copied"),
+  );
+  expect(copyEvent).toEqual(["event", "result_copied", { tool_category: "weight" }]);
+  expect(JSON.stringify(copyEvent)).not.toContain("10 kg to g");
+  expect(JSON.stringify(copyEvent)).not.toContain("10000");
+
   await search.fill("5 ft to cm");
   await search.press("Enter");
   await expect(page).toHaveURL(/\/length\?from=feet&to=centimeters&value=5$/);

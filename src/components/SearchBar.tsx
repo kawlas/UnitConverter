@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Input } from "./ui/input";
-import { Search, X } from "lucide-react";
+import { Copy, Search, X } from "lucide-react";
 import { categories } from "@/lib/conversion-data";
 import { buildSmartConversionUrl, parseSmartConversionQuery } from "@/lib/smart-query";
 import { trackProductEvent } from "@/lib/analytics";
@@ -25,7 +25,7 @@ const searchOptionId = (categoryId: string): string => `conversion-search-option
 const formatSmartResult = (value: number): string => {
   const magnitude = Math.abs(value);
   if (magnitude !== 0 && (magnitude < 1e-9 || magnitude >= 1e12)) return value.toExponential(6);
-  return new Intl.NumberFormat("en-US", { maximumSignificantDigits: 12 }).format(value);
+  return new Intl.NumberFormat("en-US", { maximumSignificantDigits: 8 }).format(value);
 };
 
 const getNextSearchResultIndex = (currentIndex: number, direction: 1 | -1, resultCount: number): number => {
@@ -40,6 +40,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [copyStatus, setCopyStatus] = useState("");
   const results = useMemo(() => {
     const query = normalize(searchTerm);
     if (!query) return [];
@@ -53,6 +54,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
     setSearchTerm(value);
     setIsOpen(normalize(value).length > 0);
     setActiveIndex(-1);
+    setCopyStatus("");
     onSearch?.(value);
   };
 
@@ -73,6 +75,19 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
     trackProductEvent("smart_query_opened", smartResult.categoryId);
     updateSearch("");
     navigate(destination);
+  };
+
+  const copySmartResult = async () => {
+    if (!smartResult) return;
+    const source = smartResult.inputDisplay ?? `${smartResult.value} ${smartResult.fromSymbol}`;
+    const answer = `${source} = ${formatSmartResult(smartResult.result)} ${smartResult.toSymbol}`;
+    try {
+      await navigator.clipboard.writeText(answer);
+      trackProductEvent("result_copied", smartResult.categoryId);
+      setCopyStatus("Answer copied.");
+    } catch {
+      setCopyStatus("Unable to copy the answer in this browser.");
+    }
   };
 
   useEffect(() => {
@@ -187,55 +202,72 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
       )}
 
       {resultsOpen && (
-        <div id={SEARCH_RESULTS_ID} role="listbox" className="absolute z-20 mt-3 w-full rounded-2xl border border-slate-200 bg-white p-2 text-slate-950 shadow-2xl" aria-label="Search results">
-          {smartResult && (
-            <Link
-              id={SMART_CONVERSION_OPTION_ID}
-              to={buildSmartConversionUrl(smartResult)}
-              role="option"
-              tabIndex={-1}
-              aria-selected={activeSmartResult}
-              onClick={() => {
-                trackProductEvent("smart_query_opened", smartResult.categoryId);
-                closeResults();
-              }}
-              onMouseEnter={() => setActiveIndex(0)}
-              className={`flex min-h-24 cursor-pointer items-center justify-between gap-4 rounded-xl bg-indigo-50 px-4 py-3 text-sm transition-colors hover:bg-indigo-100 ${activeSmartResult ? "ring-2 ring-indigo-500 text-indigo-700" : ""}`}
-            >
-              <span>
-                <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600">Instant answer</span>
-                <span className="mt-1 block font-medium text-slate-700">
-                  {smartResult.inputDisplay ?? `${smartResult.value} ${smartResult.fromSymbol}`} to {smartResult.toSymbol}
+        <div className="relative z-20 mt-3 w-full rounded-2xl border border-slate-200 bg-white p-2 text-slate-950 shadow-2xl">
+          <div id={SEARCH_RESULTS_ID} role="listbox" aria-label="Search results">
+            {smartResult && (
+              <Link
+                id={SMART_CONVERSION_OPTION_ID}
+                to={buildSmartConversionUrl(smartResult)}
+                role="option"
+                tabIndex={-1}
+                aria-selected={activeSmartResult}
+                onClick={() => {
+                  trackProductEvent("smart_query_opened", smartResult.categoryId);
+                  closeResults();
+                }}
+                onMouseEnter={() => setActiveIndex(0)}
+                className={`flex min-h-20 cursor-pointer items-center justify-between gap-3 rounded-xl bg-indigo-50 px-3 py-2 text-sm transition-colors hover:bg-indigo-100 sm:min-h-24 sm:gap-4 sm:px-4 sm:py-3 ${activeSmartResult ? "ring-2 ring-indigo-500 text-indigo-700" : ""}`}
+              >
+                <span className="min-w-0 text-left">
+                  <span className="block text-xs font-semibold uppercase tracking-[0.12em] text-indigo-600">Instant answer</span>
+                  <span className="mt-1 block truncate font-medium text-slate-700">
+                    {smartResult.inputDisplay ?? `${smartResult.value} ${smartResult.fromSymbol}`} to {smartResult.toSymbol}
+                  </span>
                 </span>
-              </span>
-              <span className="shrink-0 text-right text-xl font-bold tracking-tight text-slate-950 sm:text-2xl">
-                {formatSmartResult(smartResult.result)} {smartResult.toSymbol}
-              </span>
-            </Link>
+                <span className="max-w-[52%] shrink-0 break-words text-right text-lg font-bold tracking-tight text-slate-950 sm:max-w-none sm:text-2xl">
+                  {formatSmartResult(smartResult.result)} {smartResult.toSymbol}
+                </span>
+              </Link>
+            )}
+            {results.map((category, index) => (
+              <Link
+                id={searchOptionId(category.id)}
+                key={category.id}
+                to={`/${category.id}`}
+                role="option"
+                tabIndex={-1}
+                aria-selected={activeIndex === index + (smartResult ? 1 : 0)}
+                onClick={() => {
+                  trackProductEvent("category_search_opened", category.id);
+                  closeResults();
+                }}
+                onMouseEnter={() => setActiveIndex(index + (smartResult ? 1 : 0))}
+                className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-slate-50 ${activeIndex === index + (smartResult ? 1 : 0) ? "bg-indigo-50 text-indigo-700" : ""}`}
+              >
+                <span className="font-medium text-slate-900">{category.title}</span>
+                <span className="text-right text-xs text-slate-500">{category.units.map((unit) => unit.symbol).join(", ")}</span>
+              </Link>
+            ))}
+          </div>
+          {smartResult && (
+            <div className="mt-2 flex items-center justify-end gap-3 border-t border-slate-200 px-2 pt-2">
+              <p className="hidden min-w-0 text-xs leading-5 text-slate-500 sm:block">Copy the answer now or press Enter for the full calculator.</p>
+              <button
+                type="button"
+                onClick={copySmartResult}
+                aria-label="Copy instant answer"
+                className="flex min-h-11 w-full shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-800 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
+              >
+                <Copy aria-hidden="true" className="mr-2 h-4 w-4" />
+                {copyStatus === "Answer copied." ? "Copied" : "Copy answer"}
+              </button>
+              <span role="status" aria-label="Copy status" aria-live="polite" className="sr-only">{copyStatus}</span>
+            </div>
           )}
-          {results.map((category, index) => (
-            <Link
-              id={searchOptionId(category.id)}
-              key={category.id}
-              to={`/${category.id}`}
-              role="option"
-              tabIndex={-1}
-              aria-selected={activeIndex === index + (smartResult ? 1 : 0)}
-              onClick={() => {
-                trackProductEvent("category_search_opened", category.id);
-                closeResults();
-              }}
-              onMouseEnter={() => setActiveIndex(index + (smartResult ? 1 : 0))}
-              className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-slate-50 ${activeIndex === index + (smartResult ? 1 : 0) ? "bg-indigo-50 text-indigo-700" : ""}`}
-            >
-              <span className="font-medium text-slate-900">{category.title}</span>
-              <span className="text-right text-xs text-slate-500">{category.units.map((unit) => unit.symbol).join(", ")}</span>
-            </Link>
-          ))}
         </div>
       )}
       {isOpen && conversionMessage && results.length === 0 && (
-        <p role="status" className="absolute z-20 mt-2 w-full rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950 shadow-lg">
+        <p role="status" className="relative z-20 mt-2 w-full rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-950 shadow-lg">
           {conversionMessage} <span className="font-medium">Try “5 ft to cm”.</span>
         </p>
       )}
