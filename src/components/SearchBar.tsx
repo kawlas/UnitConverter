@@ -4,6 +4,7 @@ import { Input } from "./ui/input";
 import { Search, X } from "lucide-react";
 import { categories } from "@/lib/conversion-data";
 import { buildSmartConversionUrl, parseSmartConversionQuery } from "@/lib/smart-query";
+import { trackProductEvent } from "@/lib/analytics";
 
 interface SearchBarProps {
   onSearch?: (searchTerm: string) => void;
@@ -61,6 +62,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
   };
 
   const chooseResult = (categoryId: string) => {
+    trackProductEvent("category_search_opened", categoryId);
     updateSearch("");
     navigate(`/${categoryId}`);
   };
@@ -68,6 +70,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
   const chooseSmartResult = () => {
     if (!smartResult) return;
     const destination = buildSmartConversionUrl(smartResult);
+    trackProductEvent("smart_query_opened", smartResult.categoryId);
     updateSearch("");
     navigate(destination);
   };
@@ -127,6 +130,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
                 chooseResult(activeResult.id);
                 return;
               }
+              if (!smartResult && activeIndex < 0 && results.length === 1) {
+                event.preventDefault();
+                chooseResult(results[0].id);
+                return;
+              }
             }
             if (event.key === "Escape") {
               if (resultsOpen) closeResults();
@@ -183,7 +191,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
               role="option"
               tabIndex={-1}
               aria-selected={activeSmartResult}
-              onClick={closeResults}
+              onClick={() => {
+                trackProductEvent("smart_query_opened", smartResult.categoryId);
+                closeResults();
+              }}
               onMouseEnter={() => setActiveIndex(0)}
               className={`flex min-h-24 cursor-pointer items-center justify-between gap-4 rounded-xl bg-indigo-50 px-4 py-3 text-sm transition-colors hover:bg-indigo-100 ${activeSmartResult ? "ring-2 ring-indigo-500 text-indigo-700" : ""}`}
             >
@@ -206,7 +217,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
               role="option"
               tabIndex={-1}
               aria-selected={activeIndex === index + (smartResult ? 1 : 0)}
-              onClick={closeResults}
+              onClick={() => {
+                trackProductEvent("category_search_opened", category.id);
+                closeResults();
+              }}
               onMouseEnter={() => setActiveIndex(index + (smartResult ? 1 : 0))}
               className={`flex min-h-11 cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-slate-50 ${activeIndex === index + (smartResult ? 1 : 0) ? "bg-indigo-50 text-indigo-700" : ""}`}
             >
