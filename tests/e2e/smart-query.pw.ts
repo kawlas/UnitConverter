@@ -3,6 +3,23 @@ import { expect, test } from "@playwright/test";
 
 const searchName = "Search categories, units, or type a conversion";
 
+test("search exposes one explicit clear control", async ({ page }) => {
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  const search = page.getByRole("combobox", { name: searchName });
+
+  await expect(search).toHaveAttribute("type", "text");
+  await expect(search).toHaveAttribute("inputmode", "search");
+  await expect(search).toHaveAttribute("enterkeyhint", "search");
+  await expect(search).toHaveAttribute("autocapitalize", "off");
+  await expect(search).toHaveAttribute("spellcheck", "false");
+  await search.fill("10 kg to g");
+
+  const clear = page.getByRole("button", { name: "Clear search" });
+  await expect(clear).toHaveCount(1);
+  await clear.click();
+  await expect(search).toHaveValue("");
+});
+
 test("a typed conversion previews the answer and opens shareable calculator state", async ({ page }) => {
   const externalRequests: string[] = [];
   page.on("request", (request) => {

@@ -106,7 +106,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
       <div className="flex min-h-16 items-center rounded-2xl border border-slate-200 bg-white shadow-[0_12px_35px_rgba(15,23,42,0.16)] transition-[border-color,box-shadow] hover:border-slate-300 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/40">
         <Search aria-hidden="true" className="ml-4 h-5 w-5 shrink-0 text-slate-600" />
         <Input
-          type="search"
+          type="text"
+          inputMode="search"
+          enterKeyHint="search"
           value={searchTerm}
           onChange={(event) => updateSearch(event.target.value)}
           onFocus={() => {
@@ -143,6 +145,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
           }}
           placeholder={placeholder}
           autoComplete="off"
+          autoCapitalize="off"
+          spellCheck={false}
           maxLength={120}
           aria-label="Search categories, units, or type a conversion"
           role="combobox"
