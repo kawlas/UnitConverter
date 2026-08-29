@@ -8,7 +8,7 @@ test("reserved ad space follows useful content and makes no external requests", 
   });
 
   await page.goto("/length", { waitUntil: "networkidle" });
-  const converter = page.getByRole("region", { name: "Convert length" });
+  const converter = page.getByRole("region", { name: "Length conversion workspace" });
   const advertisement = page.getByLabel("Advertisement");
   await expect(converter).toBeVisible();
   await expect(advertisement).toHaveAttribute("data-ad-placement", "converter-after-answer");
