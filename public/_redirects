@@ -4,6 +4,7 @@
 # Serve each clean URL (with or without a trailing slash) from its prerendered
 # document. Netlify normalizes trailing slashes before matching redirect rules,
 # so a slash-removal 301 would redirect the normalized path to itself.
+/height /height/index.html 200!
 /grams-to-cups /grams-to-cups/index.html 200!
 /bmi /bmi/index.html 200!
 /power /power/index.html 200!
