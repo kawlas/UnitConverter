@@ -25,7 +25,7 @@ const searchOptionId = (categoryId: string): string => `conversion-search-option
 const formatSmartResult = (value: number): string => {
   const magnitude = Math.abs(value);
   if (magnitude !== 0 && (magnitude < 1e-9 || magnitude >= 1e12)) return value.toExponential(6);
-  return new Intl.NumberFormat("en-US", { maximumSignificantDigits: 8 }).format(value);
+  return new Intl.NumberFormat("en-US", { maximumSignificantDigits: 12 }).format(value);
 };
 
 const getNextSearchResultIndex = (currentIndex: number, direction: 1 | -1, resultCount: number): number => {
@@ -224,7 +224,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, placeholder = "Search c
                     {smartResult.inputDisplay ?? `${smartResult.value} ${smartResult.fromSymbol}`} to {smartResult.toSymbol}
                   </span>
                 </span>
-                <span className="max-w-[52%] shrink-0 break-words text-right text-lg font-bold tracking-tight text-slate-950 sm:max-w-none sm:text-2xl">
+                <span className="max-w-[58%] shrink-0 break-words text-right text-[0.95rem] font-bold tracking-tight text-slate-950 sm:max-w-none sm:text-2xl">
                   {formatSmartResult(smartResult.result)} {smartResult.toSymbol}
                 </span>
               </Link>
