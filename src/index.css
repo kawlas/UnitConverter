@@ -1,16 +1,24 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+@font-face {
+  font-family: "Manrope Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2") format("woff2-variations");
+}
+
 @layer base {
   :root {
     /* Measurement-studio palette */
-    --canvas: #F6F8FC;
+    --canvas: #F7F8FC;
     --surface: #fff;
-    --ink: #0F172A;
-    --muted-ink: #475569;
-    --line: #64748B;
-    --indigo: #4F46E5;
-    --success: #0F766E;
+    --ink: #0B1020;
+    --muted-ink: #667085;
+    --line: #667085;
+    --indigo: #5B5FEF;
+    --success: #0C6B5D;
 
     /* Keep the existing shadcn/Tailwind variable contract intact. */
     --background: 220 50% 97.6471%;
@@ -106,7 +114,7 @@
     overflow-x: hidden;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Manrope Variable", Manrope, Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-size: 1rem;
     line-height: 1.5;
     text-rendering: optimizeLegibility;
