@@ -179,6 +179,22 @@ test("search combobox supports keyboard selection", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("search opens the best category with one Enter press", async ({ page }) => {
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+
+  const search = page.getByRole("combobox", {
+    name: "Search categories, units, or type a conversion",
+  });
+  await search.fill("length");
+  await expect(search).not.toHaveAttribute("aria-activedescendant");
+  await search.press("Enter");
+
+  await expect(page).toHaveURL(/\/length$/);
+  await expect(
+    page.getByRole("heading", { name: "Length Converter", exact: true }),
+  ).toBeVisible();
+});
+
 test("history starts after user input and ignores preference-only changes", async ({ page }) => {
   await page.goto("/length", { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(650);

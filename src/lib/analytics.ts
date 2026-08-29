@@ -15,13 +15,15 @@ let analyticsInitialized = false;
 
 export type ProductEventName =
   | "batch_results_copied"
+  | "category_search_opened"
   | "conversion_completed"
   | "conversion_shared"
   | "favorite_toggled"
   | "result_copied"
   | "saved_conversion_opened"
   | "saved_data_cleared"
-  | "share_link_copied";
+  | "share_link_copied"
+  | "smart_query_opened";
 
 declare global {
   interface Window {

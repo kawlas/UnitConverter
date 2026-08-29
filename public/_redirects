@@ -32,3 +32,13 @@
 /temperature/celsius-to-fahrenheit /temperature/celsius-to-fahrenheit/index.html 200!
 /temperature/fahrenheit-to-celsius /temperature/fahrenheit-to-celsius/index.html 200!
 /volume/liters-to-gallons /volume/liters-to-gallons/index.html 200!
+/length/miles-to-kilometers /length/miles-to-kilometers/index.html 200!
+/speed/mph-to-kph /speed/mph-to-kph/index.html 200!
+/weight/grams-to-ounces /weight/grams-to-ounces/index.html 200!
+/volume/us-cups-to-milliliters /volume/us-cups-to-milliliters/index.html 200!
+/weight/stone-to-kilograms /weight/stone-to-kilograms/index.html 200!
+/area/square-feet-to-square-meters /area/square-feet-to-square-meters/index.html 200!
+/area/hectare-to-square-meters /area/hectare-to-square-meters/index.html 200!
+/area/square-meters-to-hectare /area/square-meters-to-hectare/index.html 200!
+/fuel/miles-per-gallon-to-liters-per-100km /fuel/miles-per-gallon-to-liters-per-100km/index.html 200!
+/fuel/miles-per-imperial-gallon-to-liters-per-100km /fuel/miles-per-imperial-gallon-to-liters-per-100km/index.html 200!

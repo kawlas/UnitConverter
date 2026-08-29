@@ -45,7 +45,7 @@ test("category examples provide meaningful, valid first-load comparisons", async
   await expect(comparison.getByRole("row", { name: /Miles per Gallon \(US\) mpg 33\.6 Selected/ })).toBeVisible();
 
   await page.getByRole("textbox", { name: "From" }).fill("12");
-  await page.getByRole("button", { name: "Reset category" }).click();
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
   await expect(page.getByRole("textbox", { name: "From" })).toHaveValue("7");
   await expect(page.getByRole("alert")).toHaveCount(0);
 });

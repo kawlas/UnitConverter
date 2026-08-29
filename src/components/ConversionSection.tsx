@@ -454,10 +454,10 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
 
   return (
     <div className="min-w-0 space-y-6">
-      <section aria-labelledby={`${categoryId}-conversion-workspace-heading`} className="min-w-0 rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-[0_18px_50px_rgba(11,16,32,0.08)] sm:p-6 lg:p-8">
+      <section aria-labelledby={`${categoryId}-conversion-workspace-heading`} className="min-w-0 rounded-[1.5rem] border border-slate-200 bg-white p-3 shadow-[0_18px_50px_rgba(11,16,32,0.08)] sm:p-6 lg:p-8">
         <h2 id={`${categoryId}-conversion-workspace-heading`} className="sr-only">{title} conversion workspace</h2>
 
-        <div className="grid min-w-0 items-center gap-4 md:grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)] md:gap-5">
+        <div className="grid min-w-0 items-center gap-1 md:grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)] md:gap-5">
           <div className="min-w-0">
             <label htmlFor={`${categoryId}-from-value`} className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">From</label>
             <Input
@@ -466,6 +466,7 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
               inputMode="text"
               value={fromValue}
               onChange={(event) => setValue(event.target.value)}
+              onFocus={(event) => event.currentTarget.select()}
               className="h-[72px] min-h-[72px] w-full rounded-2xl border-2 border-indigo-500 bg-indigo-50 px-4 text-[clamp(2.75rem,6vw,4.5rem)] font-bold tracking-[-0.045em] text-indigo-950 shadow-inner outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/25 sm:px-5"
               placeholder="0"
               autoCapitalize="off"

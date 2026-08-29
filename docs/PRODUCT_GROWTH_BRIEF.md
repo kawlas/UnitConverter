@@ -96,7 +96,9 @@ unit pickers and dead-scaffold removal reduced the converter route from 45.52 kB
 15.00 kB gzip and compiled CSS from 83.70 kB to 50.80 kB in the 2026-08-28 release candidate.
 Consent-gated product events now measure conversion completion and explicit copy, share,
 favorite, saved-playback and batch-copy actions using category IDs only, without sending
-conversion values or URL query state.
+conversion values or URL query state. Successful smart-query and single-category search
+navigation use the same privacy boundary: only the resolved category ID is measured, never
+the text that the visitor typed.
 The existing volume and weight tools now cover explicitly named US liquid cooking measures
 and British stone, extending real utility without creating new low-value routes.
 Pair expansion must wait for Search Console evidence and continue to

@@ -176,9 +176,9 @@ export default function ConverterPage() {
 
       <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)]">
         <Navbar />
-        <main className="mx-auto max-w-4xl px-4 py-3 sm:px-6 sm:py-5 lg:py-6">
+        <main className="mx-auto max-w-4xl px-4 py-2 sm:px-6 sm:py-5 lg:py-6">
           <div>
-            <header className="mb-3 sm:mb-4">
+            <header className="mb-2 sm:mb-4">
               <nav aria-label="Breadcrumb">
                 <ol className="flex min-h-11 flex-wrap items-center gap-1.5 text-xs font-semibold text-slate-600 sm:text-sm">
                   <li>
@@ -198,7 +198,7 @@ export default function ConverterPage() {
                   </li>
                 </ol>
               </nav>
-              <h1 className="mt-1 text-[1.75rem] font-bold leading-[1.05] tracking-[-0.035em] text-slate-950 sm:text-4xl">
+              <h1 className="text-2xl font-bold leading-[1.05] tracking-[-0.035em] text-slate-950 sm:mt-1 sm:text-4xl">
                 {toolName}
               </h1>
             </header>

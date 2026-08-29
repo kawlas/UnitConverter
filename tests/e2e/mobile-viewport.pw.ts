@@ -4,6 +4,56 @@ const MOBILE = { width: 320, height: 568 };
 const DESKTOP = { width: 1280, height: 800 };
 
 test.describe("320x568 mobile viewport", () => {
+  test("first typing replaces the prefilled value", async ({ page }) => {
+    await page.setViewportSize(MOBILE);
+    await page.goto("/length?value=12", { waitUntil: "networkidle" });
+
+    const input = page.getByRole("textbox", { name: "From" });
+    await expect(input).toHaveValue("12");
+    await input.click();
+    await input.pressSequentially("5");
+
+    await expect(input).toHaveValue("5");
+    await expect(page.getByRole("textbox", { name: "To" })).toHaveValue("16.4");
+  });
+
+  test("complete primary conversion flow stays above the fold", async ({ page }) => {
+    await page.setViewportSize(MOBILE);
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "q-converter:analytics-consent:v1",
+        JSON.stringify({ choice: "declined", updatedAt: Date.now() }),
+      );
+    });
+    for (const landing of [
+      { path: "/length", heading: "Length Converter" },
+      { path: "/length/meters-to-feet", heading: "Meters to Feet Converter" },
+    ]) {
+      await page.goto(landing.path, { waitUntil: "networkidle" });
+
+      const primaryControls = [
+        page.getByRole("heading", { name: landing.heading, exact: true }),
+        page.getByRole("textbox", { name: "From" }),
+        page.getByRole("combobox", { name: "Source unit" }),
+        page.getByRole("button", { name: "Swap units" }),
+        page.getByRole("textbox", { name: "To" }),
+        page.getByRole("button", { name: "Copy result" }),
+        page.getByRole("combobox", { name: "Target unit" }),
+      ];
+
+      for (const control of primaryControls) {
+        const box = await control.boundingBox();
+        expect(box, `${landing.path}: primary conversion control not found`).not.toBeNull();
+        expect(
+          box!.y + box!.height,
+          `${landing.path}: primary conversion control bottom (${(box!.y + box!.height).toFixed(0)}) must fit within ${MOBILE.height}px`,
+        ).toBeLessThanOrEqual(MOBILE.height);
+      }
+
+      await expect(page.getByRole("textbox", { name: "To" })).toHaveValue("3.28");
+    }
+  });
+
   test("length converter input is fully visible and consent does not overlap it", async ({ page }) => {
     await page.setViewportSize(MOBILE);
     await page.goto("/length", { waitUntil: "networkidle" });

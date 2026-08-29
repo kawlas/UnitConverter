@@ -89,11 +89,24 @@ const resolveUnit = (rawUnit: string): readonly UnitCandidate[] => {
   );
 };
 
+const localizedUnitAmbiguity = (rawUnit: string): string | undefined => {
+  const unit = normalizeUnitText(rawUnit);
+  if (unit === "pfund") {
+    return "German “Pfund” commonly means 500 g. Use lb or “englische Pfund” for international pounds.";
+  }
+  if (unit === "livre" || unit === "livres") {
+    return "French “livre” can mean 500 g. Use lb or “livres anglaises” for international pounds.";
+  }
+  return undefined;
+};
+
 const fractionToken = `(?:(?:\\d+\\s+)?\\d+\\s*[\\/⁄]\\s*\\d+|(?:\\d+\\s*)?[${VULGAR_FRACTION_CHARACTERS}])`;
 const decimalToken = `(?:(?:\\d+(?:[.,]\\d*)?)|(?:[.,]\\d+))(?:e[+-]?\\d+)?`;
-const queryPattern = new RegExp(`^(?:(?:convert|przelicz|zamień|zamien)\\s+|(?:ile\\s+(?:to|jest))\\s+)?([+-]?(?:${fractionToken}|${decimalToken}))\\s*(.+?)\\s+(?:to|in|into|as|na|w|=>|->|=|ile\\s+to)\\s+(.+?)\\s*\\??$`, "i");
+const queryCommand = "(?:convert|przelicz|zamień|zamien|rechne|berechne|wandle|convertir|convertis|convertissez)";
+const queryConnector = "(?:to|in|into|as|na|w|zu|en|vers|=>|->|=|ile\\s+to)";
+const queryPattern = new RegExp(`^(?:${queryCommand}\\s+|(?:ile\\s+(?:to|jest))\\s+)?([+-]?(?:${fractionToken}|${decimalToken}))\\s*(.+?)\\s+${queryConnector}\\s+(.+?)\\s*\\??$`, "i");
 const compoundFeetInchesPattern = new RegExp(
-  `^(?:(?:convert|przelicz|zamień|zamien)\\s+|(?:ile\\s+(?:to|jest))\\s+)?(${decimalToken})\\s*(?:ft|feet|foot|['′])\\s*(${decimalToken})\\s*(?:in|inches|inch|["″])?\\s+(?:to|in|into|as|na|w|=>|->|=)\\s+(.+?)\\s*\\??$`,
+  `^(?:${queryCommand}\\s+|(?:ile\\s+(?:to|jest))\\s+)?(${decimalToken})\\s*(?:ft|feet|foot|['′])\\s*(${decimalToken})\\s*(?:in|inches|inch|["″])?\\s+${queryConnector}\\s+(.+?)\\s*\\??$`,
   "i",
 );
 
@@ -155,6 +168,9 @@ export const parseSmartConversionQuery = (query: string): SmartConversionQuery =
   if (!serializeShareableValue(value)) {
     return { status: "invalid", message: "That number is outside the supported shareable input range." };
   }
+
+  const localizedAmbiguity = localizedUnitAmbiguity(match[2]) ?? localizedUnitAmbiguity(match[3]);
+  if (localizedAmbiguity) return { status: "ambiguous", message: localizedAmbiguity };
 
   const fromCandidates = resolveUnit(match[2]);
   const toCandidates = resolveUnit(match[3]);
