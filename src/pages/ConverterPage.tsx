@@ -3,9 +3,9 @@ import { Helmet } from "react-helmet";
 import { categories } from "@/lib/conversion-data";
 import ConversionSection from "@/components/ConversionSection";
 import BMICalculator from "@/components/BMICalculator";
-import AdCard from "@/components/AdCard";
-import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { SavedConversions } from "@/components/SavedConversions";
 
 const unitDescriptions = {
   bmi: "Body Mass Index (BMI) is a simple measure that uses your height and weight to work out if your weight is healthy. The BMI calculation divides an adult's weight in kilograms by their height in metres squared.",
@@ -35,8 +35,6 @@ export default function ConverterPage() {
   }
 
   const { title, units, id } = category;
-  const commonUnits = units.slice(0, 2);
-  const commonConversion = `${commonUnits[0].label} to ${commonUnits[1].label}`;
 
   return (
     <>
@@ -44,81 +42,43 @@ export default function ConverterPage() {
         <title>{title} Converter - Free Online Q Conversion</title>
         <meta
           name="description"
-          content={`Convert ${title.toLowerCase()} measurements online. Free ${title.toLowerCase()} converter with common conversions like ${commonConversion}. Quick and accurate results.`}
+          content={`Convert ${title.toLowerCase()} measurements online. Free ${title.toLowerCase()} converter with common conversions. Quick and accurate results.`}
         />
         <meta
           name="keywords"
-          content={`${title.toLowerCase()} converter, ${commonConversion.toLowerCase()}, ${title.toLowerCase()} unit converter, ${units.map((u) => u.label.toLowerCase()).join(", ")}`}
+          content={`${title.toLowerCase()} converter, ${title.toLowerCase()} unit converter, ${units.map((u) => u.label.toLowerCase()).join(", ")}`}
         />
       </Helmet>
 
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="py-8 px-4">
-          <div className="max-w-3xl mx-auto space-y-6">
-            <div className="text-center space-y-4">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+
+        <main className="px-4 pb-20 pt-6">
+          <div className="mx-auto max-w-3xl space-y-8">
+            <header className="space-y-3 text-center">
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                 {title} Converter
               </h1>
-              <p className="text-lg text-gray-600">
-                Convert between different {title.toLowerCase()} units quickly
-                and accurately
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Enter a value once, then change units to see instant results.
               </p>
-            </div>
+            </header>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              {id === "bmi" ? (
-                <BMICalculator title={title} />
-              ) : (
-                <ConversionSection
-                  title={title}
-                  units={units}
-                  categoryId={id}
-                />
-              )}
-            </div>
+            <ConversionSection
+              title={title}
+              units={units}
+              categoryId={id}
+            />
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-xl font-semibold mb-3">
-                About {title} Units
+            <section className="space-y-3">
+              <h2 className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                Saved for later
               </h2>
-              <p className="text-gray-600 leading-relaxed">
-                {unitDescriptions[id as keyof typeof unitDescriptions]}
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">
-                Common {title} Conversions
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {units.slice(0, 2).map((fromUnit) =>
-                  units.slice(0, 2).map((toUnit) => {
-                    if (fromUnit.value === toUnit.value) return null;
-                    return (
-                      <div
-                        key={`${fromUnit.value}-${toUnit.value}`}
-                        className="p-4 bg-white rounded-lg border border-gray-100"
-                      >
-                        <h3 className="font-medium">
-                          {fromUnit.label} to {toUnit.label}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          Quick {fromUnit.label.toLowerCase()} to{" "}
-                          {toUnit.label.toLowerCase()} conversion
-                        </p>
-                      </div>
-                    );
-                  }),
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="max-w-3xl mx-auto mt-8">
-            <AdCard />
+              <SavedConversions categoryId={id} units={units} />
+            </section>
           </div>
         </main>
+
         <Footer />
       </div>
     </>

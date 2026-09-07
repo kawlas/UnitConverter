@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { ArrowUpDown, RotateCcw } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { ArrowUpDown, RotateCcw, Copy } from "lucide-react";
 import { Button } from "./ui/button";
-import { convert } from "@/lib/conversions";
+import { Input } from "./ui/input";
 import {
   Select,
   SelectContent,
@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Input } from "./ui/input";
+import { convert } from "@/lib/conversions";
 
 interface ConversionSectionProps {
   title?: string;
@@ -41,112 +41,160 @@ const ConversionSection: React.FC<ConversionSectionProps> = ({
     to: units[1]?.value || "",
   };
 
-  const [fromValue, setFromValue] = useState<string>("0");
+  const [fromValue, setFromValue] = useState<string>("1");
   const [fromUnit, setFromUnit] = useState<string>(defaults.from);
   const [toUnit, setToUnit] = useState<string>(defaults.to);
-  const [result, setResult] = useState<string>("0");
+  const [copied, setCopied] = useState(false);
 
-  // Function to perform conversion
-  const updateConversion = (value: string, from: string, to: string) => {
-    const numericValue = parseFloat(value);
-    if (isNaN(numericValue)) {
-      setResult("0");
-      return;
+  const numericValue = useMemo(() => parseFloat(fromValue), [fromValue]);
+  const result = useMemo(() => {
+    if (isNaN(numericValue)) return "0";
+    const convertedValue = convert(numericValue, fromUnit, toUnit, categoryId);
+    return convertedValue.toString();
+  }, [numericValue, fromUnit, toUnit, categoryId]);
+
+  const presetPairs = useMemo(() => {
+    const pairSet = new Set<string>();
+    const pairs: { from: string; to: string; label: string }[] = [];
+    for (const unit of units) {
+      if (unit.value === fromUnit) continue;
+      const key = `${fromUnit}->${unit.value}`;
+      if (!pairSet.has(key)) {
+        pairSet.add(key);
+        pairs.push({ from: fromUnit, to: unit.value, label: unit.label });
+      }
     }
-    const convertedValue = convert(numericValue, from, to, categoryId);
-    setResult(convertedValue.toString());
-  };
-
-  // Update conversion whenever inputs change
-  useEffect(() => {
-    updateConversion(fromValue, fromUnit, toUnit);
-  }, [fromValue, fromUnit, toUnit]);
+    return pairs.slice(0, 4);
+  }, [units, fromUnit]);
 
   const resetToDefaults = () => {
-    setFromValue("0");
+    setFromValue("1");
     setFromUnit(defaults.from);
     setToUnit(defaults.to);
   };
 
-  return (
-    <div className="space-y-6">
-      <h2 className="font-medium text-lg">{title}</h2>
+  const swapUnits = () => {
+    const tempUnit = fromUnit;
+    setFromUnit(toUnit);
+    setToUnit(tempUnit);
+    setFromValue(result);
+  };
 
-      <div className="space-y-4">
-        <div className="grid grid-cols-[120px_1fr] gap-4 items-center">
-          {/* From Section */}
-          <div className="text-sm font-medium">From</div>
-          <div className="flex items-center gap-2">
+  const copyResult = async () => {
+    try {
+      await navigator.clipboard.writeText(result);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <div className="w-full">
+      <div className="rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <Input
               type="number"
               value={fromValue}
               onChange={(e) => setFromValue(e.target.value)}
-              className="w-[120px]"
+              className="h-14 text-2xl font-semibold tracking-tight sm:w-44"
               placeholder="0"
             />
-            <Select value={fromUnit} onValueChange={setFromUnit}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {units.map((unit) => (
-                  <SelectItem key={unit.value} value={unit.value}>
-                    {unit.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
+              <Select value={fromUnit} onValueChange={setFromUnit}>
+                <SelectTrigger className="h-12 w-full sm:w-44">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {units.map((unit) => (
+                    <SelectItem key={unit.value} value={unit.value}>
+                      {unit.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <div className="flex items-center justify-center">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={swapUnits}
+                  className="h-10 w-10 rounded-full"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <Select value={toUnit} onValueChange={setToUnit}>
+                <SelectTrigger className="h-12 w-full sm:w-44">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {units.map((unit) => (
+                    <SelectItem key={unit.value} value={unit.value}>
+                      {unit.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          {/* To Section */}
-          <div className="text-sm font-medium">To</div>
-          <div className="flex items-center gap-2">
-            <Input
-              type="number"
-              value={result}
-              readOnly
-              className="w-[120px]"
-              placeholder="0"
-            />
-            <Select value={toUnit} onValueChange={setToUnit}>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {units.map((unit) => (
-                  <SelectItem key={unit.value} value={unit.value}>
-                    {unit.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-baseline gap-2">
+              <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Result
+              </span>
+              <span className="text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50">
+                {result}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                className="h-10 px-4 text-sm"
+                onClick={copyResult}
+              >
+                <Copy className="mr-2 h-4 w-4" />
+                {copied ? "Copied" : "Copy result"}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={resetToDefaults}
+                className="h-10 w-10"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => {
-            const tempUnit = fromUnit;
-            setFromUnit(toUnit);
-            setToUnit(tempUnit);
-            setFromValue(result);
-          }}
-          className="h-8 w-8"
-        >
-          <ArrowUpDown className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={resetToDefaults}
-          className="h-8 w-8"
-        >
-          <RotateCcw className="h-4 w-4" />
-        </Button>
+      <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {presetPairs.map((pair) => {
+          const presetResult = convert(
+            numericValue || 0,
+            pair.from,
+            pair.to,
+            categoryId
+          ).toString();
+          return (
+            <div
+              key={`${pair.from}-${pair.to}`}
+              className="flex items-center justify-between rounded-xl border border-slate-200 bg-white/70 px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-900/60"
+            >
+              <span className="text-slate-600 dark:text-slate-300">
+                {pair.label}
+              </span>
+              <span className="font-semibold text-slate-900 dark:text-slate-100">
+                {presetResult}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
