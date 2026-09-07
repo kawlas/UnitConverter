@@ -1,0 +1,16 @@
+{
+  "project": "UNI CONVERTER",
+  "branch": "feature/yolo-uni-converter-overhaul",
+  "security_guard": {
+    "status": "ACTIVE",
+    "rule": "Brak wycieków sekretów, brak hardcoded kluczy API, walidacja inputów, safety-first na buildach produkcyjnych."
+  },
+  "agents": [
+    {"name": "Orchestrator", "role": "Main loop & coordination"},
+    {"name": "Security Guard", "role": "Audit changes, check security & secrets"},
+    {"name": "Researcher", "role": "SEO long-tail keywords & international growth"},
+    {"name": "Frontend/Backend", "role": "Vite React TS performance & UX"},
+    {"name": "Product Manager", "role": "Roadmap & user stories"}
+  ],
+  "synced": true
+}
