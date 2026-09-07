@@ -90,6 +90,29 @@ const factFaq = (question: string, answer: string): CategoryDefinition["faq"] =>
     question: "Are the results rounded?",
     answer: "The calculation retains full JavaScript number precision; the precision control only formats the displayed result.",
   },
+  {
+    id: "storage",
+    title: "Storage & Transfer",
+    units: [
+      { value: "bytes", label: "Bytes" },
+      { value: "kilobytes", label: "KB" },
+      { value: "megabytes", label: "MB" },
+      { value: "gigabytes", label: "GB" },
+      { value: "terabytes", label: "TB" },
+      { value: "bits", label: "Bits" },
+      { value: "megabits", label: "Mbps" },
+    ],
+  },
+  {
+    id: "temperature-detail",
+    title: "Temperature Scaling",
+    units: [
+      { value: "celsius", label: "Celsius (°C)" },
+      { value: "fahrenheit", label: "Fahrenheit (°F)" },
+      { value: "kelvin", label: "Kelvin (K)" },
+      { value: "gas_mark", label: "Gas Mark (UK Oven)" },
+    ],
+  },
 ];
 
 const definitions: CategoryDefinition[] = [
