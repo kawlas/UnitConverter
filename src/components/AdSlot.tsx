@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { adConfig } from "@/lib/ads";
 
 interface AdSlotProps {
@@ -5,16 +6,37 @@ interface AdSlotProps {
 }
 
 export default function AdSlot({ placement }: AdSlotProps) {
-  if (!adConfig.enabled) {
+  useEffect(() => {
+    if (!adConfig.enabled || !adConfig.clientId || !adConfig.slotId) {
+      return;
+    }
+
+    const pushAd = () => {
+      try {
+        // @ts-ignore - adsbygoogle injected by Google script
+        window.adsbygoogle?.push({});
+      } catch {
+        // ignore ad fill failures
+      }
+    };
+
+    pushAd();
+  }, [placement]);
+
+  if (!adConfig.enabled || !adConfig.clientId || !adConfig.slotId) {
     return null;
   }
 
   return (
     <aside aria-label="Advertisement" data-ad-placement={placement} className="my-8 flex min-h-[120px] w-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 text-center sm:min-h-[180px]">
-      <div>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Advertisement</p>
-        <p className="mt-2 text-xs text-slate-600">Reserved responsive Google ad space</p>
-      </div>
+      <ins
+        className="adsbygoogle block w-full"
+        style={{ display: "block", minHeight: "120px" }}
+        data-ad-client={adConfig.clientId}
+        data-ad-slot={adConfig.slotId}
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      />
     </aside>
   );
 }
