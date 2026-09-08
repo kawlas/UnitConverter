@@ -21,10 +21,7 @@ export const evaluateExpression = (expression: string): number => {
     throw new Error('Invalid expression');
   }
 
-  // Pre-process percentage: e.g., "5%" -> "(5/100)", "90*3*5%" -> "90*3*(5/100)"
-  const expanded = expression.replace(/([0-9.]+)\s*%/g, '($1/100)');
-
-  const sanitized = sanitizeExpression(expanded);
+  const sanitized = sanitizeExpression(expression);
   if (!sanitized.trim()) {
     return 0;
   }
