@@ -10,8 +10,6 @@ const primaryCategories = primaryCategoryIds.flatMap((id) => {
   return category ? [category] : [];
 });
 
-const calculatorLink = { to: "/calculator", label: "Calculator" };
-
 export default function Navbar() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -74,6 +72,13 @@ export default function Navbar() {
               })}
             </div>
           </div>
+
+          <Link
+            to="/calculator"
+            className="ml-3 hidden md:inline-flex min-h-12 shrink-0 items-center rounded-lg bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
+          >
+            Calculator
+          </Link>
 
           <button
             ref={menuButtonRef}
