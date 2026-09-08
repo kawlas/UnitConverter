@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 interface Message {
   agent: string;
@@ -14,19 +14,17 @@ const starterLines = [
   'Research: users want quick math + unit conversion bridge.',
 ];
 
-export default function AgentChat() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
+function buildStarterMessages() {
+  return starterLines.map((text, index) => ({
+    agent: agents[index % agents.length],
+    text,
+    timestamp: Date.now() - (starterLines.length - index) * 1000,
+  }));
+}
 
-  useEffect(() => {
-    setMessages(
-      starterLines.map((text, index) => ({
-        agent: agents[index % agents.length],
-        text,
-        timestamp: Date.now() - (starterLines.length - index) * 1000,
-      })),
-    );
-  }, []);
+export default function AgentChat() {
+  const [messages, setMessages] = useState<Message[]>(buildStarterMessages);
+  const [input, setInput] = useState('');
 
   const send = () => {
     if (!input.trim()) return;

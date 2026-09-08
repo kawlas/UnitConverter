@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { convert } from "@/lib/conversions";
 
 interface ConversionItem {
@@ -19,31 +19,37 @@ interface SavedConversionsProps {
 const STORAGE_KEY = "uni_converter_saved";
 const MAX_ITEMS = 8;
 
+function loadItems(categoryId?: string) {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as ConversionItem[];
+      const filtered = categoryId
+        ? parsed.filter((item) => item.categoryId === categoryId)
+        : parsed;
+      return filtered
+        .slice()
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, MAX_ITEMS);
+    }
+  } catch {
+    return [];
+  }
+  return [];
+}
+
 export function SavedConversions({
   categoryId,
   units = [],
 }: SavedConversionsProps) {
-  const [items, setItems] = useState<ConversionItem[]>([]);
+  const [items, setItems] = useState<ConversionItem[]>(() => loadItems(categoryId));
   const [inputValue, setInputValue] = useState("1");
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as ConversionItem[];
-        const filtered = categoryId
-          ? parsed.filter((item) => item.categoryId === categoryId)
-          : parsed;
-        const sorted = filtered
-          .slice()
-          .sort((a, b) => b.createdAt - a.createdAt)
-          .slice(0, MAX_ITEMS);
-        setItems(sorted);
-      }
-    } catch {
-      setItems([]);
-    }
-  }, [categoryId]);
+  const [prevCategoryId, setPrevCategoryId] = useState(categoryId);
+  if (categoryId !== prevCategoryId) {
+    setPrevCategoryId(categoryId);
+    setItems(loadItems(categoryId));
+  }
 
   const saveCurrent = () => {
     if (!categoryId || !units.length) return;

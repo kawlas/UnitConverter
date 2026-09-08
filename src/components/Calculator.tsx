@@ -1,17 +1,18 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { evaluateExpression } from '@/lib/calculator-parser';
+
+function loadHistory(): string[] {
+  try {
+    const saved = localStorage.getItem('q-converter:calc-history:v1');
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
 
 export default function Calculator() {
   const [display, setDisplay] = useState('0');
-
-  const history = useMemo(() => {
-    try {
-      const saved = localStorage.getItem('q-converter:calc-history:v1');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  }, []);
+  const [history, setHistory] = useState<string[]>(loadHistory);
 
   const saveHistory = (next: string[]) => {
     localStorage.setItem('q-converter:calc-history:v1', JSON.stringify(next));
@@ -24,6 +25,7 @@ export default function Calculator() {
         const entry = `${display} = ${result}`;
         const next = [entry, ...history.filter((item) => !item.startsWith(display))].slice(0, 20);
         saveHistory(next);
+        setHistory(next);
         setDisplay(String(result));
       } catch {
         setDisplay('Error');
