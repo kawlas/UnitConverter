@@ -10,6 +10,8 @@ const primaryCategories = primaryCategoryIds.flatMap((id) => {
   return category ? [category] : [];
 });
 
+const calculatorLink = { to: "/calculator", label: "Calculator" };
+
 export default function Navbar() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);

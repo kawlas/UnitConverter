@@ -13,17 +13,18 @@ export const evaluateExpression = (expression: string): number => {
     throw new Error('Invalid expression');
   }
   
-  // First check: reject anything with letters, underscores, dollar signs, or function-like patterns
   if (/[a-zA-Z_$]/.test(expression)) {
     throw new Error('Invalid expression');
   }
   
-  // Reject obvious function calls like alert(), console.log(), etc.
   if (/[a-zA-Z_$][a-zA-Z0-9_$]*\s*\(/.test(expression)) {
     throw new Error('Invalid expression');
   }
-  
-  const sanitized = sanitizeExpression(expression);
+
+  // Pre-process percentage: e.g., "5%" -> "(5/100)", "90*3*5%" -> "90*3*(5/100)"
+  const expanded = expression.replace(/([0-9.]+)\s*%/g, '($1/100)');
+
+  const sanitized = sanitizeExpression(expanded);
   if (!sanitized.trim()) {
     return 0;
   }

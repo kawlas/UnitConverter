@@ -73,7 +73,8 @@ export default function Calculator() {
       setError(null);
       const res = evaluateExpression(targetExpr);
       setDisplay(String(res));
-      
+      setExpression(''); // clear expression after calculation so new input starts fresh
+
       const newItem: HistoryItem = {
         id: Math.random().toString(36).substring(2, 9),
         expression: targetExpr,
@@ -89,7 +90,7 @@ export default function Calculator() {
         // ignore
       }
 
-      updateUrlSync(targetExpr);
+      updateUrlSync('');
     } catch {
       setError('Błąd składni');
     }
