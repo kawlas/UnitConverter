@@ -8,8 +8,18 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
+let clientTheme: Theme = 'light';
+let clientSetTheme: (t: Theme) => void = () => {};
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => (typeof window !== 'undefined' ? (localStorage.getItem('theme') as Theme) || 'light' : 'light'));
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('theme') as Theme) || 'light';
+    }
+    clientTheme = 'light';
+    clientSetTheme = setTheme;
+    return 'light';
+  });
 
   useEffect(() => {
     const root = document.documentElement;

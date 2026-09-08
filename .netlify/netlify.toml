@@ -68,6 +68,18 @@ force = true
 [redirects.headers]
 
 [[redirects]]
+from = "/calculator"
+to = "/calculator/index.html"
+status = 200.0
+force = true
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
 from = "/height"
 to = "/height/index.html"
 status = 200.0
