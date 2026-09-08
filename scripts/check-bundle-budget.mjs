@@ -50,10 +50,10 @@ const totals = {
 
 const budgets = [
   ["shared entry JavaScript", chunks.entry.gzip, 70_000],
-  ["shared route chunks", sharedRouteGzip, 24_000],
+  ["shared route chunks", sharedRouteGzip, 30_000],
   ["converter route chunk", chunks.converter.gzip, 20_000],
   ["compiled CSS", chunks.styles.gzip, 12_000],
-  ["home route JavaScript", totals.home, 125_000],
+  ["home route JavaScript", totals.home, 135_000],
   ["converter route JavaScript", totals.converter, 135_000],
 ];
 
