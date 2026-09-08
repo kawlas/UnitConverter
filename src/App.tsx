@@ -5,6 +5,7 @@ import ConnectivityStatus from "./components/ConnectivityStatus";
 
 const ConverterPage = lazy(() => import("./pages/ConverterPage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
+const CalculatorPage = lazy(() => import("./pages/CalculatorPage"));
 
 function TempoRoutes({ routes }: { routes: RouteObject[] }) {
   return useRoutes(routes);

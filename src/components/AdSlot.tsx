@@ -13,7 +13,7 @@ export default function AdSlot({ placement }: AdSlotProps) {
 
     const pushAd = () => {
       try {
-        // @ts-ignore - adsbygoogle injected by Google script
+        // @ts-expect-error - adsbygoogle injected by Google script
         window.adsbygoogle?.push({});
       } catch {
         // ignore ad fill failures
