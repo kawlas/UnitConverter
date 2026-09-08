@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { Route, Routes, useRoutes, type RouteObject } from "react-router-dom";
 import ConnectivityStatus from "./components/ConnectivityStatus";
+import { ThemeProvider } from "./components/DarkModeProvider";
 // `tempo-routes` is optional at runtime; dynamically load when enabled.
 
 const ConverterPage = lazy(() => import("./pages/ConverterPage"));
@@ -31,18 +32,20 @@ function App() {
         </div>
       }
     >
-      <div>
-        <ConnectivityStatus />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/convert/:categoryId" element={<ConverterPage />} />
-          <Route path="/:categoryId/:pairId" element={<ConverterPage />} />
-          <Route path="/:categoryId" element={<ConverterPage />} />
-  <Route path="/calculator" element={<CalculatorPage />} />
-          {tempoEnabled && <Route path="/tempobook/*" />}
-        </Routes>
-        {tempoEnabled && <TempoRoutes routes={externalRoutes} />}
-      </div>
+      <ThemeProvider>
+        <div>
+          <ConnectivityStatus />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/convert/:categoryId" element={<ConverterPage />} />
+            <Route path="/:categoryId/:pairId" element={<ConverterPage />} />
+            <Route path="/:categoryId" element={<ConverterPage />} />
+            <Route path="/calculator" element={<CalculatorPage />} />
+            {tempoEnabled && <Route path="/tempobook/*" />}
+          </Routes>
+          {tempoEnabled && <TempoRoutes routes={externalRoutes} />}
+        </div>
+      </ThemeProvider>
     </Suspense>
   );
 }
