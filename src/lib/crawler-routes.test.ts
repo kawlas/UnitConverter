@@ -9,6 +9,7 @@ const projectFile = (...segments: string[]) =>
 
 const canonicalPaths = [
   "/",
+  "/calculator",
   ...categoryDefinitions.map(({ id }) => `/${id}`),
   ...pairPages.map(pairPagePath),
 ];
@@ -49,6 +50,7 @@ describe("crawler and route contracts", () => {
       "/convert/:categoryId /:categoryId 301!",
     );
     const prerenderedPaths = [
+      "/calculator",
       ...categoryDefinitions.map(({ id }) => `/${id}`),
       ...pairPages.map(pairPagePath),
     ];

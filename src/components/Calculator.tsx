@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { evaluateExpression } from '../lib/calculator-parser';
 
 interface HistoryItem {
@@ -22,7 +22,7 @@ export default function Calculator() {
         const parsed: HistoryItem[] = JSON.parse(saved);
         const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
         const valid = parsed.filter(item => item.timestamp > thirtyDaysAgo);
-        // Use functional update to avoid setState in effect warning
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setHistory(valid);
         localStorage.setItem('q_calculator_history', JSON.stringify(valid));
       }
@@ -43,12 +43,13 @@ export default function Calculator() {
       setExpression(exprParam);
       try {
         const res = evaluateExpression(exprParam);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDisplay(String(res));
       } catch {
         // ignore invalid URL expressions
       }
     }
-  }, [expression]);
+  }, []);
 
   const updateUrlSync = (newExpr: string) => {
     try {
