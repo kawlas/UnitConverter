@@ -10,6 +10,7 @@ import { AnalyticsConsentProvider } from "./components/AnalyticsConsent";
 
 export const prerenderRoutes = [
   "/",
+  "/calculator",
   ...categories.map(({ id }) => `/${id}`),
   ...pairPages.map(pairPagePath),
 ];
