@@ -8,6 +8,7 @@ import SearchBar from "@/components/SearchBar";
 import AdSlot from "@/components/AdSlot";
 import { categories } from "@/lib/conversion-data";
 import { pairPagePath, pairPages } from "@/lib/pair-pages";
+import ConversionSection from "@/components/ConversionSection";
 
 const HOME_TITLE = "Q Converter — Free Online Unit Converter";
 const HOME_DESCRIPTION = "Convert length, area, pressure, digital data, time and more with a precise, shareable online unit converter.";
@@ -65,6 +66,11 @@ export default function HomePage() {
                 </div>
                 <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:mt-5 sm:text-lg sm:leading-7">Type the conversion the way you think it. Get the answer instantly — no forms, no hunting through dropdowns.</p>
             </div>
+          </section>
+
+          <section className="mt-10 sm:mt-14" aria-labelledby="home-conversion-heading">
+            <h2 id="home-conversion-heading" className="sr-only">Quick converter</h2>
+            <ConversionSection title="Length" categoryId="length" />
           </section>
 
           <section className="mt-14 sm:mt-20" aria-labelledby="categories-heading">
