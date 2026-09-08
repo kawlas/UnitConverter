@@ -21,7 +21,11 @@ export const evaluateExpression = (expression: string): number => {
     throw new Error('Invalid expression');
   }
 
-  const sanitized = sanitizeExpression(expression);
+  // Convert percentage postfix to division: "5%" or "5 %" at end/middle -> "(5/100)"
+  // But keep modulo when % is between two numbers: "50 % 10" stays as modulo
+  const withPercentage = expression.replace(/([0-9.]+)\s*%(?!\s*[0-9])/g, '($1/100)');
+
+  const sanitized = sanitizeExpression(withPercentage);
   if (!sanitized.trim()) {
     return 0;
   }
@@ -134,6 +138,15 @@ function tokenize(input: string): string[] {
       while (i < input.length && /[0-9.]/.test(input[i])) {
         numStr += input[i];
         i++;
+      }
+      // Support percent notation: 5% => 0.05
+      if (i < input.length && input[i] === '%') {
+        const value = parseFloat(numStr);
+        if (!isNaN(value)) {
+          tokens.push(String(value / 100));
+          i++;
+          continue;
+        }
       }
       tokens.push(numStr);
       continue;

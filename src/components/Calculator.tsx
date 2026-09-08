@@ -67,13 +67,13 @@ export default function Calculator() {
 
   const handleCalculate = (exprToCalc?: string) => {
     const targetExpr = exprToCalc !== undefined ? exprToCalc : expression;
-    if (!targetExpr.trim()) return;
+    if (!targetExpr.trim() && !exprToCalc) return;
 
     try {
       setError(null);
       const res = evaluateExpression(targetExpr);
       setDisplay(String(res));
-      setExpression(''); // clear expression after calculation so new input starts fresh
+      setExpression('');
 
       const newItem: HistoryItem = {
         id: Math.random().toString(36).substring(2, 9),
@@ -82,7 +82,7 @@ export default function Calculator() {
         timestamp: Date.now()
       };
 
-      const updatedHistory = [newItem, ...history].slice(0, 20); // Keep max 20 items
+      const updatedHistory = [newItem, ...history].slice(0, 20);
       setHistory(updatedHistory);
       try {
         localStorage.setItem('q_calculator_history', JSON.stringify(updatedHistory));
@@ -187,9 +187,9 @@ export default function Calculator() {
 
       {/* History Sidebar */}
       <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl p-6 border border-zinc-200 dark:border-zinc-800 flex flex-col h-[500px]">
-        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-3 flex items-center justify-between">
+        <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-3">
           <span>Ostatnie obliczenia</span>
-          <span className="text-xs bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded text-zinc-500">{history.length}/20</span>
+          <span className="text-xs bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded text-zinc-500 float-right">{history.length}/20</span>
         </h3>
         <div className="flex-1 overflow-y-auto space-y-2 pr-1">
           {history.length === 0 ? (
